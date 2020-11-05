@@ -16,6 +16,11 @@ public class UserWrapper implements WrappedEntity<User> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }

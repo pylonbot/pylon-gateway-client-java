@@ -18,6 +18,11 @@ public class ChannelWrapper implements WrappedEntity<Channel> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }

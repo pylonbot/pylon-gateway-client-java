@@ -16,6 +16,11 @@ public class VoiceStateWrapper implements WrappedEntity<VoiceStateData> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }
@@ -32,5 +37,9 @@ public class VoiceStateWrapper implements WrappedEntity<VoiceStateData> {
 
     public ChannelWrapper getChannel() {
         return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
+    }
+
+    public MemberWrapper getMember() {
+        return new MemberWrapper(cacheService, getBotId(), getData().getMember());
     }
 }

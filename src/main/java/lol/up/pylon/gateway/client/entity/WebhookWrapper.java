@@ -16,6 +16,11 @@ public class WebhookWrapper implements WrappedEntity<Webhook> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }
@@ -28,6 +33,10 @@ public class WebhookWrapper implements WrappedEntity<Webhook> {
     @Override
     public Webhook getData() {
         return data;
+    }
+
+    public ChannelWrapper getChannel() {
+        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
     }
 
 }

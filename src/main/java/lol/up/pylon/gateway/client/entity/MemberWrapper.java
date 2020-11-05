@@ -21,6 +21,11 @@ public class MemberWrapper implements WrappedEntity<Member> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }
@@ -42,5 +47,9 @@ public class MemberWrapper implements WrappedEntity<Member> {
         return data.getRolesList().stream()
                 .map(roleMap::get)
                 .collect(Collectors.toList());
+    }
+
+    public UserWrapper getUser() {
+        return new UserWrapper(cacheService, getBotId(), getData().getUser());
     }
 }

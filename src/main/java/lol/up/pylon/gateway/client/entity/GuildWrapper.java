@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.*;
+import rpc.gateway.v1.Guild;
 
 import java.util.List;
 
@@ -18,6 +18,11 @@ public class GuildWrapper implements WrappedEntity<Guild> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }
@@ -30,6 +35,22 @@ public class GuildWrapper implements WrappedEntity<Guild> {
     @Override
     public Guild getData() {
         return data;
+    }
+
+    public ChannelWrapper getChannelById(final long channelId) {
+        return cacheService.getChannel(getBotId(), getGuildId(), channelId);
+    }
+
+    public RoleWrapper getRoleById(final long roleId) {
+        return cacheService.getRole(getBotId(), getGuildId(), roleId);
+    }
+
+    public MemberWrapper getMemberById(final long memberId) {
+        return cacheService.getMember(getBotId(), getGuildId(), memberId);
+    }
+
+    public EmojiWrapper getEmojiById(final long emojiId) {
+        return cacheService.getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
     public List<ChannelWrapper> listChannels() {

@@ -16,6 +16,11 @@ public class RoleWrapper implements WrappedEntity<Role> {
     }
 
     @Override
+    public GatewayCacheService getGatewayCacheService() {
+        return cacheService;
+    }
+
+    @Override
     public long getBotId() {
         return botId;
     }
