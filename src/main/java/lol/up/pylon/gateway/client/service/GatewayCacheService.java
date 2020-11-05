@@ -52,6 +52,117 @@ public class GatewayCacheService {
         }
     }
 
+    @Nullable
+    public Channel getChannel(final long guildId, final long channelId) throws GrpcRequestException {
+        return getChannel(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+    }
+
+    @Nullable
+    public Channel getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final GetGuildChannelResponse response = client.getGuildChannel(GetGuildChannelRequest.newBuilder()
+                        .setChannelId(channelId)
+                        .build());
+                return response.hasChannel() ? response.getChannel() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getChannel gRPC", throwable);
+        }
+    }
+
+    @Nullable
+    public Member getMember(final long guildId, final long userId) throws GrpcRequestException {
+        return getMember(gatewayGrpcClient.getDefaultBotId(), guildId, userId);
+    }
+
+    @Nullable
+    public Member getMember(final long botId, final long guildId, final long userId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final GetGuildMemberResponse response = client.getGuildMember(GetGuildMemberRequest.newBuilder()
+                        .setUserId(userId)
+                        .build());
+                return response.hasMember() ? response.getMember() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getMember gRPC", throwable);
+        }
+    }
+
+    @Nullable
+    public Role getRole(final long guildId, final long roleId) throws GrpcRequestException {
+        return getRole(gatewayGrpcClient.getDefaultBotId(), guildId, roleId);
+    }
+
+    @Nullable
+    public Role getRole(final long botId, final long guildId, final long roleId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final GetGuildRoleResponse response = client.getGuildRole(GetGuildRoleRequest.newBuilder()
+                        .setRoleId(roleId)
+                        .build());
+                return response.hasRole() ? response.getRole() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getRole gRPC", throwable);
+        }
+    }
+
+    @Nullable
+    public Emoji getEmoji(final long guildId, final long emojiId) throws GrpcRequestException {
+        return getEmoji(gatewayGrpcClient.getDefaultBotId(), guildId, emojiId);
+    }
+
+    @Nullable
+    public Emoji getEmoji(final long botId, final long guildId, final long emojiId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final GetGuildEmojiResponse response = client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
+                        .setEmojiId(emojiId)
+                        .build());
+                return response.hasEmoji() ? response.getEmoji() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getEmoji gRPC", throwable);
+        }
+    }
+
+    @Nullable
+    public VoiceStateData getVoiceState(final long guildId, final long userId) throws GrpcRequestException {
+        return getVoiceState(gatewayGrpcClient.getDefaultBotId(), guildId, userId);
+    }
+
+    @Nullable
+    public VoiceStateData getVoiceState(final long botId, final long guildId, final long userId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final GetGuildMemberVoiceStateResponse response = client.getGuildMemberVoiceState(
+                        GetGuildMemberVoiceStateRequest.newBuilder()
+                                .setUserId(userId)
+                                .build());
+                return response.hasVoiceStateData() ? response.getVoiceStateData() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);
+        }
+    }
+
+    @Nullable
+    public User getUser(final long botId, final long userId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L).call(() -> {
+                final GetUserResponse response = client.getUser(
+                        GetUserRequest.newBuilder()
+                                .setUserId(userId)
+                                .build());
+                return response.hasUser() ? response.getUser() : null;
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);
+        }
+    }
+
     public List<Channel> listGuildChannels(final long guildId) throws GrpcRequestException {
         return listGuildChannels(gatewayGrpcClient.getDefaultBotId(), guildId);
     }
@@ -64,7 +175,7 @@ public class GatewayCacheService {
                 return response.getChannelsList();
             });
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildChannels gRPC", throwable);
+            throw new GrpcRequestException("An error occurred during listGuildChannels gRPC", throwable);
         }
     }
 
@@ -99,7 +210,7 @@ public class GatewayCacheService {
                 return response.getMembersList();
             });
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildMembers gRPC", throwable);
+            throw new GrpcRequestException("An error occurred during listGuildMembers gRPC", throwable);
         }
     }
 
@@ -115,7 +226,7 @@ public class GatewayCacheService {
                 return response.getRolesList();
             });
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildRoles gRPC", throwable);
+            throw new GrpcRequestException("An error occurred during listGuildRoles gRPC", throwable);
         }
     }
 
@@ -132,6 +243,42 @@ public class GatewayCacheService {
             });
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuildEmojis gRPC", throwable);
+        }
+    }
+
+    public List<Webhook> listChannelWebhooks(final long guildId, final long channelId) throws GrpcRequestException {
+        return listChannelWebhooks(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+    }
+
+    public List<Webhook> listChannelWebhooks(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final ListTextChannelWebhooksResponse response = client.listTextChannelWebhooks(
+                        ListTextChannelWebhooksRequest.newBuilder()
+                                .setChannelId(channelId)
+                                .build());
+                return response.getWebhooksList();
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during listChannelWebhooks gRPC", throwable);
+        }
+    }
+
+    public List<VoiceStateData> listChannelVoiceStates(final long guildId, final long channelId) throws GrpcRequestException {
+        return listChannelVoiceStates(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+    }
+
+    public List<VoiceStateData> listChannelVoiceStates(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
+        try {
+            return Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId).call(() -> {
+                final ListGuildChannelVoiceStatesResponse response = client.listGuildChannelVoiceStates(
+                        ListGuildChannelVoiceStatesRequest.newBuilder()
+                                .setChannelId(channelId)
+                                .build());
+                return response.getVoiceStatesDataList();
+            });
+        } catch (final Throwable throwable) {
+            throw new GrpcRequestException("An error occurred during listChannelVoiceStates gRPC", throwable);
         }
     }
 }
