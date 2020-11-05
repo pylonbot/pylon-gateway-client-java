@@ -1,0 +1,264 @@
+syntax = "proto3";
+
+package rpc.gateway.v1;
+option java_multiple_files = true;
+option go_package = "up.lol/pylon/rpc/go/rpc/gateway";
+
+// Cluster RPC Service
+
+message ShardKey {
+  uint64 bot_id = 1;
+  uint32 shard_id = 2;
+  uint32 shard_count = 3;
+}
+
+message TransferShardResponse { bytes data = 1; }
+
+service Gateway { rpc TransferShard(ShardKey) returns(TransferShardResponse); }
+
+// Discord Cache Service
+
+message Guild {
+  uint64 id = 1 [jstype = JS_STRING];
+  string name = 2;
+  string icon = 3;
+  string region = 4;
+  uint64 afk_channel_id = 5 [jstype = JS_STRING];
+  uint64 owner_id = 6 [jstype = JS_STRING];
+  string joined_at = 7;
+  string splash = 8;
+  string discovery_splash = 9;
+  uint32 afk_timeout = 10;
+  uint32 member_count = 11;
+  uint32 verification_level = 12;
+  uint32 default_message_notifications = 13;
+  uint32 explicit_content_filter = 14;
+  repeated string features = 15;
+  uint32 mfa_level = 16;
+  bool widget_enabled = 17;
+  uint64 widget_channel_id = 18 [jstype = JS_STRING];
+  uint64 system_channel_id = 19 [jstype = JS_STRING];
+  string vanity_url_code = 20;
+  string description = 21;
+  string banner = 22;
+  uint32 premium_tier = 23;
+  uint32 premium_subscription_count = 24;
+  bool unavailable = 25;
+}
+
+message Channel {
+  uint64 id = 1 [jstype = JS_STRING];
+  uint64 guild_id = 2 [jstype = JS_STRING];
+  string name = 3;
+  string topic = 4;
+  uint32 type = 5;
+  bool nsfw = 6;
+  uint64 position = 7;
+  uint32 bitrate = 8;
+  uint32 user_limit = 9;
+  uint64 parent_id = 10;
+  uint64 rate_limit_per_user = 11;
+  repeated PermissionOverwrite permission_overwrites = 12;
+
+  message PermissionOverwrite {
+    uint64 id = 1;
+    uint32 type = 2;
+    uint64 allow = 3;
+    uint64 deny = 4;
+  }
+}
+
+message User {
+  uint64 id = 1 [jstype = JS_STRING];
+  string username = 2;
+  string avatar = 3;
+  uint32 discriminator = 4;
+  bool bot = 5;
+}
+
+message Member {
+  uint64 id = 1 [jstype = JS_STRING];
+  uint64 guild_id = 2 [jstype = JS_STRING];
+  User user = 3;
+  string nick = 4;
+  repeated uint64 roles = 5 [jstype = JS_STRING];
+  string joined_at = 6;
+  string premium_since = 7;
+  uint64 permissions = 8;
+}
+
+message Role {
+  uint64 id = 1 [jstype = JS_STRING];
+  uint64 guild_id = 2 [jstype = JS_STRING];
+  string name = 3;
+  bool managed = 4;
+  bool mentionable = 5;
+  bool hoist = 6;
+  uint32 color = 7;
+  uint32 position = 8;
+  uint64 permissions = 9 [jstype = JS_STRING];
+}
+
+message Emoji {
+  uint64 id = 1 [jstype = JS_STRING];
+  uint64 guild_id = 2 [jstype = JS_STRING];
+  string name = 3;
+  bool animated = 4;
+  repeated uint64 roles = 5 [jstype = JS_STRING];
+  bool managed = 6;
+  bool require_colons = 7;
+  bool available = 8;
+  uint64 user_id = 9 [jstype = JS_STRING];
+}
+
+message VoiceStateData {
+  Member member = 1;
+  uint64 guild_id = 2 [jstype = JS_STRING];
+  uint64 channel_id = 3 [jstype = JS_STRING];
+  string session_id = 4;
+  bool self_mute = 5;
+  bool self_deaf = 6;
+  bool self_video = 7;
+  bool self_stream = 8;
+  bool mute = 9;
+  bool deaf = 10;
+  bool suppress = 11;
+}
+
+message Webhook {
+  uint64 id = 1 [jstype = JS_STRING];
+  uint64 channel_id = 2 [jstype = JS_STRING];
+  uint64 guild_id = 3 [jstype = JS_STRING];
+  WebhookType type = 4;
+  string name = 5;
+  string avatar = 6;
+  string token = 7;
+}
+
+enum WebhookType { INCOMING = 0; CHANNEL_FOLLOWER = 1; }
+
+// GetGuild
+
+message GetGuildRequest {}
+
+message GetGuildResponse { Guild guild = 1; }
+
+// ListGuildChannels
+
+message ListGuildChannelsRequest {}
+
+message ListGuildChannelsResponse { repeated Channel channels = 1; }
+
+// GetGuildChannel
+
+message GetGuildChannelRequest { uint64 channel_id = 1 [jstype = JS_STRING]; }
+
+message GetGuildChannelResponse { Channel channel = 1; }
+
+// ListGuildMembers
+
+message ListGuildMembersRequest {
+  uint64 after = 1 [jstype = JS_STRING];
+  uint32 limit = 2;
+}
+
+message ListGuildMembersResponse { repeated Member members = 1; }
+
+// GetGuildMember
+
+message GetGuildMemberRequest { uint64 user_id = 1 [jstype = JS_STRING]; }
+
+message GetGuildMemberResponse { Member member = 1; }
+
+// ListGuildRoles
+
+message ListGuildRolesRequest {}
+
+message ListGuildRolesResponse { repeated Role roles = 1; }
+
+// GetGuildRole
+
+message GetGuildRoleRequest { uint64 role_id = 1 [jstype = JS_STRING]; }
+
+message GetGuildRoleResponse { Role role = 1; }
+
+// ListGuildEmojis
+
+message ListGuildEmojisRequest {}
+
+message ListGuildEmojisResponse { repeated Emoji Emojis = 1; }
+
+// GetGuildEmoji
+
+message GetGuildEmojiRequest { uint64 emoji_id = 1 [jstype = JS_STRING]; }
+
+message GetGuildEmojiResponse { Emoji emoji = 1; }
+
+// GetUser
+
+message GetUserRequest { uint64 user_id = 1 [jstype = JS_STRING]; }
+message GetUserResponse { User user = 1; }
+
+// ListTextChannelWebhooks
+
+message ListTextChannelWebhooksRequest {
+  uint64 channel_id = 1 [jstype = JS_STRING];
+}
+
+message ListTextChannelWebhooksResponse { repeated Webhook Webhooks = 1; }
+
+// GetGuildMemberVoiceState
+
+message GetGuildMemberVoiceStateRequest {
+  uint64 user_id = 1 [jstype = JS_STRING];
+}
+
+message GetGuildMemberVoiceStateResponse {
+  VoiceStateData voice_state_data = 1;
+}
+
+// ListGuildChannelVoiceStates
+
+message ListGuildChannelVoiceStatesRequest {
+  uint64 channel_id = 1 [jstype = JS_STRING];
+}
+
+message ListGuildChannelVoiceStatesResponse {
+  repeated VoiceStateData voice_states_data = 1;
+}
+
+service GatewayCache {
+  // Guilds
+  rpc GetGuild(GetGuildRequest) returns(GetGuildResponse);
+
+  // Channels
+  rpc ListGuildChannels(ListGuildChannelsRequest)
+      returns(ListGuildChannelsResponse);
+  rpc GetGuildChannel(GetGuildChannelRequest) returns(GetGuildChannelResponse);
+
+  // Guild Members
+  rpc ListGuildMembers(ListGuildMembersRequest)
+      returns(ListGuildMembersResponse);
+  rpc GetGuildMember(GetGuildMemberRequest) returns(GetGuildMemberResponse);
+
+  // Guild Member Properties
+  rpc ListGuildRoles(ListGuildRolesRequest) returns(ListGuildRolesResponse);
+  rpc GetGuildRole(GetGuildRoleRequest) returns(GetGuildRoleResponse);
+
+  // Emojis
+  rpc ListGuildEmojis(ListGuildEmojisRequest) returns(ListGuildEmojisResponse);
+  rpc GetGuildEmoji(GetGuildEmojiRequest) returns(GetGuildEmojiResponse);
+
+  // Users
+  rpc GetUser(GetUserRequest) returns(GetUserResponse);
+
+  // Webhooks
+  rpc ListTextChannelWebhooks(ListTextChannelWebhooksRequest)
+      returns(ListTextChannelWebhooksResponse);
+
+  // VoiceStates
+  rpc GetGuildMemberVoiceState(GetGuildMemberVoiceStateRequest)
+      returns(GetGuildMemberVoiceStateResponse);
+  rpc ListGuildChannelVoiceStates(ListGuildChannelVoiceStatesRequest)
+      returns(ListGuildChannelVoiceStatesResponse);
+}
