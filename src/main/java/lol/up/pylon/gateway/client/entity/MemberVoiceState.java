@@ -1,15 +1,15 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Emoji;
+import rpc.gateway.v1.VoiceStateData;
 
-public class EmojiWrapper implements WrappedEntity<Emoji> {
+public class MemberVoiceState implements Entity<VoiceStateData> {
 
     private final long botId;
-    private final Emoji data;
+    private final VoiceStateData data;
     private final GatewayCacheService cacheService;
 
-    public EmojiWrapper(final GatewayCacheService cacheService, final long botId, final Emoji data) {
+    public MemberVoiceState(final GatewayCacheService cacheService, final long botId, final VoiceStateData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -31,8 +31,15 @@ public class EmojiWrapper implements WrappedEntity<Emoji> {
     }
 
     @Override
-    public Emoji getData() {
+    public VoiceStateData getData() {
         return data;
     }
 
+    public Channel getChannel() {
+        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
+    }
+
+    public Member getMember() {
+        return new Member(cacheService, getBotId(), getData().getMember());
+    }
 }

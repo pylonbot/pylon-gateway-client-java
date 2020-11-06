@@ -1,17 +1,17 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Channel;
+import rpc.gateway.v1.ChannelData;
 
 import java.util.List;
 
-public class ChannelWrapper implements WrappedEntity<Channel> {
+public class Channel implements Entity<ChannelData> {
 
     private final long botId;
-    private final Channel data;
+    private final ChannelData data;
     private final GatewayCacheService cacheService;
 
-    public ChannelWrapper(final GatewayCacheService cacheService, final long botId, final Channel data) {
+    public Channel(final GatewayCacheService cacheService, final long botId, final ChannelData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -33,15 +33,15 @@ public class ChannelWrapper implements WrappedEntity<Channel> {
     }
 
     @Override
-    public Channel getData() {
+    public ChannelData getData() {
         return data;
     }
 
-    public List<VoiceStateWrapper> getVoiceStates() {
+    public List<MemberVoiceState> getVoiceStates() {
         return cacheService.listChannelVoiceStates(getBotId(), getGuildId(), data.getId());
     }
 
-    public List<WebhookWrapper> getWebhooks() {
+    public List<Webhook> getWebhooks() {
         return cacheService.listChannelWebhooks(getBotId(), getGuildId(), data.getId());
     }
 }

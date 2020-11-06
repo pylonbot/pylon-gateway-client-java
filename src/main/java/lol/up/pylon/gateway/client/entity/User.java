@@ -1,15 +1,15 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Webhook;
+import rpc.gateway.v1.UserData;
 
-public class WebhookWrapper implements WrappedEntity<Webhook> {
+public class User implements Entity<UserData> {
 
-    private final long botId;
-    private final Webhook data;
     private final GatewayCacheService cacheService;
+    private final long botId;
+    private final UserData data;
 
-    public WebhookWrapper(final GatewayCacheService cacheService, final long botId, final Webhook data) {
+    public User(final GatewayCacheService cacheService, final long botId, final UserData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -27,16 +27,11 @@ public class WebhookWrapper implements WrappedEntity<Webhook> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId();
+        throw new RuntimeException("Can't get a guildId on a user object");
     }
 
     @Override
-    public Webhook getData() {
+    public UserData getData() {
         return data;
     }
-
-    public ChannelWrapper getChannel() {
-        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
-    }
-
 }

@@ -1,20 +1,20 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Member;
+import rpc.gateway.v1.MemberData;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MemberWrapper implements WrappedEntity<Member> {
+public class Member implements Entity<MemberData> {
 
     private final long botId;
-    private final Member data;
+    private final MemberData data;
     private final GatewayCacheService cacheService;
 
-    public MemberWrapper(final GatewayCacheService cacheService, final long botId, final Member data) {
+    public Member(final GatewayCacheService cacheService, final long botId, final MemberData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -36,20 +36,20 @@ public class MemberWrapper implements WrappedEntity<Member> {
     }
 
     @Override
-    public Member getData() {
+    public MemberData getData() {
         return data;
     }
 
-    public List<RoleWrapper> getRoles() {
-        final List<RoleWrapper> roles = cacheService.listGuildRoles(getBotId(), getGuildId());
-        final Map<Long, RoleWrapper> roleMap = new HashMap<>();
+    public List<Role> getRoles() {
+        final List<Role> roles = cacheService.listGuildRoles(getBotId(), getGuildId());
+        final Map<Long, Role> roleMap = new HashMap<>();
         roles.forEach(role -> roleMap.put(role.getData().getId(), role));
         return data.getRolesList().stream()
                 .map(roleMap::get)
                 .collect(Collectors.toList());
     }
 
-    public UserWrapper getUser() {
-        return new UserWrapper(cacheService, getBotId(), getData().getUser());
+    public User getUser() {
+        return new User(cacheService, getBotId(), getData().getUser());
     }
 }

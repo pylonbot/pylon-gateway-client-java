@@ -1,17 +1,17 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Guild;
+import rpc.gateway.v1.GuildData;
 
 import java.util.List;
 
-public class GuildWrapper implements WrappedEntity<Guild> {
+public class Guild implements Entity<GuildData> {
 
     private final long botId;
-    private final Guild data;
+    private final GuildData data;
     private final GatewayCacheService cacheService;
 
-    public GuildWrapper(final GatewayCacheService cacheService, final long botId, final Guild data) {
+    public Guild(final GatewayCacheService cacheService, final long botId, final GuildData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -33,39 +33,39 @@ public class GuildWrapper implements WrappedEntity<Guild> {
     }
 
     @Override
-    public Guild getData() {
+    public GuildData getData() {
         return data;
     }
 
-    public ChannelWrapper getChannelById(final long channelId) {
+    public Channel getChannelById(final long channelId) {
         return cacheService.getChannel(getBotId(), getGuildId(), channelId);
     }
 
-    public RoleWrapper getRoleById(final long roleId) {
+    public Role getRoleById(final long roleId) {
         return cacheService.getRole(getBotId(), getGuildId(), roleId);
     }
 
-    public MemberWrapper getMemberById(final long memberId) {
+    public Member getMemberById(final long memberId) {
         return cacheService.getMember(getBotId(), getGuildId(), memberId);
     }
 
-    public EmojiWrapper getEmojiById(final long emojiId) {
+    public Emoji getEmojiById(final long emojiId) {
         return cacheService.getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
-    public List<ChannelWrapper> listChannels() {
+    public List<Channel> listChannels() {
         return cacheService.listGuildChannels(getBotId(), getGuildId());
     }
 
-    public List<RoleWrapper> listRoles() {
+    public List<Role> listRoles() {
         return cacheService.listGuildRoles(getBotId(), getGuildId());
     }
 
-    public List<MemberWrapper> listMembers() {
+    public List<Member> listMembers() {
         return cacheService.listGuildMembers(getBotId(), getGuildId());
     }
 
-    public List<EmojiWrapper> listEmojis() {
+    public List<Emoji> listEmojis() {
         return cacheService.listGuildEmojis(getBotId(), getGuildId());
     }
 }

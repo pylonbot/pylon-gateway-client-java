@@ -18,7 +18,7 @@ service Gateway { rpc TransferShard(ShardKey) returns(TransferShardResponse); }
 
 // Discord Cache Service
 
-message Guild {
+message GuildData {
   uint64 id = 1 [jstype = JS_STRING];
   string name = 2;
   string icon = 3;
@@ -46,7 +46,7 @@ message Guild {
   bool unavailable = 25;
 }
 
-message Channel {
+message ChannelData {
   uint64 id = 1 [jstype = JS_STRING];
   uint64 guild_id = 2 [jstype = JS_STRING];
   string name = 3;
@@ -68,7 +68,7 @@ message Channel {
   }
 }
 
-message User {
+message UserData {
   uint64 id = 1 [jstype = JS_STRING];
   string username = 2;
   string avatar = 3;
@@ -76,10 +76,10 @@ message User {
   bool bot = 5;
 }
 
-message Member {
+message MemberData {
   uint64 id = 1 [jstype = JS_STRING];
   uint64 guild_id = 2 [jstype = JS_STRING];
-  User user = 3;
+  UserData user = 3;
   string nick = 4;
   repeated uint64 roles = 5 [jstype = JS_STRING];
   string joined_at = 6;
@@ -87,7 +87,7 @@ message Member {
   uint64 permissions = 8;
 }
 
-message Role {
+message RoleData {
   uint64 id = 1 [jstype = JS_STRING];
   uint64 guild_id = 2 [jstype = JS_STRING];
   string name = 3;
@@ -99,7 +99,7 @@ message Role {
   uint64 permissions = 9 [jstype = JS_STRING];
 }
 
-message Emoji {
+message EmojiData {
   uint64 id = 1 [jstype = JS_STRING];
   uint64 guild_id = 2 [jstype = JS_STRING];
   string name = 3;
@@ -112,7 +112,7 @@ message Emoji {
 }
 
 message VoiceStateData {
-  Member member = 1;
+  MemberData member = 1;
   uint64 guild_id = 2 [jstype = JS_STRING];
   uint64 channel_id = 3 [jstype = JS_STRING];
   string session_id = 4;
@@ -125,7 +125,7 @@ message VoiceStateData {
   bool suppress = 11;
 }
 
-message Webhook {
+message WebhookData {
   uint64 id = 1 [jstype = JS_STRING];
   uint64 channel_id = 2 [jstype = JS_STRING];
   uint64 guild_id = 3 [jstype = JS_STRING];
@@ -141,19 +141,19 @@ enum WebhookType { INCOMING = 0; CHANNEL_FOLLOWER = 1; }
 
 message GetGuildRequest {}
 
-message GetGuildResponse { Guild guild = 1; }
+message GetGuildResponse { GuildData guild = 1; }
 
 // ListGuildChannels
 
 message ListGuildChannelsRequest {}
 
-message ListGuildChannelsResponse { repeated Channel channels = 1; }
+message ListGuildChannelsResponse { repeated ChannelData channels = 1; }
 
 // GetGuildChannel
 
 message GetGuildChannelRequest { uint64 channel_id = 1 [jstype = JS_STRING]; }
 
-message GetGuildChannelResponse { Channel channel = 1; }
+message GetGuildChannelResponse { ChannelData channel = 1; }
 
 // ListGuildMembers
 
@@ -162,42 +162,42 @@ message ListGuildMembersRequest {
   uint32 limit = 2;
 }
 
-message ListGuildMembersResponse { repeated Member members = 1; }
+message ListGuildMembersResponse { repeated MemberData members = 1; }
 
 // GetGuildMember
 
 message GetGuildMemberRequest { uint64 user_id = 1 [jstype = JS_STRING]; }
 
-message GetGuildMemberResponse { Member member = 1; }
+message GetGuildMemberResponse { MemberData member = 1; }
 
 // ListGuildRoles
 
 message ListGuildRolesRequest {}
 
-message ListGuildRolesResponse { repeated Role roles = 1; }
+message ListGuildRolesResponse { repeated RoleData roles = 1; }
 
 // GetGuildRole
 
 message GetGuildRoleRequest { uint64 role_id = 1 [jstype = JS_STRING]; }
 
-message GetGuildRoleResponse { Role role = 1; }
+message GetGuildRoleResponse { RoleData role = 1; }
 
 // ListGuildEmojis
 
 message ListGuildEmojisRequest {}
 
-message ListGuildEmojisResponse { repeated Emoji Emojis = 1; }
+message ListGuildEmojisResponse { repeated EmojiData Emojis = 1; }
 
 // GetGuildEmoji
 
 message GetGuildEmojiRequest { uint64 emoji_id = 1 [jstype = JS_STRING]; }
 
-message GetGuildEmojiResponse { Emoji emoji = 1; }
+message GetGuildEmojiResponse { EmojiData emoji = 1; }
 
 // GetUser
 
 message GetUserRequest { uint64 user_id = 1 [jstype = JS_STRING]; }
-message GetUserResponse { User user = 1; }
+message GetUserResponse { UserData user = 1; }
 
 // ListTextChannelWebhooks
 
@@ -205,7 +205,7 @@ message ListTextChannelWebhooksRequest {
   uint64 channel_id = 1 [jstype = JS_STRING];
 }
 
-message ListTextChannelWebhooksResponse { repeated Webhook Webhooks = 1; }
+message ListTextChannelWebhooksResponse { repeated WebhookData Webhooks = 1; }
 
 // GetGuildMemberVoiceState
 

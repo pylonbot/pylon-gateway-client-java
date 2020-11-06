@@ -1,15 +1,15 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.Role;
+import rpc.gateway.v1.WebhookData;
 
-public class RoleWrapper implements WrappedEntity<Role> {
+public class Webhook implements Entity<WebhookData> {
 
     private final long botId;
-    private final Role data;
+    private final WebhookData data;
     private final GatewayCacheService cacheService;
 
-    public RoleWrapper(final GatewayCacheService cacheService, final long botId, final Role data) {
+    public Webhook(final GatewayCacheService cacheService, final long botId, final WebhookData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -31,8 +31,12 @@ public class RoleWrapper implements WrappedEntity<Role> {
     }
 
     @Override
-    public Role getData() {
+    public WebhookData getData() {
         return data;
+    }
+
+    public Channel getChannel() {
+        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
     }
 
 }

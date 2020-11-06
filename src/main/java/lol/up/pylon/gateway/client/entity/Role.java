@@ -1,15 +1,15 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.User;
+import rpc.gateway.v1.RoleData;
 
-public class UserWrapper implements WrappedEntity<User> {
+public class Role implements Entity<RoleData> {
 
-    private final GatewayCacheService cacheService;
     private final long botId;
-    private final User data;
+    private final RoleData data;
+    private final GatewayCacheService cacheService;
 
-    public UserWrapper(final GatewayCacheService cacheService, final long botId, final User data) {
+    public Role(final GatewayCacheService cacheService, final long botId, final RoleData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
@@ -27,11 +27,12 @@ public class UserWrapper implements WrappedEntity<User> {
 
     @Override
     public long getGuildId() {
-        throw new RuntimeException("Can't get a guildId on a user object");
+        return data.getGuildId();
     }
 
     @Override
-    public User getData() {
+    public RoleData getData() {
         return data;
     }
+
 }
