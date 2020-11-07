@@ -1,8 +1,10 @@
 package lol.up.pylon.gateway.client.event;
 
+import lol.up.pylon.gateway.client.util.ClosingRunnable;
+
 @FunctionalInterface
 public interface EventSupplier {
 
-    Runnable supplyEvents(EventDispatcher dispatcher);
+    ClosingRunnable supplyEvents(EventDispatcher dispatcher);
 
 }

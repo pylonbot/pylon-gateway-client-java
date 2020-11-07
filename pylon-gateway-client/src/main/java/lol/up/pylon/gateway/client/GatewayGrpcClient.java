@@ -7,6 +7,9 @@ import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.util.ClosingRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pylon.rpc.gateway.v1.cache.GatewayCacheGrpc;
 
 import java.io.Closeable;
@@ -16,6 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class GatewayGrpcClient implements Closeable {
+
+    private static final Logger log = LoggerFactory.getLogger(GatewayGrpcClient.class);
 
     private final ManagedChannel channel;
     private final GatewayCacheService cacheService;
@@ -60,9 +65,16 @@ public class GatewayGrpcClient implements Closeable {
         eventDispatcher.registerReceiver(eventClass, receiver);
     }
 
-    public void registerEventSupplier(final EventSupplier eventSupplier) {
-        final Runnable eventSupplierTask = eventSupplier.supplyEvents(eventDispatcher);
+    public Closeable registerEventSupplier(final EventSupplier eventSupplier) {
+        final ClosingRunnable eventSupplierTask = eventSupplier.supplyEvents(eventDispatcher);
         Executors.newSingleThreadExecutor().submit(eventSupplierTask);
+        return () -> {
+            try {
+                eventSupplierTask.stop();
+            } catch (Exception exception) {
+                log.error("Couldn't stop EventSupplier {}", eventSupplier.getClass().getCanonicalName(), exception);
+            }
+        };
     }
 
     @Override
