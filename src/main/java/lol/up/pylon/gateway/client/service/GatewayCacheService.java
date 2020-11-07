@@ -5,8 +5,10 @@ import io.grpc.Context;
 import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
+import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
-import rpc.gateway.v1.*;
+import pylon.rpc.discord.v1.model.*;
+import pylon.rpc.gateway.v1.cache.*;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -37,9 +39,17 @@ public class GatewayCacheService {
         });
     }
 
+    private long getBotId() {
+        final EventContext current = EventContext.current();
+        if (current != null) {
+            return current.getBotId();
+        }
+        return gatewayGrpcClient.getDefaultBotId();
+    }
+
     @Nullable
     public Guild getGuild(final long guildId) throws GrpcRequestException {
-        return getGuild(gatewayGrpcClient.getDefaultBotId(), guildId);
+        return getGuild(getBotId(), guildId);
     }
 
     @Nullable
@@ -58,7 +68,7 @@ public class GatewayCacheService {
 
     @Nullable
     public Channel getChannel(final long guildId, final long channelId) throws GrpcRequestException {
-        return getChannel(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+        return getChannel(getBotId(), guildId, channelId);
     }
 
     @Nullable
@@ -79,7 +89,7 @@ public class GatewayCacheService {
 
     @Nullable
     public Member getMember(final long guildId, final long userId) throws GrpcRequestException {
-        return getMember(gatewayGrpcClient.getDefaultBotId(), guildId, userId);
+        return getMember(getBotId(), guildId, userId);
     }
 
     @Nullable
@@ -100,7 +110,7 @@ public class GatewayCacheService {
 
     @Nullable
     public Role getRole(final long guildId, final long roleId) throws GrpcRequestException {
-        return getRole(gatewayGrpcClient.getDefaultBotId(), guildId, roleId);
+        return getRole(getBotId(), guildId, roleId);
     }
 
     @Nullable
@@ -121,7 +131,7 @@ public class GatewayCacheService {
 
     @Nullable
     public Emoji getEmoji(final long guildId, final long emojiId) throws GrpcRequestException {
-        return getEmoji(gatewayGrpcClient.getDefaultBotId(), guildId, emojiId);
+        return getEmoji(getBotId(), guildId, emojiId);
     }
 
     @Nullable
@@ -142,7 +152,7 @@ public class GatewayCacheService {
 
     @Nullable
     public MemberVoiceState getVoiceState(final long guildId, final long userId) throws GrpcRequestException {
-        return getVoiceState(gatewayGrpcClient.getDefaultBotId(), guildId, userId);
+        return getVoiceState(getBotId(), guildId, userId);
     }
 
     @Nullable
@@ -180,7 +190,7 @@ public class GatewayCacheService {
     }
 
     public List<Channel> listGuildChannels(final long guildId) throws GrpcRequestException {
-        return listGuildChannels(gatewayGrpcClient.getDefaultBotId(), guildId);
+        return listGuildChannels(getBotId(), guildId);
     }
 
     public List<Channel> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
@@ -200,15 +210,15 @@ public class GatewayCacheService {
     }
 
     public List<Member> listGuildMembers(final long guildId) throws GrpcRequestException {
-        return listGuildMembers(gatewayGrpcClient.getDefaultBotId(), guildId);
+        return listGuildMembers(getBotId(), guildId);
     }
 
     public List<Member> listGuildMembersAfter(final long guildId, final long after) throws GrpcRequestException {
-        return listGuildMembersAfter(gatewayGrpcClient.getDefaultBotId(), guildId, after);
+        return listGuildMembersAfter(getBotId(), guildId, after);
     }
 
     public List<Member> listGuildMembersAfter(final long guildId, long after, int limit) throws GrpcRequestException {
-        return listGuildMembersAfter(gatewayGrpcClient.getDefaultBotId(), guildId, after, limit);
+        return listGuildMembersAfter(getBotId(), guildId, after, limit);
     }
 
     public List<Member> listGuildMembers(final long botId, final long guildId) throws GrpcRequestException {
@@ -239,7 +249,7 @@ public class GatewayCacheService {
     }
 
     public List<Role> listGuildRoles(final long guildId) throws GrpcRequestException {
-        return listGuildRoles(gatewayGrpcClient.getDefaultBotId(), guildId);
+        return listGuildRoles(getBotId(), guildId);
     }
 
     public List<Role> listGuildRoles(final long botId, final long guildId) throws GrpcRequestException {
@@ -259,7 +269,7 @@ public class GatewayCacheService {
     }
 
     public List<Emoji> listGuildEmojis(final long guildId) throws GrpcRequestException {
-        return listGuildEmojis(gatewayGrpcClient.getDefaultBotId(), guildId);
+        return listGuildEmojis(getBotId(), guildId);
     }
 
     public List<Emoji> listGuildEmojis(final long botId, final long guildId) throws GrpcRequestException {
@@ -280,7 +290,7 @@ public class GatewayCacheService {
     }
 
     public List<Webhook> listChannelWebhooks(final long guildId, final long channelId) throws GrpcRequestException {
-        return listChannelWebhooks(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+        return listChannelWebhooks(getBotId(), guildId, channelId);
     }
 
     public List<Webhook> listChannelWebhooks(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
@@ -302,7 +312,7 @@ public class GatewayCacheService {
     }
 
     public List<MemberVoiceState> listChannelVoiceStates(final long guildId, final long channelId) throws GrpcRequestException {
-        return listChannelVoiceStates(gatewayGrpcClient.getDefaultBotId(), guildId, channelId);
+        return listChannelVoiceStates(getBotId(), guildId, channelId);
     }
 
     public List<MemberVoiceState> listChannelVoiceStates(final long botId, final long guildId, final long channelId) throws GrpcRequestException {

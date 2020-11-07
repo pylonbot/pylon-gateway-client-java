@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import rpc.gateway.v1.VoiceStateData;
+import pylon.rpc.discord.v1.model.VoiceStateData;
 
 public class MemberVoiceState implements Entity<VoiceStateData> {
 

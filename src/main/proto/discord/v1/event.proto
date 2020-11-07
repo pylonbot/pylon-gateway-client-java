@@ -1,0 +1,133 @@
+
+syntax = "proto3";
+
+package pylon.rpc.discord.v1.event;
+option java_multiple_files = true;
+option go_package = "up.lol/pylon/rpc/go/rpc/discord/v1/event";
+
+import "discord/v1/model.proto";
+
+message EventScope {
+  uint64 bot_id = 1 [jstype = JS_STRING];
+  uint64 guild_id = 2 [jstype = JS_STRING];
+}
+
+message GuildCreateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.GuildData payload = 2;
+}
+
+message GuildUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.GuildData payload = 2;
+  pylon.rpc.discord.v1.model.GuildData previously_cached = 3;
+}
+
+message GuildDeleteEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.GuildData payload = 2;
+}
+
+message PresenceUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.PresenceData payload = 2;
+  pylon.rpc.discord.v1.model.PresenceData previously_cached = 3;
+}
+
+message GuildMemberAddEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.MemberData payload = 2;
+}
+
+message GuildMemberUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.MemberData payload = 2;
+  pylon.rpc.discord.v1.model.MemberData previously_cached = 3;
+}
+
+message GuildMemberRemoveEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.MemberData payload = 2;
+}
+
+message ChannelCreateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.ChannelData payload = 2;
+}
+
+message ChannelUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.ChannelData payload = 2;
+  pylon.rpc.discord.v1.model.ChannelData previously_cached = 3;
+}
+
+message ChannelDeleteEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.ChannelData payload = 2;
+}
+
+message ChannelPinsUpdateEvent {
+  EventScope scope = 1;
+  Payload payload = 2;
+
+  message Payload {
+    uint64 channel_id = 1 [jstype = JS_STRING];
+    uint64 guild_id = 2 [jstype = JS_STRING];
+    string last_pin_timestamp = 3;
+  }
+}
+message GuildRoleCreateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.RoleData payload = 2;
+}
+message GuildRoleUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.RoleData payload = 2;
+  pylon.rpc.discord.v1.model.RoleData previous = 3;
+}
+message GuildRoleDeleteEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.RoleData payload = 2;
+}
+message MessageCreateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.MessageData message = 2;
+}
+message MessageUpdateEvent {
+  EventScope scope = 1;
+  pylon.rpc.discord.v1.model.MessageData payload = 2;
+  pylon.rpc.discord.v1.model.MessageData previous = 3;
+}
+message MessageDeleteEvent {
+  EventScope scope = 1;
+  oneof payload {
+    Payload uncached = 2;
+    pylon.rpc.discord.v1.model.MessageData cached = 3;
+  }
+
+  message Payload {
+    uint64 id = 1 [jstype = JS_STRING];
+    uint64 channel_id = 2 [jstype = JS_STRING];
+    uint64 guild_id = 3 [jstype = JS_STRING];
+  }
+}
+message MessageDeleteBulkEvent { EventScope scope = 1; }
+message MessageReactionAddEvent { EventScope scope = 1; }
+message MessageReactionRemoveEvent { EventScope scope = 1; }
+message MessageReactionRemoveAllEvent { EventScope scope = 1; }
+message MessageReactionRemoveEmojiEvent { EventScope scope = 1; }
+message TypingStartEvent { EventScope scope = 1; }
+message VoiceStateUpdateEvent { EventScope scope = 1; }
+message VoiceServerUpdateEvent { EventScope scope = 1; }
+message InviteCreateEvent { EventScope scope = 1; }
+message InviteDeleteEvent { EventScope scope = 1; }
+message GuildMembersChunkEvent { EventScope scope = 1; }
+message GuildBanAddEvent { EventScope scope = 1; }
+message GuildBanRemoveEvent { EventScope scope = 1; }
+message GuildEmojisUpdateEvent { EventScope scope = 1; }
+message GuildIntegrationsUpdateEvent { EventScope scope = 1; }
+message WebhooksUpdateEvent { EventScope scope = 1; }
+message IntegrationCreateEvent { EventScope scope = 1; }
+message IntegrationUpdateEvent { EventScope scope = 1; }
+message IntegrationDeleteEvent { EventScope scope = 1; }
+message InteractionCreateEvent { EventScope scope = 1; }
