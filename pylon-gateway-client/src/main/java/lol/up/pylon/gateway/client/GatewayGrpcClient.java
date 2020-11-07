@@ -14,6 +14,7 @@ import pylon.rpc.gateway.v1.cache.GatewayCacheGrpc;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,66 @@ import java.util.concurrent.TimeUnit;
 public class GatewayGrpcClient implements Closeable {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayGrpcClient.class);
+
+    public static class GatewayGrpcClientBuilder {
+
+        private long defaultBotId;
+        private String routerHost;
+        private int routerPort;
+        private boolean enableRetry;
+        private ExecutorService eventExecutor;
+
+        private GatewayGrpcClientBuilder(final long defaultBotId) {
+            this.defaultBotId = defaultBotId;
+            this.eventExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        }
+
+        public GatewayGrpcClientBuilder setDefaultBotId(long defaultBotId) {
+            this.defaultBotId = defaultBotId;
+            return this;
+        }
+
+        public GatewayGrpcClientBuilder setRouterHost(String routerHost) {
+            this.routerHost = routerHost;
+            return this;
+        }
+
+        public GatewayGrpcClientBuilder setRouterPort(int routerPort) {
+            this.routerPort = routerPort;
+            return this;
+        }
+
+        public GatewayGrpcClientBuilder setEnableRetry(boolean enableRetry) {
+            this.enableRetry = enableRetry;
+            return this;
+        }
+
+        public GatewayGrpcClientBuilder setEventExecutor(ExecutorService eventExecutor) {
+            this.eventExecutor = eventExecutor;
+            return this;
+        }
+
+        public GatewayGrpcClient build() {
+            if (defaultBotId == 0) {
+                throw new NullPointerException("The default bot id must not be 0");
+            }
+            if (routerPort <= 0 || routerPort > 65535) {
+                throw new IllegalArgumentException("The port must be greater than 0 and less than or equal to 65535");
+            }
+            Objects.requireNonNull(routerHost, "A routerHost is mandatory");
+            return new GatewayGrpcClient(
+                    defaultBotId,
+                    routerHost,
+                    routerPort,
+                    enableRetry,
+                    eventExecutor
+            );
+        }
+    }
+
+    public static GatewayGrpcClientBuilder builder(final long defaultBotId) {
+        return new GatewayGrpcClientBuilder(defaultBotId);
+    }
 
     private final ManagedChannel channel;
     private final GatewayCacheService cacheService;
@@ -40,8 +101,8 @@ public class GatewayGrpcClient implements Closeable {
                         .build());
     }
 
-    public GatewayGrpcClient(final long defaultBotId, final ExecutorService eventExecutor,
-                             final ManagedChannel channel) {
+    private GatewayGrpcClient(final long defaultBotId, final ExecutorService eventExecutor,
+                              final ManagedChannel channel) {
         this.channel = channel;
         this.cacheService = new GatewayCacheService(this, GatewayCacheGrpc.newBlockingStub(channel));
         this.defaultBotId = defaultBotId;
