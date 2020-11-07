@@ -1,4 +1,16 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-public interface GuildDeleteEvent extends Event {
+import lol.up.pylon.gateway.client.entity.Guild;
+import lol.up.pylon.gateway.client.service.GatewayCacheService;
+
+public interface GuildDeleteEvent extends Event<GuildDeleteEvent> {
+
+    default Guild getGuild() {
+        if (!(this instanceof pylon.rpc.discord.v1.event.GuildDeleteEvent)) {
+            throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
+                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+        }
+        final pylon.rpc.discord.v1.event.GuildDeleteEvent event = (pylon.rpc.discord.v1.event.GuildDeleteEvent) this;
+        return new Guild(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+    }
 }

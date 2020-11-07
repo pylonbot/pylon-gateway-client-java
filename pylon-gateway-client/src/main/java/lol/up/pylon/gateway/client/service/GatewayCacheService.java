@@ -17,11 +17,21 @@ import java.util.stream.Collectors;
 
 public class GatewayCacheService {
 
+    private static GatewayCacheService instance;
+
+    public static GatewayCacheService getSingleton() {
+        return instance;
+    }
+
     private final GatewayCacheGrpc.GatewayCacheBlockingStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
 
     public GatewayCacheService(final GatewayGrpcClient gatewayGrpcClient,
                                final GatewayCacheGrpc.GatewayCacheBlockingStub client) {
+        if (instance != null) {
+            throw new IllegalStateException("You might only create GatewayCacheService once");
+        }
+        instance = this;
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.client = client.withCallCredentials(new CallCredentials() {
             @Override

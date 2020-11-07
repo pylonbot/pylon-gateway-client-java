@@ -22,7 +22,8 @@ public class EventGenerator extends Generator {
     }
 
     @Override
-    public List<PluginProtos.CodeGeneratorResponse.File> generateFiles(final PluginProtos.CodeGeneratorRequest request) throws GeneratorException {
+    public List<PluginProtos.CodeGeneratorResponse.File> generateFiles(final PluginProtos.CodeGeneratorRequest request)
+            throws GeneratorException {
         return request.getProtoFileList().stream()
                 .flatMap(this::handleProtoFile)
                 .collect(Collectors.toList());
@@ -36,7 +37,8 @@ public class EventGenerator extends Generator {
                 .flatMap(descriptorProto -> handleMessageType(fileDesc, descriptorProto));
     }
 
-    public Stream<PluginProtos.CodeGeneratorResponse.File> handleMessageType(final DescriptorProtos.FileDescriptorProto fileDesc, final DescriptorProtos.DescriptorProto messageTypeDesc) {
+    public Stream<PluginProtos.CodeGeneratorResponse.File> handleMessageType(final DescriptorProtos.FileDescriptorProto fileDesc,
+                                                                             final DescriptorProtos.DescriptorProto messageTypeDesc) {
         final String javaPackage;
         if (fileDesc.getOptions().hasJavaPackage()) {
             javaPackage = fileDesc.getOptions().getJavaPackage();
@@ -45,12 +47,30 @@ public class EventGenerator extends Generator {
         }
         final String fileName = javaPackage.replace(".", "/") + "/" + messageTypeDesc.getName() + ".java";
 
+        final String messageType = fileDesc.getPackage() + "." + messageTypeDesc.getName();
+        final String interfaceClass = "lol.up.pylon.gateway.client.entity.event." + messageTypeDesc.getName();
         final List<PluginProtos.CodeGeneratorResponse.File> files = new ArrayList<>();
         files.add(PluginProtos.CodeGeneratorResponse.File.newBuilder()
                 .setName(fileName)
-                .setContent("lol.up.pylon.gateway.client.entity.event." + messageTypeDesc.getName() + ", ")
-                .setInsertionPoint("message_implements:" + fileDesc.getPackage() + "." + messageTypeDesc.getName())
+                .setContent(interfaceClass + ", ")
+                .setInsertionPoint("message_implements:" + messageType)
+                .build());
+        files.add(PluginProtos.CodeGeneratorResponse.File.newBuilder()
+                .setName(fileName)
+                .setContent(
+                        "@Override\n" +
+                                "public Class<" + interfaceClass + "> getInterfaceType() {\n" +
+                                "  return " + interfaceClass + ".class;\n" +
+                                "}"
+                )
+                .setInsertionPoint("class_scope:" + messageType)
                 .build());
         return files.stream();
+        /*
+        @Override
+        public Class<lol.up.pylon.gateway.client.entity.event.MessageCreateEvent> getInterfaceType() {
+            return null;
+        }
+         */
     }
 }

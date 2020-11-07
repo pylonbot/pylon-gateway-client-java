@@ -1,4 +1,4 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-public interface MessageReactionRemoveEmojiEvent extends Event {
+public interface MessageReactionRemoveEmojiEvent extends Event<MessageReactionRemoveEmojiEvent> {
 }

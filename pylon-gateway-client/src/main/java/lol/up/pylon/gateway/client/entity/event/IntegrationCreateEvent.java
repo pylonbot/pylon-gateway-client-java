@@ -1,4 +1,4 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-public interface IntegrationCreateEvent extends Event {
+public interface IntegrationCreateEvent extends Event<IntegrationCreateEvent> {
 }

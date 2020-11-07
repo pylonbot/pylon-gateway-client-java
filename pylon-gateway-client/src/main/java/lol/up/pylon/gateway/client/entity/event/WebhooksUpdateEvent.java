@@ -1,4 +1,4 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-public interface WebhooksUpdateEvent extends Event {
+public interface WebhooksUpdateEvent extends Event<WebhooksUpdateEvent> {
 }

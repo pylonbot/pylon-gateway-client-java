@@ -1,4 +1,4 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-public interface InviteDeleteEvent extends Event {
+public interface InviteDeleteEvent extends Event<InviteDeleteEvent> {
 }
