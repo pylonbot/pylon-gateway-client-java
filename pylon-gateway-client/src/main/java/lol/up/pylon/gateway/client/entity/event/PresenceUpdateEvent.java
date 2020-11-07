@@ -21,6 +21,9 @@ public interface PresenceUpdateEvent extends Event<PresenceUpdateEvent> {
         }
         final pylon.rpc.discord.v1.event.PresenceUpdateEvent event =
                 (pylon.rpc.discord.v1.event.PresenceUpdateEvent) this;
+        if (!event.hasPreviouslyCached()) {
+            return null;
+        }
         return event.getPreviousPresence(); // todo wrap nicely
     }
 }

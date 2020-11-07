@@ -25,4 +25,5 @@ public interface ChannelPinsUpdateEvent extends Event<ChannelPinsUpdateEvent> {
                 (pylon.rpc.discord.v1.event.ChannelPinsUpdateEvent) this;
         return event.getLastPinTimestamp();
     }
+
 }

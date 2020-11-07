@@ -37,20 +37,26 @@ message ChannelData {
   fixed64 guild_id = 2 [jstype = JS_STRING];
   string name = 3;
   string topic = 4;
-  uint32 type = 5;
+  ChannelType type = 5;
   bool nsfw = 6;
   uint32 position = 7;
   uint32 bitrate = 8;
   uint32 user_limit = 9;
   fixed64 parent_id = 10 [jstype = JS_STRING];
   uint32 rate_limit_per_user = 11;
-  repeated PermissionOverwriteData permission_overwrites = 12;
+  repeated ChannelPermissionOverwriteData permission_overwrites = 12;
 
-  message PermissionOverwriteData {
+  enum ChannelType {
+    GUILD_TEXT = 0; DM = 1; GUILD_VOICE = 2; GROUP_DM = 3; GUILD_CATEGORY = 4;
+    GUILD_NEWS = 5;
+    GUILD_STORE = 6;
+  }
+
+  message ChannelPermissionOverwriteData {
     fixed64 id = 1 [jstype = JS_STRING];
     uint32 type = 2;
-    fixed64 allow = 3 [jstype = JS_STRING];
-    fixed64 deny = 4 [jstype = JS_STRING];
+    uint64 allow = 3 [jstype = JS_STRING];
+    uint64 deny = 4 [jstype = JS_STRING];
   }
 }
 
@@ -82,7 +88,7 @@ message RoleData {
   bool hoist = 6;
   uint32 color = 7;
   uint32 position = 8;
-  fixed64 permissions = 9 [jstype = JS_STRING];
+  uint64 permissions = 9 [jstype = JS_STRING];
 }
 
 message EmojiData {
@@ -120,28 +126,28 @@ message MessageData {
   repeated fixed64 mention_roles = 6 [jstype = JS_STRING];
   bool tts = 7;
   bool mention_everyone = 8;
-  repeated AttachmentData attachments = 9;
-  repeated EmbedData embeds = 10;
-  repeated MentionData mentions = 11;
-  repeated ReactionData reactions = 12;
+  repeated MessageAttachmentData attachments = 9;
+  repeated MessageEmbedData embeds = 10;
+  repeated MessageMentionData mentions = 11;
+  repeated MessageReactionData reactions = 12;
   bool pinned = 13;
-  Type type = 14;
-  repeated MentionChannelData mention_channels = 15;
+  MessageType type = 14;
+  repeated MessageMentionChannelData mention_channels = 15;
   uint32 flags = 16;
-  ActivityData activity = 17;
-  ApplicationData application = 18;
+  MessageActivityData activity = 17;
+  MessageApplicationData application = 18;
   MessageReferenceData message_reference = 19;
   UserData author = 20;
   MemberData member = 21;
   fixed64 webhook_id = 22;
 
-  enum Type {
+  enum MessageType {
     GUILD_TEXT = 0; DM = 1; GUILD_VOICE = 2; GROUP_DM = 3; GUILD_CATEGORY = 4;
     GUILD_NEWS = 5;
     GUILD_STORE = 6;
   }
 
-  message AttachmentData {
+  message MessageAttachmentData {
     fixed64 id = 1 [jstype = JS_STRING];
     string filename = 2;
     uint32 size = 3;
@@ -151,26 +157,26 @@ message MessageData {
     uint32 height = 7;
   }
 
-  message MentionData {
+  message MessageMentionData {
     fixed64 id = 1 [jstype = JS_STRING];
     string username = 2;
     string avatar = 3;
     uint32 discriminator = 4;
   }
 
-  message ReactionData {
+  message MessageReactionData {
     uint32 count = 1;
     bool me = 2;
-    ReactionEmojiData emoji = 3;
-
-    message ReactionEmojiData {
-      fixed64 id = 1 [jstype = JS_STRING];
-      string name = 2;
-      bool animated = 3;
-    }
+    MessageData.MessageReactionEmojiData emoji = 3;
   }
 
-  message ApplicationData {
+  message MessageReactionEmojiData {
+    fixed64 id = 1 [jstype = JS_STRING];
+    string name = 2;
+    bool animated = 3;
+  }
+
+  message MessageApplicationData {
     fixed64 id = 1 [jstype = JS_STRING];
     string cover_image = 2;
     string description = 3;
@@ -184,79 +190,79 @@ message MessageData {
     fixed64 guild_id = 3 [jstype = JS_STRING];
   }
 
-  message ActivityData {
+  message MessageActivityData {
     uint32 type = 1;
     string party_id = 2;
   }
 
-  message MentionChannelData {
-    uint64 id = 1 [jstype = JS_STRING];
-    uint64 guild_id = 2 [jstype = JS_STRING];
+  message MessageMentionChannelData {
+    fixed64 id = 1 [jstype = JS_STRING];
+    fixed64 guild_id = 2 [jstype = JS_STRING];
     uint32 type = 3;
     string name = 4;
   }
 
-  message EmbedData {
-    enum Type {
+  message MessageEmbedData {
+    enum MessageEmbedType {
       RICH = 0; IMAGE = 1; VIDEO = 2; GIFV = 3; ARTICLE = 4; LINK = 5;
     }
 
-    message FooterData {
+    message MessageEmbedFooterData {
       string text = 1;
       string icon_url = 2;
       string proxy_icon_url = 3;
     }
 
-    message ImageData {
+    message MessageEmbedImageData {
       string url = 1;
       uint32 width = 2;
       uint32 height = 3;
     }
 
-    message ThumbnailData {
+    message MessageEmbedThumbnailData {
       string url = 1;
       string proxy_url = 2;
       uint32 width = 3;
       uint32 height = 4;
     }
 
-    message VideoData {
+    message MessageEmbedVideoData {
       string url = 1;
       uint32 width = 2;
       uint32 height = 3;
     }
 
-    message ProviderData {
+    message MessageEmbedProviderData {
       string name = 1;
       string url = 2;
     }
 
-    message AuthorData {
+    message MessageEmbedAuthorData {
       string name = 1;
       string url = 2;
       string icon_url = 3;
       string proxy_icon_url = 4;
     }
 
-    message FieldData {
+    message MessageEmbedFieldData {
       string name = 1;
       string value = 2;
       bool inline = 3;
     }
 
     string title = 1;
-    Type type = 2;
+    MessageEmbedType type = 2;
     string description = 3;
     string url = 4;
     string timestamp = 5;
     uint32 color = 6;
-    FooterData footer = 7;
-    ImageData image = 8;
-    ThumbnailData thumbnail = 9;
-    VideoData video = 10;
-    ProviderData provider = 11;
-    AuthorData author = 12;
-    repeated FieldData fields = 13;
+    MessageEmbedFooterData footer = 7;
+    MessageEmbedImageData image = 8;
+    MessageEmbedThumbnailData thumbnail = 9;
+    MessageEmbedVideoData video = 10;
+    MessageEmbedProviderData provider = 11;
+    MessageEmbedAuthorData author = 12;
+    repeated MessageEmbedFieldData fields = 13;
   }
 }
 
@@ -264,71 +270,83 @@ message PresenceData {
   fixed64 guild_id = 1 [jstype = JS_STRING];
   UserData user = 2;
   string status = 3;
-  ClientStatusData client_status = 4;
-  repeated ActivityData activities = 5;
+  PresenceClientStatusData client_status = 4;
+  repeated PresenceActivityData activities = 5;
 
-  message ClientStatusData {
+  message PresenceClientStatusData {
     string desktop = 1;
     string mobile = 2;
     string web = 3;
   }
 
-  message ActivityData {
-    message TimestampsData {
+  message PresenceActivityData {
+    string name = 1;
+    uint32 type = 2;
+    string url = 3;
+    string created_at = 4;
+    PresenceActivityTimestampsData timestamps = 5;
+    fixed64 application_id = 6 [jstype = JS_STRING];
+    string details = 7;
+    string state = 8;
+    PresenceActivityEmojiData emoji = 9;
+    PresenceActivityPartyData party = 10;
+    PresenceActivityAssetsData assets = 11;
+    PresenceActivitySecretsData secrets = 12;
+    bool instance = 13;
+    uint32 flags = 14;
+
+    message PresenceActivityTimestampsData {
       uint64 start = 1;
       uint64 end = 2;
     }
 
-    message EmojiData {
+    message PresenceActivityEmojiData {
       string name = 1;
       fixed64 id = 2 [jstype = JS_STRING];
       bool animated = 3;
     }
 
-    message PartyData {
+    message PresenceActivityPartyData {
       string id = 1;
       uint64 current_size = 2;
       uint64 max_size = 3;
     }
 
-    message AssetsData {
+    message PresenceActivityAssetsData {
       string large_image = 1;
       string large_text = 2;
       string small_image = 3;
       string small_text = 4;
     }
 
-    message SecretsData {
+    message PresenceActivitySecretsData {
       string join = 1;
       string spectate = 2;
       string match = 3;
     }
-
-    string name = 1;
-    uint32 type = 2;
-    string url = 3;
-    string created_at = 4;
-    TimestampsData timestamps = 5;
-    fixed64 application_id = 6 [jstype = JS_STRING];
-    string details = 7;
-    string state = 8;
-    EmojiData emoji = 9;
-    PartyData party = 10;
-    AssetsData assets = 11;
-    SecretsData secrets = 12;
-    bool instance = 13;
-    uint32 flags = 14;
   }
 }
 
 message WebhookData {
-  uint64 id = 1 [jstype = JS_STRING];
-  uint64 channel_id = 2 [jstype = JS_STRING];
-  uint64 guild_id = 3 [jstype = JS_STRING];
-  Type type = 4;
+  fixed64 id = 1 [jstype = JS_STRING];
+  fixed64 channel_id = 2 [jstype = JS_STRING];
+  fixed64 guild_id = 3 [jstype = JS_STRING];
+  WebhookType type = 4;
   string name = 5;
   string avatar = 6;
   string token = 7;
 
-  enum Type { INCOMING = 0; CHANNEL_FOLLOWER = 1; }
+  enum WebhookType { INCOMING = 0; CHANNEL_FOLLOWER = 1; }
+}
+
+message InviteData {
+  fixed64 guild_id = 1 [jstype = JS_STRING];
+  fixed64 channel_id = 2 [jstype = JS_STRING];
+  string code = 3;
+  string created_at = 4;
+  UserData inviter = 5;
+  uint64 max_age = 6;
+  uint64 max_uses = 7;
+  bool temporary = 8;
+  uint64 uses = 9;
 }

@@ -21,6 +21,9 @@ public interface MessageUpdateEvent extends Event<MessageUpdateEvent> {
         }
         final pylon.rpc.discord.v1.event.MessageUpdateEvent event =
                 (pylon.rpc.discord.v1.event.MessageUpdateEvent) this;
-        return event.getPrevious(); // todo wrap nicely
+        if (!event.hasPreviouslyCached()) {
+            return null;
+        }
+        return event.getPreviouslyCached(); // todo wrap nicely
     }
 }

@@ -3,6 +3,8 @@ package lol.up.pylon.gateway.client.entity.event;
 import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
 
+import javax.annotation.Nullable;
+
 public interface ChannelUpdateEvent extends Event<ChannelUpdateEvent> {
 
     default Channel getChannel() {
@@ -15,6 +17,7 @@ public interface ChannelUpdateEvent extends Event<ChannelUpdateEvent> {
         return new Channel(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 
+    @Nullable
     default Channel getOldChannel() {
         if (!(this instanceof pylon.rpc.discord.v1.event.ChannelUpdateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
@@ -22,6 +25,9 @@ public interface ChannelUpdateEvent extends Event<ChannelUpdateEvent> {
         }
         final pylon.rpc.discord.v1.event.ChannelUpdateEvent event =
                 (pylon.rpc.discord.v1.event.ChannelUpdateEvent) this;
+        if (!event.hasPreviouslyCached()) {
+            return null;
+        }
         return new Channel(GatewayCacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
     }
 

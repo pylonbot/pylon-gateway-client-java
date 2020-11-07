@@ -14,4 +14,5 @@ public interface ChannelCreateEvent extends Event<ChannelCreateEvent> {
                 (pylon.rpc.discord.v1.event.ChannelCreateEvent) this;
         return new Channel(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
+
 }

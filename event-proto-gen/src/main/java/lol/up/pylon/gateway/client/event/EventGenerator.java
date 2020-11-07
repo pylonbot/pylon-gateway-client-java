@@ -33,7 +33,8 @@ public class EventGenerator extends Generator {
         return fileDesc.getMessageTypeList().stream()
                 .filter(descriptorProto -> descriptorProto.getName().contains("Event")
                         && !descriptorProto.getName().contains("Builder")
-                        && !descriptorProto.getName().contains("Scope"))
+                        && !descriptorProto.getName().contains("Scope")
+                && !descriptorProto.getName().contains("EventResponse"))
                 .flatMap(descriptorProto -> handleMessageType(fileDesc, descriptorProto));
     }
 
