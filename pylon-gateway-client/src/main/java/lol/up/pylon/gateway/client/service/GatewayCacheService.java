@@ -70,6 +70,9 @@ public class GatewayCacheService {
                 final GetGuildResponse response = client.getGuild(GetGuildRequest.newBuilder().build());
                 return response.hasGuild() ? response.getGuild() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new Guild(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuild gRPC", throwable);
@@ -91,6 +94,9 @@ public class GatewayCacheService {
                         .build());
                 return response.hasChannel() ? response.getChannel() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new Channel(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getChannel gRPC", throwable);
@@ -112,6 +118,9 @@ public class GatewayCacheService {
                         .build());
                 return response.hasMember() ? response.getMember() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new Member(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getMember gRPC", throwable);
@@ -133,6 +142,9 @@ public class GatewayCacheService {
                         .build());
                 return response.hasRole() ? response.getRole() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new Role(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getRole gRPC", throwable);
@@ -154,6 +166,9 @@ public class GatewayCacheService {
                         .build());
                 return response.hasEmoji() ? response.getEmoji() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new Emoji(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getEmoji gRPC", throwable);
@@ -176,6 +191,9 @@ public class GatewayCacheService {
                                 .build());
                 return response.hasVoiceStateData() ? response.getVoiceStateData() : null;
             });
+            if (data == null) {
+                return null;
+            }
             return new MemberVoiceState(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);
@@ -193,6 +211,9 @@ public class GatewayCacheService {
                                         .build());
                         return response.hasUser() ? response.getUser() : null;
                     });
+            if (data == null) {
+                return null;
+            }
             return new User(this, botId, data);
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);

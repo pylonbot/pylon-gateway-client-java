@@ -303,7 +303,7 @@ public class EventSuppliers {
         @Override
         public void stop() throws Exception {
             if (server != null) {
-                server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                server.shutdown().shutdown();
             }
         }
     }
