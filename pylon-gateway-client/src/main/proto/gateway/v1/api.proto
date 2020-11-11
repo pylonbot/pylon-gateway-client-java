@@ -53,4 +53,53 @@ service GatewayRest {
       returns(pylon.rpc.discord.v1.api.GetGuildVoiceRegionsResponse);
   rpc GetGuildInvites(pylon.rpc.discord.v1.api.GetGuildInvitesRequest)
       returns(pylon.rpc.discord.v1.api.GetGuildInvitesResponse);
+
+  rpc ModifyChannel(pylon.rpc.discord.v1.api.ModifyChannelRequest)
+      returns(pylon.rpc.discord.v1.api.ModifyChannelResponse);
+  rpc DeleteChannel(pylon.rpc.discord.v1.api.DeleteChannelRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteChannelResponse);
+  rpc CreateMessage(pylon.rpc.discord.v1.api.CreateMessageRequest)
+      returns(pylon.rpc.discord.v1.api.CreateMessageResponse);
+  rpc CrosspostMessage(pylon.rpc.discord.v1.api.CrosspostMessageRequest)
+      returns(pylon.rpc.discord.v1.api.CrosspostMessageResponse);
+  rpc CreateReaction(pylon.rpc.discord.v1.api.CreateReactionRequest)
+      returns(pylon.rpc.discord.v1.api.CreateReactionResponse);
+  rpc DeleteOwnReaction(pylon.rpc.discord.v1.api.DeleteOwnReactionRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteOwnReactionResponse);
+  rpc DeleteUserReaction(pylon.rpc.discord.v1.api.DeleteUserReactionRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteUserReactionResponse);
+  rpc DeleteAllReactions(pylon.rpc.discord.v1.api.DeleteAllReactionsRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteAllReactionsResponse);
+  rpc DeleteAllReactionsForEmoji(
+      pylon.rpc.discord.v1.api.DeleteAllReactionsForEmojiRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteAllReactionsForEmojiResponse);
+  rpc EditMessage(pylon.rpc.discord.v1.api.EditMessageRequest)
+      returns(pylon.rpc.discord.v1.api.EditMessageResponse);
+  rpc DeleteMessage(pylon.rpc.discord.v1.api.DeleteMessageRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteMessageResponse);
+  rpc BulkDeleteMessages(pylon.rpc.discord.v1.api.BulkDeleteMessagesRequest)
+      returns(pylon.rpc.discord.v1.api.BulkDeleteMessagesResponse);
+  rpc EditChannelPermissions(
+      pylon.rpc.discord.v1.api.EditChannelPermissionsRequest)
+      returns(pylon.rpc.discord.v1.api.EditChannelPermissionsResponse);
+  rpc GetChannelInvites(pylon.rpc.discord.v1.api.GetChannelInvitesRequest)
+      returns(pylon.rpc.discord.v1.api.GetChannelInvitesResponse);
+  rpc CreateChannelInvite(pylon.rpc.discord.v1.api.CreateChannelInviteRequest)
+      returns(pylon.rpc.discord.v1.api.CreateChannelInviteResponse);
+  rpc DeleteChannelPermission(
+      pylon.rpc.discord.v1.api.DeleteChannelPermissionRequest)
+      returns(pylon.rpc.discord.v1.api.DeleteChannelPermissionResponse);
+  rpc FollowNewsChannel(pylon.rpc.discord.v1.api.FollowNewsChannelRequest)
+      returns(pylon.rpc.discord.v1.api.FollowNewsChannelResponse);
+  rpc TriggerTypingIndicator(
+      pylon.rpc.discord.v1.api.TriggerTypingIndicatorRequest)
+      returns(pylon.rpc.discord.v1.api.TriggerTypingIndicatorResponse);
+  rpc GetPinnedMessages(pylon.rpc.discord.v1.api.GetPinnedMessagesRequest)
+      returns(pylon.rpc.discord.v1.api.GetPinnedMessagesResponse);
+  rpc AddPinnedChannelMessage(
+      pylon.rpc.discord.v1.api.AddPinnedChannelMessageRequest)
+      returns(pylon.rpc.discord.v1.api.AddPinnedChannelMessageResponse);
+  rpc DeletePinnedChannelMessage(
+      pylon.rpc.discord.v1.api.DeletePinnedChannelMessageRequest)
+      returns(pylon.rpc.discord.v1.api.DeletePinnedChannelMessageResponse);
 }
