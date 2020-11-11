@@ -6,11 +6,13 @@ import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
+import lol.up.pylon.gateway.client.service.ApiService;
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pylon.rpc.gateway.v1.cache.GatewayCacheGrpc;
+import pylon.rpc.gateway.v1.rest.GatewayRestGrpc;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -85,6 +87,7 @@ public class GatewayGrpcClient implements Closeable {
 
     private final ManagedChannel channel;
     private final GatewayCacheService cacheService;
+    private final ApiService apiService;
     private final EventDispatcher eventDispatcher;
 
     private long defaultBotId;
@@ -105,6 +108,7 @@ public class GatewayGrpcClient implements Closeable {
                               final ManagedChannel channel) {
         this.channel = channel;
         this.cacheService = new GatewayCacheService(this, GatewayCacheGrpc.newBlockingStub(channel));
+        this.apiService = new ApiService(this, GatewayRestGrpc.newBlockingStub(channel));
         this.defaultBotId = defaultBotId;
         this.eventDispatcher = new EventDispatcher(eventExecutor);
     }
@@ -119,6 +123,10 @@ public class GatewayGrpcClient implements Closeable {
 
     public GatewayCacheService getCacheService() {
         return cacheService;
+    }
+
+    public ApiService getApiService() {
+        return apiService;
     }
 
     public <E extends Event<E>> void registerReceiver(final Class<E> eventClass,
