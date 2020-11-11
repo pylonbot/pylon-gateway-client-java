@@ -350,3 +350,8 @@ message InviteData {
   bool temporary = 8;
   uint64 uses = 9;
 }
+
+message GuildBan {
+  string reason = 1;
+  UserData user = 2;
+}
