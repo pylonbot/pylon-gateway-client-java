@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import pylon.rpc.discord.v1.model.ChannelData;
+import bot.pylon.proto.discord.v1.model.ChannelData;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class Channel implements Entity<ChannelData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId();
+        return data.getGuildId().getValue();
     }
 
     @Override
@@ -39,9 +39,5 @@ public class Channel implements Entity<ChannelData> {
 
     public List<MemberVoiceState> getVoiceStates() {
         return cacheService.listChannelVoiceStates(getBotId(), getGuildId(), data.getId());
-    }
-
-    public List<Webhook> getWebhooks() {
-        return cacheService.listChannelWebhooks(getBotId(), getGuildId(), data.getId());
     }
 }

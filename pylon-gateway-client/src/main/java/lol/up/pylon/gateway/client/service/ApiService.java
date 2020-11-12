@@ -1,5 +1,10 @@
 package lol.up.pylon.gateway.client.service;
 
+import bot.pylon.proto.discord.v1.model.GuildBanData;
+import bot.pylon.proto.discord.v1.model.GuildData;
+import bot.pylon.proto.discord.v1.model.InviteData;
+import bot.pylon.proto.discord.v1.rest.*;
+import bot.pylon.proto.gateway.v1.restservice.GatewayRestGrpc;
 import com.google.protobuf.ByteString;
 import io.grpc.CallCredentials;
 import io.grpc.Context;
@@ -10,11 +15,6 @@ import lol.up.pylon.gateway.client.entity.Role;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcGatewayApiException;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
-import pylon.rpc.discord.v1.api.*;
-import pylon.rpc.discord.v1.model.GuildBan;
-import pylon.rpc.discord.v1.model.GuildData;
-import pylon.rpc.discord.v1.model.InviteData;
-import pylon.rpc.gateway.v1.rest.GatewayRestGrpc;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -63,7 +63,7 @@ public class ApiService {
         return gatewayGrpcClient.getDefaultBotId();
     }
 
-    private String getErrorMessage(final ApiError apiError) {
+    private String getErrorMessage(final RestError apiError) {
         return "An error occurred during REST request: " +
                 "HTTPStatus:" + apiError.getStatus() + " | " +
                 "ErrorCode:" + apiError.getCode() + " | " +
@@ -78,7 +78,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getResponse();
+            return response.getData().getGuild();
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during modifyGuild gRPC", throwable);
         }
@@ -92,7 +92,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new Channel(gatewayGrpcClient.getCacheService(), botId, response.getResponse());
+            return new Channel(gatewayGrpcClient.getCacheService(), botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during createChannel gRPC", throwable);
         }
@@ -120,7 +120,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getAdded();
+            return response.getData().getAdded();
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during addGuildMember gRPC", throwable);
         }
@@ -191,7 +191,7 @@ public class ApiService {
         }
     }
 
-    public List<GuildBan> getGuildBans(final long botId, final long guildId, final GetGuildBansRequest request) throws GrpcRequestException {
+    public List<GuildBanData> getGuildBans(final long botId, final long guildId, final GetGuildBansRequest request) throws GrpcRequestException {
         try {
             final GetGuildBansResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -199,14 +199,14 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getBansList();
+            return response.getData().getBansList();
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuildBans gRPC", throwable);
         }
     }
 
     @Nullable
-    public GuildBan getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request) throws GrpcRequestException {
+    public GuildBanData getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request) throws GrpcRequestException {
         try {
             final GetGuildBanResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -214,10 +214,10 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            if (!response.hasBan()) {
+            if (!response.hasData() || !response.getData().hasBan()) {
                 return null;
             }
-            return response.getBan();
+            return response.getData().getBan();
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuildBan gRPC", throwable);
         }
@@ -257,7 +257,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new Role(gatewayGrpcClient.getCacheService(), botId, response.getRole());
+            return new Role(gatewayGrpcClient.getCacheService(), botId, response.getData().getRole());
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during createGuildRole gRPC", throwable);
         }
@@ -272,7 +272,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getRolesList().stream()
+            return response.getData().getRolesList().stream()
                     .map(roleData -> new Role(gatewayGrpcClient.getCacheService(), botId, roleData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
@@ -288,7 +288,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new Role(gatewayGrpcClient.getCacheService(), botId, response.getRole());
+            return new Role(gatewayGrpcClient.getCacheService(), botId, response.getData().getRole());
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during modifyGuildRole gRPC", throwable);
         }
@@ -343,7 +343,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getRegionsList().asByteStringList().stream()
+            return response.getData().getRegionsList().asByteStringList().stream()
                     .map(ByteString::toStringUtf8)
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
@@ -360,7 +360,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getInvitesList();
+            return response.getData().getInvitesList();
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuildVoiceRegions gRPC", throwable);
         }

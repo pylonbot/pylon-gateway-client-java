@@ -1,5 +1,7 @@
 package lol.up.pylon.gateway.client;
 
+import bot.pylon.proto.gateway.v1.cacheservice.GatewayCacheGrpc;
+import bot.pylon.proto.gateway.v1.restservice.GatewayRestGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lol.up.pylon.gateway.client.entity.event.Event;
@@ -11,8 +13,6 @@ import lol.up.pylon.gateway.client.service.GatewayCacheService;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pylon.rpc.gateway.v1.cache.GatewayCacheGrpc;
-import pylon.rpc.gateway.v1.rest.GatewayRestGrpc;
 
 import java.io.Closeable;
 import java.io.IOException;

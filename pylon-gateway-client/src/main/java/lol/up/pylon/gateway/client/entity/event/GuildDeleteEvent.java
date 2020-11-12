@@ -10,11 +10,11 @@ public interface GuildDeleteEvent extends Event<GuildDeleteEvent> {
     @Override
     @Nonnull
     default Guild getGuild() {
-        if (!(this instanceof pylon.rpc.discord.v1.event.GuildDeleteEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.GuildDeleteEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.GuildDeleteEvent event = (pylon.rpc.discord.v1.event.GuildDeleteEvent) this;
+        final bot.pylon.proto.discord.v1.event.GuildDeleteEvent event = (bot.pylon.proto.discord.v1.event.GuildDeleteEvent) this;
         return new Guild(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 }

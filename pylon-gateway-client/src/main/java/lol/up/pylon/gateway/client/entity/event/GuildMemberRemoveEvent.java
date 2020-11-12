@@ -6,12 +6,12 @@ import lol.up.pylon.gateway.client.service.GatewayCacheService;
 public interface GuildMemberRemoveEvent extends Event<GuildMemberRemoveEvent> {
 
     default Member getMember() {
-        if (!(this instanceof pylon.rpc.discord.v1.event.GuildMemberRemoveEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.GuildMemberRemoveEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.GuildMemberRemoveEvent event =
-                (pylon.rpc.discord.v1.event.GuildMemberRemoveEvent) this;
+        final bot.pylon.proto.discord.v1.event.GuildMemberRemoveEvent event =
+                (bot.pylon.proto.discord.v1.event.GuildMemberRemoveEvent) this;
         return new Member(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 

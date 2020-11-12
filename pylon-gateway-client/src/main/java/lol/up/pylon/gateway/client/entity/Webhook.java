@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import pylon.rpc.discord.v1.model.WebhookData;
+import bot.pylon.proto.discord.v1.model.WebhookData;
 
 public class Webhook implements Entity<WebhookData> {
 

@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.service;
 
+import bot.pylon.proto.gateway.v1.cacheservice.*;
 import io.grpc.CallCredentials;
 import io.grpc.Context;
 import io.grpc.Metadata;
@@ -7,8 +8,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
-import pylon.rpc.discord.v1.model.*;
-import pylon.rpc.gateway.v1.cache.*;
+import bot.pylon.proto.discord.v1.model.*;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -317,28 +317,6 @@ public class GatewayCacheService {
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during getGuildEmojis gRPC", throwable);
-        }
-    }
-
-    public List<Webhook> listChannelWebhooks(final long guildId, final long channelId) throws GrpcRequestException {
-        return listChannelWebhooks(getBotId(), guildId, channelId);
-    }
-
-    public List<Webhook> listChannelWebhooks(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
-        try {
-            final List<WebhookData> dataList = Context.current().withValues(Constants.CTX_BOT_ID, botId,
-                    Constants.CTX_GUILD_ID, guildId).call(() -> {
-                final ListTextChannelWebhooksResponse response = client.listTextChannelWebhooks(
-                        ListTextChannelWebhooksRequest.newBuilder()
-                                .setChannelId(channelId)
-                                .build());
-                return response.getWebhooksList();
-            });
-            return dataList.stream()
-                    .map(webhook -> new Webhook(this, botId, webhook))
-                    .collect(Collectors.toList());
-        } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during listChannelWebhooks gRPC", throwable);
         }
     }
 

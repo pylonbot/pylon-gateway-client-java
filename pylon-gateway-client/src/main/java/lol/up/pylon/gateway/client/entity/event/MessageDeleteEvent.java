@@ -2,7 +2,7 @@ package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import pylon.rpc.discord.v1.model.MessageData;
+import bot.pylon.proto.discord.v1.model.MessageData;
 
 import javax.annotation.Nullable;
 
@@ -10,12 +10,12 @@ public interface MessageDeleteEvent extends Event<MessageDeleteEvent> {
 
     @Nullable
     default MessageData getCachedMessage() throws IllegalStateException {
-        if (!(this instanceof pylon.rpc.discord.v1.event.MessageDeleteEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageDeleteEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.MessageDeleteEvent event =
-                (pylon.rpc.discord.v1.event.MessageDeleteEvent) this;
+        final bot.pylon.proto.discord.v1.event.MessageDeleteEvent event =
+                (bot.pylon.proto.discord.v1.event.MessageDeleteEvent) this;
         if (!event.hasPreviouslyCached()) {
             return null;
         }
@@ -25,21 +25,21 @@ public interface MessageDeleteEvent extends Event<MessageDeleteEvent> {
         return GatewayCacheService.getSingleton().getChannel(getGuildId(), getChannelId());
     }
     default long getChannelId() {
-        if (!(this instanceof pylon.rpc.discord.v1.event.MessageDeleteEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageDeleteEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.MessageDeleteEvent event =
-                (pylon.rpc.discord.v1.event.MessageDeleteEvent) this;
+        final bot.pylon.proto.discord.v1.event.MessageDeleteEvent event =
+                (bot.pylon.proto.discord.v1.event.MessageDeleteEvent) this;
         return event.getPayload().getChannelId();
     }
     default long getMessageId() {
-        if (!(this instanceof pylon.rpc.discord.v1.event.MessageDeleteEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageDeleteEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.MessageDeleteEvent event =
-                (pylon.rpc.discord.v1.event.MessageDeleteEvent) this;
+        final bot.pylon.proto.discord.v1.event.MessageDeleteEvent event =
+                (bot.pylon.proto.discord.v1.event.MessageDeleteEvent) this;
         return event.getPayload().getId();
     }
 

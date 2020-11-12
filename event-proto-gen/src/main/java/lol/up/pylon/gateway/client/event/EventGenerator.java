@@ -116,7 +116,7 @@ public class EventGenerator extends Generator {
                         " if(value == null) {\n" +
                         "    clear" + fieldName + "();\n" +
                         "  } else {\n" +
-                        "    " + getSetterOf(fieldName, fieldTypeDesc.getTypeName()) + "\n" +
+                        "    " + getSetterOf(fieldName, fieldTypeDesc.getTypeName(), shortType) + "\n" +
                         "  }\n" +
                         "  return this;\n" +
                         "}\n\n")
@@ -147,9 +147,9 @@ public class EventGenerator extends Generator {
         }
     }
 
-    public String getSetterOf(final String fieldName, final String typeName) {
-        if(typeName.contains("SnowflakeValue")) {
-            return "set" + fieldName + "(" + typeName.substring(1) + ".newBuilder().setValue(value).build());";
+    public String getSetterOf(final String fieldName, final String typeName, final String typeNameShort) {
+        if(typeNameShort.equals("SnowflakeValue")) {
+            return "set" + fieldName + "(bot.pylon.proto.discord.v1.model." + typeNameShort + ".newBuilder().setValue(value).build());";
         } else {
             return "set" + fieldName + "(com" + typeName + ".of(value));";
         }

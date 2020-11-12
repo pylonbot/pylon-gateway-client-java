@@ -1,17 +1,17 @@
 package lol.up.pylon.gateway.client.exception;
 
-import pylon.rpc.discord.v1.api.ApiError;
+import bot.pylon.proto.discord.v1.rest.RestError;
 
 public class GrpcGatewayApiException extends RuntimeException {
 
-    private final ApiError apiError;
+    private final RestError apiError;
 
-    public GrpcGatewayApiException(final ApiError apiError, final String message) {
+    public GrpcGatewayApiException(final RestError apiError, final String message) {
         super(message);
         this.apiError = apiError;
     }
 
-    public ApiError getApiError() {
+    public RestError getApiError() {
         return apiError;
     }
 }

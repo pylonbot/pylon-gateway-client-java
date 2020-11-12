@@ -1,18 +1,17 @@
 package lol.up.pylon.gateway.client.event;
 
+import bot.pylon.proto.discord.v1.event.*;
+import bot.pylon.proto.gateway.v1.dispatchservice.EventResponse;
+import bot.pylon.proto.gateway.v1.dispatchservice.GatewayDispatchGrpc;
+import bot.pylon.proto.gateway.v1.dispatchservice.InteractionEventResponse;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pylon.rpc.discord.v1.event.*;
-import pylon.rpc.gateway.v1.dispatch.EventResponse;
-import pylon.rpc.gateway.v1.dispatch.GatewayDispatchGrpc;
-import pylon.rpc.gateway.v1.dispatch.InteractionEventResponse;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class EventSuppliers {
 

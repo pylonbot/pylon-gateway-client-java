@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
+import bot.pylon.proto.discord.v1.model.VoiceStateData;
 import lol.up.pylon.gateway.client.service.GatewayCacheService;
-import pylon.rpc.discord.v1.model.VoiceStateData;
 
 public class MemberVoiceState implements Entity<VoiceStateData> {
 
@@ -36,7 +36,7 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
     }
 
     public Channel getChannel() {
-        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
+        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
     }
 
     public Member getMember() {

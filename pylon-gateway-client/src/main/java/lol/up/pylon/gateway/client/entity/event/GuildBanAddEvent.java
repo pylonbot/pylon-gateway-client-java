@@ -6,12 +6,12 @@ import lol.up.pylon.gateway.client.service.GatewayCacheService;
 public interface GuildBanAddEvent extends Event<GuildBanAddEvent> {
 
     default User getUser() {
-        if (!(this instanceof pylon.rpc.discord.v1.event.GuildBanAddEvent)) {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.GuildBanAddEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
-                    "pylon.rpc.discord.v1.event." + getClass().getSimpleName());
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
-        final pylon.rpc.discord.v1.event.GuildBanAddEvent event =
-                (pylon.rpc.discord.v1.event.GuildBanAddEvent) this;
+        final bot.pylon.proto.discord.v1.event.GuildBanAddEvent event =
+                (bot.pylon.proto.discord.v1.event.GuildBanAddEvent) this;
         return new User(GatewayCacheService.getSingleton(), getBotId(), event.getPayload().getUser());
     }
 

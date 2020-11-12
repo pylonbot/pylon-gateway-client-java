@@ -1,0 +1,3 @@
+[submodule "pylon-gateway-client/src/main/proto"]
+	path = pylon-gateway-client/src/main/proto
+	url = git@github.com:pylonbot/pylon-gateway-protobuf.git
