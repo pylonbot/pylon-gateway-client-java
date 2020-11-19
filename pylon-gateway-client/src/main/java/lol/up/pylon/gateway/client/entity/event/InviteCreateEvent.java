@@ -11,7 +11,7 @@ public interface InviteCreateEvent extends Event<InviteCreateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.InviteCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.InviteCreateEvent) this;
-        return event.getPayload();
+        return event.getInvite();
     }
 
 }

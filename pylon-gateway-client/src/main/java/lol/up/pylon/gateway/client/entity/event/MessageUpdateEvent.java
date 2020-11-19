@@ -11,7 +11,7 @@ public interface MessageUpdateEvent extends Event<MessageUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.MessageUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.MessageUpdateEvent) this;
-        return event.getPayload(); // todo wrap nicely
+        return event.getCached(); // todo wrap nicely
     }
 
     default MessageData getOldMessage() {

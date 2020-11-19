@@ -1,9 +1,7 @@
 package lol.up.pylon.gateway.client.event;
 
 import bot.pylon.proto.discord.v1.event.*;
-import bot.pylon.proto.gateway.v1.dispatchservice.EventResponse;
-import bot.pylon.proto.gateway.v1.dispatchservice.GatewayDispatchGrpc;
-import bot.pylon.proto.gateway.v1.dispatchservice.InteractionEventResponse;
+import bot.pylon.proto.gateway.v1.service.GatewayDispatchGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -275,13 +273,6 @@ public class EventSuppliers {
                                                       StreamObserver<EventResponse> responseObserver) {
                             eventDispatcher.dispatchEvent(request);
                             responseObserver.onNext(EventResponse.newBuilder().build());
-                        }
-
-                        @Override
-                        public void interactionCreate(InteractionCreateEvent request,
-                                                      StreamObserver<InteractionEventResponse> responseObserver) {
-                            log.warn("interactionCreate is not implemented {}", request);
-                            responseObserver.onNext(InteractionEventResponse.newBuilder().build());
                         }
                     })
                     .build();

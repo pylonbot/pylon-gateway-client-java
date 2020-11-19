@@ -4,7 +4,7 @@ import bot.pylon.proto.discord.v1.model.GuildBanData;
 import bot.pylon.proto.discord.v1.model.GuildData;
 import bot.pylon.proto.discord.v1.model.InviteData;
 import bot.pylon.proto.discord.v1.rest.*;
-import bot.pylon.proto.gateway.v1.restservice.GatewayRestGrpc;
+import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import com.google.protobuf.ByteString;
 import io.grpc.CallCredentials;
 import io.grpc.Context;

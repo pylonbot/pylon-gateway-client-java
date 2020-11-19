@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.service;
 
-import bot.pylon.proto.gateway.v1.cacheservice.*;
+import bot.pylon.proto.discord.v1.cache.*;
+import bot.pylon.proto.gateway.v1.service.GatewayCacheGrpc;
 import io.grpc.CallCredentials;
 import io.grpc.Context;
 import io.grpc.Metadata;

@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client;
 
-import bot.pylon.proto.gateway.v1.cacheservice.GatewayCacheGrpc;
-import bot.pylon.proto.gateway.v1.restservice.GatewayRestGrpc;
+import bot.pylon.proto.gateway.v1.service.GatewayCacheGrpc;
+import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lol.up.pylon.gateway.client.entity.event.Event;
