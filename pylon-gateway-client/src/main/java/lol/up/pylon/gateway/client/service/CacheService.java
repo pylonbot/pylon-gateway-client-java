@@ -10,6 +10,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
+import lol.up.pylon.gateway.client.util.ExceptionUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -77,7 +78,8 @@ public class CacheService {
             }
             return new Guild(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuild gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -103,7 +105,8 @@ public class CacheService {
             }
             return new Channel(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getChannel gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -124,7 +127,8 @@ public class CacheService {
                     .map(channel -> new Channel(this, botId, channel))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during listGuildChannels gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -151,7 +155,8 @@ public class CacheService {
             }
             return new Member(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getMember gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -191,7 +196,8 @@ public class CacheService {
                     .map(member -> new Member(this, botId, member))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during listGuildMembers gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -217,7 +223,8 @@ public class CacheService {
             }
             return new Role(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -238,7 +245,8 @@ public class CacheService {
                     .map(role -> new Role(this, botId, role))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during listGuildRoles gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -264,7 +272,8 @@ public class CacheService {
             }
             return new Emoji(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getEmoji gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -286,7 +295,8 @@ public class CacheService {
                     .map(emoji -> new Emoji(this, botId, emoji))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildEmojis gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -312,7 +322,8 @@ public class CacheService {
             }
             return new User(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -339,7 +350,8 @@ public class CacheService {
             }
             return new MemberVoiceState(this, botId, data);
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getVoiceStateData gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -362,7 +374,8 @@ public class CacheService {
                     .map(voiceStateData -> new MemberVoiceState(this, botId, voiceStateData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during listChannelVoiceStates gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 }

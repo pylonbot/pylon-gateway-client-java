@@ -1,8 +1,8 @@
 package lol.up.pylon.gateway.client.service;
 
 import bot.pylon.proto.discord.v1.model.GuildBanData;
-import bot.pylon.proto.discord.v1.model.GuildData;
 import bot.pylon.proto.discord.v1.model.InviteData;
+import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.*;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import com.google.protobuf.ByteString;
@@ -10,12 +10,11 @@ import io.grpc.CallCredentials;
 import io.grpc.Context;
 import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.entity.Channel;
-import lol.up.pylon.gateway.client.entity.Guild;
-import lol.up.pylon.gateway.client.entity.Role;
+import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcGatewayApiException;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
+import lol.up.pylon.gateway.client.util.ExceptionUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -81,7 +80,8 @@ public class RestService {
             }
             return new Guild(gatewayGrpcClient.getCacheService(), botId, response.getData().getGuild());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during modifyGuild gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -95,7 +95,8 @@ public class RestService {
             }
             return new Channel(gatewayGrpcClient.getCacheService(), botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during createChannel gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -109,7 +110,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during modifyChannelPositions gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -123,7 +124,8 @@ public class RestService {
             }
             return response.getData().getAdded();
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during addGuildMember gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return false; // unreachable
         }
     }
 
@@ -136,7 +138,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during modifyGuildMember gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -149,7 +151,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during changeSelfNickname gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -162,7 +164,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during addMemberRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -175,7 +177,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during removeMemberRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -188,7 +190,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during removeGuildMember gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -202,7 +204,8 @@ public class RestService {
             }
             return response.getData().getBansList();
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildBans gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -220,7 +223,8 @@ public class RestService {
             }
             return response.getData().getBan();
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildBan gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -233,7 +237,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during createGuildBan gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -246,7 +250,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during removeGuildBan gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -260,7 +264,8 @@ public class RestService {
             }
             return new Role(gatewayGrpcClient.getCacheService(), botId, response.getData().getRole());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during createGuildRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -277,7 +282,8 @@ public class RestService {
                     .map(roleData -> new Role(gatewayGrpcClient.getCacheService(), botId, roleData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during modifyGuildRolePositions gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -291,7 +297,8 @@ public class RestService {
             }
             return new Role(gatewayGrpcClient.getCacheService(), botId, response.getData().getRole());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during modifyGuildRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
@@ -304,7 +311,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during deleteGuildRole gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -316,9 +323,10 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getSerializedSize(); // todo ehhhhh?
+            return response.getData().getSerializedSize(); // todo ehhhhh?
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildPruneCount gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return 0; // unreachable
         }
     }
 
@@ -331,7 +339,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during beginGuildPrune gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
         }
     }
 
@@ -348,12 +356,13 @@ public class RestService {
                     .map(ByteString::toStringUtf8)
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildVoiceRegions gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
-    public List<InviteData> getGuildVoiceRegions(final long botId, final long guildId,
-                                                 final GetGuildInvitesRequest request) throws GrpcRequestException {
+    public List<InviteData> getGuildInvites(final long botId, final long guildId,
+                                            final GetGuildInvitesRequest request) throws GrpcRequestException {
         try {
             final GetGuildInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -361,9 +370,454 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getInvitesList();
+            return response.getData().getInvitesList(); // todo wrap nicely
         } catch (final Throwable throwable) {
-            throw new GrpcRequestException("An error occurred during getGuildVoiceRegions gRPC", throwable);
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public Channel modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request) throws GrpcRequestException {
+        try {
+            final ModifyChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.modifyChannel(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new Channel(gatewayGrpcClient.getCacheService(), botId, response.getData().getChannel());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request) throws GrpcRequestException {
+        try {
+            final DeleteChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteChannel(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public MessageData createMessage(final long botId, final long guildId, final CreateMessageRequest request) throws GrpcRequestException {
+        try {
+            final CreateMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.createMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getMessage(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public MessageData crosspostMessage(final long botId, final long guildId, final CrosspostMessageRequest request) throws GrpcRequestException {
+        try {
+            final CrosspostMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.crosspostMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getMessage(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void createReaction(final long botId, final long guildId, final CreateReactionRequest request) throws GrpcRequestException {
+        try {
+            final CreateReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.createReaction(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void deleteOwnReaction(final long botId, final long guildId, final DeleteOwnReactionRequest request) throws GrpcRequestException {
+        try {
+            final DeleteOwnReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteOwnReaction(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void deleteReaction(final long botId, final long guildId, final DeleteUserReactionRequest request) throws GrpcRequestException {
+        try {
+            final DeleteUserReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteUserReaction(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void deleteAllReactions(final long botId, final long guildId, final DeleteAllReactionsRequest request) throws GrpcRequestException {
+        try {
+            final DeleteAllReactionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteAllReactions(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void deleteEmoteReactions(final long botId, final long guildId,
+                                     final DeleteAllReactionsForEmojiRequest request) throws GrpcRequestException {
+        try {
+            final DeleteAllReactionsForEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteAllReactionsForEmoji(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public MessageData editMessage(final long botId, final long guildId, final EditMessageRequest request) throws GrpcRequestException {
+        try {
+            final EditMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.editMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getMessage(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request) throws GrpcRequestException {
+        try {
+            final DeleteMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void bulkDeleteMessages(final long botId, final long guildId, final BulkDeleteMessagesRequest request) throws GrpcRequestException {
+        try {
+            final BulkDeleteMessagesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.bulkDeleteMessages(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void editChannelPermissions(final long botId, final long guildId,
+                                       final EditChannelPermissionsRequest request) throws GrpcRequestException {
+        try {
+            final EditChannelPermissionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.editChannelPermissions(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public List<InviteData> getChannelInvites(final long botId, final long guildId,
+                                              final GetChannelInvitesRequest request) throws GrpcRequestException {
+        try {
+            final GetChannelInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.getChannelInvites(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getInvitesList(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public InviteData createChannelInvite(final long botId, final long guildId,
+                                          final CreateChannelInviteRequest request) throws GrpcRequestException {
+        try {
+            final CreateChannelInviteResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.createChannelInvite(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getInvite(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void deleteChannelPermission(final long botId, final long guildId,
+                                        final DeleteChannelPermissionRequest request) throws GrpcRequestException {
+        try {
+            final DeleteChannelPermissionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteChannelPermission(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public long followNewsChannel(final long botId, final long guildId, final FollowNewsChannelRequest request) throws GrpcRequestException {
+        try {
+            final FollowNewsChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.followNewsChannel(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getChannelId();
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return 0L; // unreachable
+        }
+    }
+
+    public void startTyping(final long botId, final long guildId, final TriggerTypingIndicatorRequest request) throws GrpcRequestException {
+        try {
+            final TriggerTypingIndicatorResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.triggerTypingIndicator(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public List<MessageData> getPinnedMessages(final long botId, final long guildId,
+                                               final GetPinnedMessagesRequest request) throws GrpcRequestException {
+        try {
+            final GetPinnedMessagesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.getPinnedMessages(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getMessagesList(); // todo wrap nicely
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void pinMessage(final long botId, final long guildId, final AddPinnedChannelMessageRequest request) throws GrpcRequestException {
+        try {
+            final AddPinnedChannelMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.addPinnedChannelMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public void unpinMessage(final long botId, final long guildId, final DeletePinnedChannelMessageRequest request) throws GrpcRequestException {
+        try {
+            final DeletePinnedChannelMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deletePinnedChannelMessage(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public List<Emoji> listGuildEmojis(final long botId, final long guildId,
+                                       final ListGuildEmojisRequest request) throws GrpcRequestException {
+        try {
+            final ListGuildEmojisResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.listGuildEmojis(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return response.getData().getEmojisList().stream()
+                    .map(emojiData -> new Emoji(gatewayGrpcClient.getCacheService(), botId, emojiData))
+                    .collect(Collectors.toList());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public Emoji getGuildEmoji(final long botId, final long guildId, final GetGuildEmojiRequest request) throws GrpcRequestException {
+        try {
+            final GetGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.getGuildEmoji(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new Emoji(gatewayGrpcClient.getCacheService(), botId, response.getData().getEmoji());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public Emoji createGuildEmoji(final long botId, final long guildId, final CreateGuildEmojiRequest request) throws GrpcRequestException {
+        try {
+            final CreateGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.createGuildEmoji(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new Emoji(gatewayGrpcClient.getCacheService(), botId, response.getData().getEmoji());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public Emoji modifyGuildEmoji(final long botId, final long guildId, final ModifyGuildEmojiRequest request) throws GrpcRequestException {
+        try {
+            final ModifyGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.modifyGuildEmoji(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new Emoji(gatewayGrpcClient.getCacheService(), botId, response.getData().getEmoji());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void deleteGuildEmoji(final long botId, final long guildId, final DeleteGuildEmojiRequest request) throws GrpcRequestException {
+        try {
+            final DeleteGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.deleteGuildEmoji(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public User getSelfUser(final long botId, final long guildId, final GetCurrentUserRequest request) throws GrpcRequestException {
+        try {
+            final GetCurrentUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.getCurrentUser(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new User(gatewayGrpcClient.getCacheService(), botId, response.getData().getUser());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public User getUser(final long botId, final long guildId, final GetUserRequest request) throws GrpcRequestException {
+        try {
+            final GetUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.getUser(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new User(gatewayGrpcClient.getCacheService(), botId, response.getData().getUser());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public User modifySelfUser(final long botId, final long guildId, final ModifyCurrentUserRequest request) throws GrpcRequestException {
+        try {
+            final ModifyCurrentUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.modifyCurrentUser(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new User(gatewayGrpcClient.getCacheService(), botId, response.getData().getUser());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
+        }
+    }
+
+    public void leaveGuild(final long botId, final long guildId, final LeaveGuildRequest request) throws GrpcRequestException {
+        try {
+            final LeaveGuildResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.leaveGuild(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+        }
+    }
+
+    public Channel createDmChannel(final long botId, final long guildId, final CreateDmRequest request) throws GrpcRequestException {
+        try {
+            final CreateDmResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
+                    botId, Constants.CTX_GUILD_ID, guildId)
+                    .call(() -> client.createDm(request));
+            if (response.hasError()) {
+                throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+            }
+            return new Channel(gatewayGrpcClient.getCacheService(), botId, response.getData().getChannel());
+        } catch (final Throwable throwable) {
+            ExceptionUtil.rethrowGrpcException(throwable);
+            return null; // unreachable
         }
     }
 
