@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.entity;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.GuildData;
 
@@ -7,19 +8,19 @@ import java.util.List;
 
 public class Guild implements Entity<GuildData> {
 
+    private final GatewayGrpcClient grpcClient;
     private final long botId;
     private final GuildData data;
-    private final CacheService cacheService;
 
-    public Guild(final CacheService cacheService, final long botId, final GuildData data) {
-        this.cacheService = cacheService;
+    public Guild(final GatewayGrpcClient grpcClient, final long botId, final GuildData data) {
+        this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
     public CacheService getGatewayCacheService() {
-        return cacheService;
+        return grpcClient.getCacheService();
     }
 
     @Override
@@ -38,34 +39,34 @@ public class Guild implements Entity<GuildData> {
     }
 
     public Channel getChannelById(final long channelId) {
-        return cacheService.getChannel(getBotId(), getGuildId(), channelId);
+        return getGatewayCacheService().getChannel(getBotId(), getGuildId(), channelId);
     }
 
     public Role getRoleById(final long roleId) {
-        return cacheService.getRole(getBotId(), getGuildId(), roleId);
+        return getGatewayCacheService().getRole(getBotId(), getGuildId(), roleId);
     }
 
     public Member getMemberById(final long memberId) {
-        return cacheService.getMember(getBotId(), getGuildId(), memberId);
+        return getGatewayCacheService().getMember(getBotId(), getGuildId(), memberId);
     }
 
     public Emoji getEmojiById(final long emojiId) {
-        return cacheService.getEmoji(getBotId(), getGuildId(), emojiId);
+        return getGatewayCacheService().getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
     public List<Channel> listChannels() {
-        return cacheService.listGuildChannels(getBotId(), getGuildId());
+        return getGatewayCacheService().listGuildChannels(getBotId(), getGuildId());
     }
 
     public List<Role> listRoles() {
-        return cacheService.listGuildRoles(getBotId(), getGuildId());
+        return getGatewayCacheService().listGuildRoles(getBotId(), getGuildId());
     }
 
     public List<Member> listMembers() {
-        return cacheService.listGuildMembers(getBotId(), getGuildId());
+        return getGatewayCacheService().listGuildMembers(getBotId(), getGuildId());
     }
 
     public List<Emoji> listEmojis() {
-        return cacheService.listGuildEmojis(getBotId(), getGuildId());
+        return getGatewayCacheService().listGuildEmojis(getBotId(), getGuildId());
     }
 }

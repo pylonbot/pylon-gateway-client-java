@@ -1,23 +1,26 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.EmojiData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.CacheService;
+
+import javax.annotation.Nullable;
 
 public class Emoji implements Entity<EmojiData> {
 
+    private final GatewayGrpcClient grpcClient;
     private final long botId;
-    private final EmojiData data;
-    private final CacheService cacheService;
+    private EmojiData data;
 
-    public Emoji(final CacheService cacheService, final long botId, final EmojiData data) {
-        this.cacheService = cacheService;
+    public Emoji(final GatewayGrpcClient grpcClient, final long botId, final EmojiData data) {
+        this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
     public CacheService getGatewayCacheService() {
-        return cacheService;
+        return grpcClient.getCacheService();
     }
 
     @Override
@@ -33,6 +36,23 @@ public class Emoji implements Entity<EmojiData> {
     @Override
     public EmojiData getData() {
         return data;
+    }
+
+    public void changeName(final String name) {
+        changeName(name, null);
+    }
+
+    public void changeName(final String name, @Nullable final String reason) {
+        this.data = grpcClient.getRestService().modifyGuildEmoji(getBotId(), getGuildId(), data.getId(), name, reason)
+                .getData();
+    }
+
+    public void delete() {
+        delete(null);
+    }
+
+    public void delete(@Nullable final String reason) {
+        grpcClient.getRestService().deleteGuildEmoji(getBotId(), getGuildId(), data.getId(), reason);
     }
 
 }

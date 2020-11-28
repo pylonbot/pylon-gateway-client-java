@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.service.CacheService;
 
@@ -12,7 +13,7 @@ public interface ChannelPinsUpdateEvent extends Event<ChannelPinsUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.ChannelPinsUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.ChannelPinsUpdateEvent) this;
-        return CacheService.getSingleton().getChannel(event.getPayload().getGuildId(),
+        return GatewayGrpcClient.getSingleton().getCacheService().getChannel(event.getPayload().getGuildId(),
                 event.getPayload().getChannelId());
     }
 

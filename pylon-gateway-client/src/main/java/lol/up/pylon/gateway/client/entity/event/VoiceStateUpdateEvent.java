@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.MemberVoiceState;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface VoiceStateUpdateEvent extends Event<VoiceStateUpdateEvent> {
 
@@ -12,7 +12,7 @@ public interface VoiceStateUpdateEvent extends Event<VoiceStateUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.VoiceStateUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.VoiceStateUpdateEvent) this;
-        return new MemberVoiceState(CacheService.getSingleton(), getBotId(), event.getPayload());
+        return new MemberVoiceState(GatewayGrpcClient.getSingleton(), getBotId(), event.getPayload());
     }
 
     default MemberVoiceState getOldVoiceState() {
@@ -22,7 +22,7 @@ public interface VoiceStateUpdateEvent extends Event<VoiceStateUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.VoiceStateUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.VoiceStateUpdateEvent) this;
-        return new MemberVoiceState(CacheService.getSingleton(), getBotId(), event.getPreviouslyCached());
+        return new MemberVoiceState(GatewayGrpcClient.getSingleton(), getBotId(), event.getPreviouslyCached());
     }
 
 }

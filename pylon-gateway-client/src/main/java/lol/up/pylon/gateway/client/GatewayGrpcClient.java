@@ -8,8 +8,8 @@ import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
-import lol.up.pylon.gateway.client.service.RestService;
 import lol.up.pylon.gateway.client.service.CacheService;
+import lol.up.pylon.gateway.client.service.RestService;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +85,12 @@ public class GatewayGrpcClient implements Closeable {
         return new GatewayGrpcClientBuilder(defaultBotId);
     }
 
+    private static GatewayGrpcClient instance;
+
+    public static GatewayGrpcClient getSingleton() {
+        return instance;
+    }
+
     private final ManagedChannel channel;
     private final CacheService cacheService;
     private final RestService restService;
@@ -106,6 +112,10 @@ public class GatewayGrpcClient implements Closeable {
 
     private GatewayGrpcClient(final long defaultBotId, final ExecutorService eventExecutor,
                               final ManagedChannel channel) {
+        if (instance != null) {
+            throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
+        }
+        instance = this;
         this.channel = channel;
         this.cacheService = new CacheService(this, GatewayCacheGrpc.newBlockingStub(channel));
         this.restService = new RestService(this, GatewayRestGrpc.newBlockingStub(channel));
@@ -125,7 +135,7 @@ public class GatewayGrpcClient implements Closeable {
         return cacheService;
     }
 
-    public RestService getApiService() {
+    public RestService getRestService() {
         return restService;
     }
 

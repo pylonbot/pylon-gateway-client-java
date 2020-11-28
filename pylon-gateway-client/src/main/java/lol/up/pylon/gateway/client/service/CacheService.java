@@ -19,21 +19,11 @@ import java.util.stream.Collectors;
 
 public class CacheService {
 
-    private static CacheService instance;
-
-    public static CacheService getSingleton() {
-        return instance;
-    }
-
     private final GatewayCacheGrpc.GatewayCacheBlockingStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
 
     public CacheService(final GatewayGrpcClient gatewayGrpcClient,
                         final GatewayCacheGrpc.GatewayCacheBlockingStub client) {
-        if (instance != null) {
-            throw new IllegalStateException("You might only create GatewayCacheService once");
-        }
-        instance = this;
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.client = client.withCallCredentials(new CallCredentials() {
             @Override
@@ -76,7 +66,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new Guild(this, botId, data);
+            return new Guild(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -103,7 +93,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new Channel(this, botId, data);
+            return new Channel(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -124,7 +114,7 @@ public class CacheService {
                 return response.getChannelsList();
             });
             return dataList.stream()
-                    .map(channel -> new Channel(this, botId, channel))
+                    .map(channel -> new Channel(gatewayGrpcClient, botId, channel))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
@@ -153,7 +143,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new Member(this, botId, data);
+            return new Member(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -193,7 +183,7 @@ public class CacheService {
                 return response.getMembersList();
             });
             return dataList.stream()
-                    .map(member -> new Member(this, botId, member))
+                    .map(member -> new Member(gatewayGrpcClient, botId, member))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
@@ -221,7 +211,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new Role(this, botId, data);
+            return new Role(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -242,7 +232,7 @@ public class CacheService {
                 return response.getRolesList();
             });
             return dataList.stream()
-                    .map(role -> new Role(this, botId, role))
+                    .map(role -> new Role(gatewayGrpcClient, botId, role))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
@@ -270,7 +260,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new Emoji(this, botId, data);
+            return new Emoji(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -292,7 +282,7 @@ public class CacheService {
                 return response.getEmojisList();
             });
             return dataList.stream()
-                    .map(emoji -> new Emoji(this, botId, emoji))
+                    .map(emoji -> new Emoji(gatewayGrpcClient, botId, emoji))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
@@ -320,7 +310,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new User(this, botId, data);
+            return new User(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -348,7 +338,7 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new MemberVoiceState(this, botId, data);
+            return new MemberVoiceState(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -371,7 +361,7 @@ public class CacheService {
                 return response.getVoiceStatesDataList();
             });
             return dataList.stream()
-                    .map(voiceStateData -> new MemberVoiceState(this, botId, voiceStateData))
+                    .map(voiceStateData -> new MemberVoiceState(gatewayGrpcClient, botId, voiceStateData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);

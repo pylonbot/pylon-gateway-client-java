@@ -1,23 +1,24 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.VoiceStateData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.CacheService;
 
 public class MemberVoiceState implements Entity<VoiceStateData> {
 
+    private final GatewayGrpcClient grpcClient;
     private final long botId;
     private final VoiceStateData data;
-    private final CacheService cacheService;
 
-    public MemberVoiceState(final CacheService cacheService, final long botId, final VoiceStateData data) {
-        this.cacheService = cacheService;
+    public MemberVoiceState(final GatewayGrpcClient grpcClient, final long botId, final VoiceStateData data) {
+        this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
     public CacheService getGatewayCacheService() {
-        return cacheService;
+        return grpcClient.getCacheService();
     }
 
     @Override
@@ -36,10 +37,10 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
     }
 
     public Channel getChannel() {
-        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
+        return getGatewayCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
     }
 
     public Member getMember() {
-        return new Member(cacheService, getBotId(), getData().getMember());
+        return new Member(grpcClient, getBotId(), getData().getMember());
     }
 }

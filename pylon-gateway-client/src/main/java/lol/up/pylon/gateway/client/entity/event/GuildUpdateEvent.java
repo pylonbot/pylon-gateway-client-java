@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Guild;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,8 +15,9 @@ public interface GuildUpdateEvent extends Event<GuildUpdateEvent> {
             throw new IllegalStateException("GuildUpdateEvent interface might only be implemented by pylon.rpc" +
                     ".discord.v1.event.GuildUpdateEvent");
         }
-        final bot.pylon.proto.discord.v1.event.GuildUpdateEvent event = (bot.pylon.proto.discord.v1.event.GuildUpdateEvent) this;
-        return new Guild(CacheService.getSingleton(), event.getBotId(), event.getPayload());
+        final bot.pylon.proto.discord.v1.event.GuildUpdateEvent event =
+                (bot.pylon.proto.discord.v1.event.GuildUpdateEvent) this;
+        return new Guild(GatewayGrpcClient.getSingleton(), event.getBotId(), event.getPayload());
     }
 
     @Nullable
@@ -25,11 +26,12 @@ public interface GuildUpdateEvent extends Event<GuildUpdateEvent> {
             throw new IllegalStateException("GuildUpdateEvent interface might only be implemented by pylon.rpc" +
                     ".discord.v1.event.GuildUpdateEvent");
         }
-        final bot.pylon.proto.discord.v1.event.GuildUpdateEvent event = (bot.pylon.proto.discord.v1.event.GuildUpdateEvent) this;
+        final bot.pylon.proto.discord.v1.event.GuildUpdateEvent event =
+                (bot.pylon.proto.discord.v1.event.GuildUpdateEvent) this;
         if (!event.hasPreviouslyCached()) {
             return null;
         }
-        return new Guild(CacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
+        return new Guild(GatewayGrpcClient.getSingleton(), event.getBotId(), event.getPreviouslyCached());
     }
 
 }

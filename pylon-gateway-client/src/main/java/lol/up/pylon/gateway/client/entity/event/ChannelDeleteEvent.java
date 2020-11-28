@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface ChannelDeleteEvent extends Event<ChannelDeleteEvent> {
 
@@ -12,7 +12,7 @@ public interface ChannelDeleteEvent extends Event<ChannelDeleteEvent> {
         }
         final bot.pylon.proto.discord.v1.event.ChannelDeleteEvent event =
                 (bot.pylon.proto.discord.v1.event.ChannelDeleteEvent) this;
-        return new Channel(CacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Channel(GatewayGrpcClient.getSingleton(), event.getBotId(), event.getPayload());
     }
 
 }

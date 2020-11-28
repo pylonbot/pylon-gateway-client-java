@@ -1,8 +1,8 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.entity.Member;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface TypingStartEvent extends Event<TypingStartEvent> {
 
@@ -31,10 +31,10 @@ public interface TypingStartEvent extends Event<TypingStartEvent> {
         }
         final bot.pylon.proto.discord.v1.event.TypingStartEvent event =
                 (bot.pylon.proto.discord.v1.event.TypingStartEvent) this;
-        return new Member(CacheService.getSingleton(), getBotId(), event.getPayload().getMember());
+        return new Member(GatewayGrpcClient.getSingleton(), getBotId(), event.getPayload().getMember());
     }
     default Channel getChannel() {
-        return CacheService.getSingleton().getChannel(getGuildId(), getChannelId());
+        return GatewayGrpcClient.getSingleton().getCacheService().getChannel(getGuildId(), getChannelId());
     }
     default long getChannelId() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.TypingStartEvent)) {

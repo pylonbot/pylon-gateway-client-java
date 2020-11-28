@@ -1,8 +1,8 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-import lol.up.pylon.gateway.client.entity.Guild;
-import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.event.EventScope;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Guild;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +18,7 @@ public interface Event<T extends Event> {
         if (getGuildId() == 0) {
             return null;
         }
-        return CacheService.getSingleton().getGuild(getGuildId());
+        return GatewayGrpcClient.getSingleton().getCacheService().getGuild(getGuildId());
     }
     default long getGuildId() {
         return getScope().getGuildId();

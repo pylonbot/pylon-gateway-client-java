@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Emoji;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +16,7 @@ public interface GuildEmojisUpdateEvent extends Event<GuildEmojisUpdateEvent> {
         final bot.pylon.proto.discord.v1.event.GuildEmojisUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.GuildEmojisUpdateEvent) this;
         return event.getPayload().getEmojisList().stream()
-                .map(emojiData -> new Emoji(CacheService.getSingleton(), getBotId(), emojiData))
+                .map(emojiData -> new Emoji(GatewayGrpcClient.getSingleton(), getBotId(), emojiData))
                 .collect(Collectors.toList());
     }
 

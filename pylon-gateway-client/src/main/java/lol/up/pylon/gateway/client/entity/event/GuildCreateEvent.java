@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Guild;
 import lol.up.pylon.gateway.client.service.CacheService;
 
@@ -15,6 +16,6 @@ public interface GuildCreateEvent extends Event<GuildCreateEvent> {
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
         final bot.pylon.proto.discord.v1.event.GuildCreateEvent event = (bot.pylon.proto.discord.v1.event.GuildCreateEvent) this;
-        return new Guild(CacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Guild(GatewayGrpcClient.getSingleton(), event.getBotId(), event.getPayload());
     }
 }

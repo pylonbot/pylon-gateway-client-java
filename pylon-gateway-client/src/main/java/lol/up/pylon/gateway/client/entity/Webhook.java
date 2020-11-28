@@ -1,23 +1,24 @@
 package lol.up.pylon.gateway.client.entity;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.WebhookData;
 
 public class Webhook implements Entity<WebhookData> {
 
+    private final GatewayGrpcClient grpcClient;
     private final long botId;
     private final WebhookData data;
-    private final CacheService cacheService;
 
-    public Webhook(final CacheService cacheService, final long botId, final WebhookData data) {
-        this.cacheService = cacheService;
+    public Webhook(final GatewayGrpcClient grpcClient, final long botId, final WebhookData data) {
+        this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
     public CacheService getGatewayCacheService() {
-        return cacheService;
+        return grpcClient.getCacheService();
     }
 
     @Override
@@ -36,7 +37,7 @@ public class Webhook implements Entity<WebhookData> {
     }
 
     public Channel getChannel() {
-        return cacheService.getChannel(getBotId(), getGuildId(), getData().getChannelId());
+        return getGatewayCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId());
     }
 
 }
