@@ -3,6 +3,7 @@ package lol.up.pylon.gateway.client.service;
 import bot.pylon.proto.discord.v1.model.GuildBanData;
 import bot.pylon.proto.discord.v1.model.InviteData;
 import bot.pylon.proto.discord.v1.model.MessageData;
+import bot.pylon.proto.discord.v1.model.SnowflakeListValue;
 import bot.pylon.proto.discord.v1.rest.*;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import com.google.protobuf.ByteString;
@@ -70,7 +71,13 @@ public class RestService {
                 "Message:" + apiError.getMessage();
     }
 
-    public Guild modifyGuild(final long botId, final long guildId, final ModifyGuildRequest request) throws GrpcRequestException, GrpcGatewayApiException {
+    public Guild modifyGuild(final long guildId, final ModifyGuildRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuild(getBotId(), guildId, request);
+    }
+
+    public Guild modifyGuild(final long botId, final long guildId, final ModifyGuildRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildResponse response = Context.current().withValues(Constants.CTX_BOT_ID, botId,
                     Constants.CTX_GUILD_ID, guildId)
@@ -85,7 +92,13 @@ public class RestService {
         }
     }
 
-    public Channel createChannel(final long botId, final long guildId, final CreateGuildChannelRequest request) throws GrpcRequestException {
+    public Channel createChannel(final long guildId, final CreateGuildChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createChannel(getBotId(), guildId, request);
+    }
+
+    public Channel createChannel(final long botId, final long guildId, final CreateGuildChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateGuildChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID, botId,
                     Constants.CTX_GUILD_ID, guildId)
@@ -100,8 +113,14 @@ public class RestService {
         }
     }
 
+    public void modifyChannelPositions(final long guildId, final ModifyGuildChannelPositionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        modifyChannelPositions(getBotId(), guildId, request);
+    }
+
     public void modifyChannelPositions(final long botId, final long guildId,
-                                       final ModifyGuildChannelPositionsRequest request) throws GrpcRequestException {
+                                       final ModifyGuildChannelPositionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildChannelPositionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -114,7 +133,13 @@ public class RestService {
         }
     }
 
-    public boolean addGuildMember(final long botId, final long guildId, final AddGuildMemberRequest request) throws GrpcRequestException {
+    public boolean addGuildMember(final long guildId, final AddGuildMemberRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return addGuildMember(getBotId(), guildId, request);
+    }
+
+    public boolean addGuildMember(final long botId, final long guildId, final AddGuildMemberRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final AddGuildMemberResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -129,7 +154,13 @@ public class RestService {
         }
     }
 
-    public void modifyGuildMember(final long botId, final long guildId, final ModifyGuildMemberRequest request) throws GrpcRequestException {
+    public void modifyGuildMember(final long guildId, final ModifyGuildMemberRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        modifyGuildMember(getBotId(), guildId, request);
+    }
+
+    public void modifyGuildMember(final long botId, final long guildId, final ModifyGuildMemberRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildMemberResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -142,7 +173,20 @@ public class RestService {
         }
     }
 
-    public void changeSelfNickname(final long botId, final long guildId, final ModifyCurrentUserNickRequest request) throws GrpcRequestException {
+    public void changeSelfNickname(final long guildId, final String nickName)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        changeSelfNickname(getBotId(), guildId, nickName);
+    }
+
+    public void changeSelfNickname(final long botId, final long guildId, final String nickName)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        changeSelfNickname(botId, guildId, ModifyCurrentUserNickRequest.newBuilder()
+                .setNick(nickName)
+                .build());
+    }
+
+    public void changeSelfNickname(final long botId, final long guildId, final ModifyCurrentUserNickRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyCurrentUserNickResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -155,7 +199,28 @@ public class RestService {
         }
     }
 
-    public void addMemberRole(final long botId, final long guildId, final AddGuildMemberRoleRequest request) throws GrpcRequestException {
+    public void addMemberRole(final long guildId, final long memberId, final long roleId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        addMemberRole(guildId, memberId, roleId, null);
+    }
+
+    public void addMemberRole(final long guildId, final long memberId, final long roleId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        addMemberRole(getBotId(), guildId, memberId, roleId, reason);
+    }
+
+    public void addMemberRole(final long botId, final long guildId, final long memberId, final long roleId,
+                              @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        addMemberRole(botId, guildId, AddGuildMemberRoleRequest.newBuilder()
+                .setUserId(memberId)
+                .setRoleId(roleId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void addMemberRole(final long botId, final long guildId, final AddGuildMemberRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final AddGuildMemberRoleResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -168,7 +233,29 @@ public class RestService {
         }
     }
 
-    public void removeMemberRole(final long botId, final long guildId, final RemoveGuildMemberRoleRequest request) throws GrpcRequestException {
+    public void removeMemberRole(final long guildId, final long memberId, final long roleId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        removeMemberRole(guildId, memberId, roleId, null);
+    }
+
+    public void removeMemberRole(final long guildId, final long memberId, final long roleId,
+                                 @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        removeMemberRole(getBotId(), guildId, memberId, roleId, reason);
+    }
+
+    public void removeMemberRole(final long botId, final long guildId, final long memberId, final long roleId,
+                                 @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        removeMemberRole(botId, guildId, RemoveGuildMemberRoleRequest.newBuilder()
+                .setUserId(memberId)
+                .setRoleId(roleId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void removeMemberRole(final long botId, final long guildId, final RemoveGuildMemberRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final RemoveGuildMemberRoleResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -181,7 +268,8 @@ public class RestService {
         }
     }
 
-    public void removeGuildMember(final long botId, final long guildId, final RemoveGuildMemberRequest request) throws GrpcRequestException {
+    public void removeGuildMember(final long botId, final long guildId, final RemoveGuildMemberRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final RemoveGuildMemberResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -194,11 +282,17 @@ public class RestService {
         }
     }
 
-    public List<GuildBanData> getGuildBans(final long botId, final long guildId, final GetGuildBansRequest request) throws GrpcRequestException {
+    public List<GuildBanData> getGuildBans(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildBans(getBotId(), guildId);
+    }
+
+    public List<GuildBanData> getGuildBans(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildBansResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getGuildBans(request));
+                    .call(() -> client.getGuildBans(GetGuildBansRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -210,7 +304,22 @@ public class RestService {
     }
 
     @Nullable
-    public GuildBanData getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request) throws GrpcRequestException {
+    public GuildBanData getGuildBan(final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildBan(getBotId(), guildId, userId);
+    }
+
+    @Nullable
+    public GuildBanData getGuildBan(final long botId, final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildBan(botId, guildId, GetGuildBanRequest.newBuilder()
+                .setUserId(userId)
+                .build());
+    }
+
+    @Nullable
+    public GuildBanData getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildBanResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -228,7 +337,29 @@ public class RestService {
         }
     }
 
-    public void createGuildBan(final long botId, final long guildId, final CreateGuildBanRequest request) throws GrpcRequestException {
+    public void createGuildBan(final long guildId, final long userId, final int deleteDays)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        createGuildBan(guildId, userId, deleteDays, null);
+    }
+
+    public void createGuildBan(final long guildId, final long userId, final int deleteDays,
+                               @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        createGuildBan(getBotId(), guildId, userId, deleteDays, reason);
+    }
+
+    public void createGuildBan(final long botId, final long guildId, final long userId, final int deleteDays,
+                               @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        createGuildBan(botId, guildId, CreateGuildBanRequest.newBuilder()
+                .setUserId(userId)
+                .setDeleteMessageDays(deleteDays)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void createGuildBan(final long botId, final long guildId, final CreateGuildBanRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateGuildBanResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -241,7 +372,8 @@ public class RestService {
         }
     }
 
-    public void removeGuildBan(final long botId, final long guildId, final RemoveGuildBanRequest request) throws GrpcRequestException {
+    public void removeGuildBan(final long botId, final long guildId, final RemoveGuildBanRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final RemoveGuildBanResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -254,7 +386,13 @@ public class RestService {
         }
     }
 
-    public Role createGuildRole(final long botId, final long guildId, final CreateGuildRoleRequest request) throws GrpcRequestException {
+    public Role createGuildRole(final long guildId, final CreateGuildRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createGuildRole(getBotId(), guildId, request);
+    }
+
+    public Role createGuildRole(final long botId, final long guildId, final CreateGuildRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateGuildRoleResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -269,8 +407,14 @@ public class RestService {
         }
     }
 
+    public List<Role> modifyGuildRolePositions(final long guildId, final ModifyGuildRolePositionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuildRolePositions(getBotId(), guildId, request);
+    }
+
     public List<Role> modifyGuildRolePositions(final long botId, final long guildId,
-                                               final ModifyGuildRolePositionsRequest request) throws GrpcRequestException {
+                                               final ModifyGuildRolePositionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildRolePositionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -287,7 +431,13 @@ public class RestService {
         }
     }
 
-    public Role modifyGuildRole(final long botId, final long guildId, final ModifyGuildRoleRequest request) throws GrpcRequestException {
+    public Role modifyGuildRole(final long guildId, final ModifyGuildRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuildRole(getBotId(), guildId, request);
+    }
+
+    public Role modifyGuildRole(final long botId, final long guildId, final ModifyGuildRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildRoleResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -302,7 +452,26 @@ public class RestService {
         }
     }
 
-    public void deleteGuildRole(final long botId, final long guildId, final DeleteGuildRoleRequest request) throws GrpcRequestException {
+    public void deleteGuildRole(final long guildId, final long roleId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildRole(guildId, roleId, (String) null);
+    }
+
+    public void deleteGuildRole(final long guildId, final long roleId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildRole(getBotId(), guildId, roleId, reason);
+    }
+
+    public void deleteGuildRole(final long botId, final long guildId, final long roleId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildRole(botId, guildId, DeleteGuildRoleRequest.newBuilder()
+                .setRoleId(roleId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void deleteGuildRole(final long botId, final long guildId, final DeleteGuildRoleRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteGuildRoleResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -315,7 +484,23 @@ public class RestService {
         }
     }
 
-    public int getGuildPruneCount(final long botId, final long guildId, final GetGuildPruneCountRequest request) throws GrpcRequestException {
+    public int getGuildPruneCount(final long guildId, final int days, final List<Long> roles)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildPruneCount(getBotId(), guildId, days, roles);
+    }
+
+    public int getGuildPruneCount(final long botId, final long guildId, final int days, final List<Long> roles)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildPruneCount(botId, guildId, GetGuildPruneCountRequest.newBuilder()
+                .setDays(days)
+                .setIncludeRoles(SnowflakeListValue.newBuilder()
+                        .addAllValues(roles)
+                        .build())
+                .build());
+    }
+
+    public int getGuildPruneCount(final long botId, final long guildId, final GetGuildPruneCountRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildPruneCountResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -330,7 +515,13 @@ public class RestService {
         }
     }
 
-    public void beginGuildPrune(final long botId, final long guildId, final BeginGuildPruneRequest request) throws GrpcRequestException {
+    public void beginGuildPrune(final long guildId, final BeginGuildPruneRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        beginGuildPrune(getBotId(), guildId, request);
+    }
+
+    public void beginGuildPrune(final long botId, final long guildId, final BeginGuildPruneRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final BeginGuildPruneResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -343,12 +534,17 @@ public class RestService {
         }
     }
 
-    public List<String> getGuildVoiceRegions(final long botId, final long guildId,
-                                             final GetGuildVoiceRegionsRequest request) throws GrpcRequestException {
+    public List<String> getGuildVoiceRegions(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildVoiceRegions(getBotId(), guildId);
+    }
+
+    public List<String> getGuildVoiceRegions(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildVoiceRegionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getGuildVoiceRegions(request));
+                    .call(() -> client.getGuildVoiceRegions(GetGuildVoiceRegionsRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -361,12 +557,17 @@ public class RestService {
         }
     }
 
-    public List<InviteData> getGuildInvites(final long botId, final long guildId,
-                                            final GetGuildInvitesRequest request) throws GrpcRequestException {
+    public List<InviteData> getGuildInvites(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildInvites(getBotId(), guildId);
+    }
+
+    public List<InviteData> getGuildInvites(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getGuildInvites(request));
+                    .call(() -> client.getGuildInvites(GetGuildInvitesRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -377,7 +578,13 @@ public class RestService {
         }
     }
 
-    public Channel modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request) throws GrpcRequestException {
+    public Channel modifyChannel(final long guildId, final ModifyChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyChannel(getBotId(), guildId, request);
+    }
+
+    public Channel modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -392,7 +599,26 @@ public class RestService {
         }
     }
 
-    public void deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request) throws GrpcRequestException {
+    public void deleteChannel(final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteChannel(guildId, channelId, (String) null);
+    }
+
+    public void deleteChannel(final long guildId, final long channelId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteChannel(getBotId(), guildId, channelId, reason);
+    }
+
+    public void deleteChannel(final long botId, final long guildId, final long channelId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteChannel(botId, guildId, DeleteChannelRequest.newBuilder()
+                .setChannelId(channelId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -405,7 +631,13 @@ public class RestService {
         }
     }
 
-    public MessageData createMessage(final long botId, final long guildId, final CreateMessageRequest request) throws GrpcRequestException {
+    public MessageData createMessage(final long guildId, final CreateMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createMessage(getBotId(), guildId, request);
+    }
+
+    public MessageData createMessage(final long botId, final long guildId, final CreateMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -420,7 +652,22 @@ public class RestService {
         }
     }
 
-    public MessageData crosspostMessage(final long botId, final long guildId, final CrosspostMessageRequest request) throws GrpcRequestException {
+    public MessageData crosspostMessage(final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return crosspostMessage(getBotId(), guildId, channelId, messageId);
+    }
+
+    public MessageData crosspostMessage(final long botId, final long guildId, final long channelId,
+                                        final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return crosspostMessage(botId, guildId, CrosspostMessageRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .build());
+    }
+
+    public MessageData crosspostMessage(final long botId, final long guildId, final CrosspostMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CrosspostMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -435,7 +682,23 @@ public class RestService {
         }
     }
 
-    public void createReaction(final long botId, final long guildId, final CreateReactionRequest request) throws GrpcRequestException {
+    public void createReaction(final long guildId, final long channelId, final long messageId, final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        createReaction(getBotId(), guildId, channelId, messageId, emoji);
+    }
+
+    public void createReaction(final long botId, final long guildId, final long channelId, final long messageId,
+                               final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        createReaction(botId, guildId, CreateReactionRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setEmoji(emoji)
+                .build());
+    }
+
+    public void createReaction(final long botId, final long guildId, final CreateReactionRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -448,7 +711,23 @@ public class RestService {
         }
     }
 
-    public void deleteOwnReaction(final long botId, final long guildId, final DeleteOwnReactionRequest request) throws GrpcRequestException {
+    public void deleteOwnReaction(final long guildId, final long channelId, final long messageId, final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteOwnReaction(getBotId(), guildId, channelId, messageId, emoji);
+    }
+
+    public void deleteOwnReaction(final long botId, final long guildId, final long channelId, final long messageId,
+                                  final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteOwnReaction(botId, guildId, DeleteOwnReactionRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setEmoji(emoji)
+                .build());
+    }
+
+    public void deleteOwnReaction(final long botId, final long guildId, final DeleteOwnReactionRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteOwnReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -461,7 +740,25 @@ public class RestService {
         }
     }
 
-    public void deleteReaction(final long botId, final long guildId, final DeleteUserReactionRequest request) throws GrpcRequestException {
+    public void deleteReaction(final long guildId, final long channelId, final long messageId, final long userId,
+                               final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteReaction(getBotId(), guildId, channelId, messageId, userId, emoji);
+    }
+
+    public void deleteReaction(final long botId, final long guildId, final long channelId, final long messageId,
+                               final long userId, final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteReaction(botId, guildId, DeleteUserReactionRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setUserId(userId)
+                .setEmoji(emoji)
+                .build());
+    }
+
+    public void deleteReaction(final long botId, final long guildId, final DeleteUserReactionRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteUserReactionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -474,7 +771,21 @@ public class RestService {
         }
     }
 
-    public void deleteAllReactions(final long botId, final long guildId, final DeleteAllReactionsRequest request) throws GrpcRequestException {
+    public void deleteAllReactions(final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteAllReactions(getBotId(), guildId, channelId, messageId);
+    }
+
+    public void deleteAllReactions(final long botId, final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteAllReactions(botId, guildId, DeleteAllReactionsRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .build());
+    }
+
+    public void deleteAllReactions(final long botId, final long guildId, final DeleteAllReactionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteAllReactionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -487,8 +798,24 @@ public class RestService {
         }
     }
 
+    public void deleteEmoteReactions(final long guildId, final long channelId, final long messageId, final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteEmoteReactions(getBotId(), guildId, channelId, messageId, emoji);
+    }
+
+    public void deleteEmoteReactions(final long botId, final long guildId, final long channelId, final long messageId,
+                                     final String emoji)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteEmoteReactions(botId, guildId, DeleteAllReactionsForEmojiRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setEmoji(emoji)
+                .build());
+    }
+
     public void deleteEmoteReactions(final long botId, final long guildId,
-                                     final DeleteAllReactionsForEmojiRequest request) throws GrpcRequestException {
+                                     final DeleteAllReactionsForEmojiRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteAllReactionsForEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -501,7 +828,13 @@ public class RestService {
         }
     }
 
-    public MessageData editMessage(final long botId, final long guildId, final EditMessageRequest request) throws GrpcRequestException {
+    public MessageData editMessage(final long guildId, final EditMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return editMessage(getBotId(), guildId, request);
+    }
+
+    public MessageData editMessage(final long botId, final long guildId, final EditMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final EditMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -516,7 +849,29 @@ public class RestService {
         }
     }
 
-    public void deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request) throws GrpcRequestException {
+    public void deleteMessage(final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteMessage(guildId, channelId, messageId, null);
+    }
+
+    public void deleteMessage(final long guildId, final long channelId, final long messageId,
+                              @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteMessage(getBotId(), guildId, channelId, messageId, reason);
+    }
+
+    public void deleteMessage(final long botId, final long guildId, final long channelId, final long messageId,
+                              @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteMessage(botId, guildId, DeleteMessageRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -529,7 +884,29 @@ public class RestService {
         }
     }
 
-    public void bulkDeleteMessages(final long botId, final long guildId, final BulkDeleteMessagesRequest request) throws GrpcRequestException {
+    public void bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        bulkDeleteMessages(guildId, channelId, messageIds, null);
+    }
+
+    public void bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds,
+                                   @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        bulkDeleteMessages(getBotId(), guildId, channelId, messageIds, reason);
+    }
+
+    public void bulkDeleteMessages(final long botId, final long guildId, final long channelId,
+                                   final List<Long> messageIds, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        bulkDeleteMessages(botId, guildId, BulkDeleteMessagesRequest.newBuilder()
+                .setChannelId(channelId)
+                .addAllMessageIds(messageIds)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void bulkDeleteMessages(final long botId, final long guildId, final BulkDeleteMessagesRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final BulkDeleteMessagesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -542,8 +919,14 @@ public class RestService {
         }
     }
 
+    public void editChannelPermissions(final long guildId, final EditChannelPermissionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        editChannelPermissions(getBotId(), guildId, request);
+    }
+
     public void editChannelPermissions(final long botId, final long guildId,
-                                       final EditChannelPermissionsRequest request) throws GrpcRequestException {
+                                       final EditChannelPermissionsRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final EditChannelPermissionsResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -556,12 +939,19 @@ public class RestService {
         }
     }
 
-    public List<InviteData> getChannelInvites(final long botId, final long guildId,
-                                              final GetChannelInvitesRequest request) throws GrpcRequestException {
+    public List<InviteData> getChannelInvites(final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getChannelInvites(getBotId(), guildId, channelId);
+    }
+
+    public List<InviteData> getChannelInvites(final long botId, final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetChannelInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getChannelInvites(request));
+                    .call(() -> client.getChannelInvites(GetChannelInvitesRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -572,8 +962,14 @@ public class RestService {
         }
     }
 
+    public InviteData createChannelInvite(final long guildId, final CreateChannelInviteRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createChannelInvite(getBotId(), guildId, request);
+    }
+
     public InviteData createChannelInvite(final long botId, final long guildId,
-                                          final CreateChannelInviteRequest request) throws GrpcRequestException {
+                                          final CreateChannelInviteRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateChannelInviteResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -588,8 +984,14 @@ public class RestService {
         }
     }
 
+    public void deleteChannelPermission(final long guildId, final DeleteChannelPermissionRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteChannelPermission(getBotId(), guildId, request);
+    }
+
     public void deleteChannelPermission(final long botId, final long guildId,
-                                        final DeleteChannelPermissionRequest request) throws GrpcRequestException {
+                                        final DeleteChannelPermissionRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteChannelPermissionResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -602,7 +1004,21 @@ public class RestService {
         }
     }
 
-    public long followNewsChannel(final long botId, final long guildId, final FollowNewsChannelRequest request) throws GrpcRequestException {
+    public long followNewsChannel(final long guildId, final long channelId, final long webhookId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return followNewsChannel(getBotId(), guildId, channelId, webhookId);
+    }
+
+    public long followNewsChannel(final long botId, final long guildId, final long channelId, final long webhookId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return followNewsChannel(botId, guildId, FollowNewsChannelRequest.newBuilder()
+                .setChannelId(channelId)
+                .setWebhookChannelId(webhookId)
+                .build());
+    }
+
+    public long followNewsChannel(final long botId, final long guildId, final FollowNewsChannelRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final FollowNewsChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -617,11 +1033,19 @@ public class RestService {
         }
     }
 
-    public void startTyping(final long botId, final long guildId, final TriggerTypingIndicatorRequest request) throws GrpcRequestException {
+    public void startTyping(final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        startTyping(getBotId(), guildId, channelId);
+    }
+
+    public void startTyping(final long botId, final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final TriggerTypingIndicatorResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.triggerTypingIndicator(request));
+                    .call(() -> client.triggerTypingIndicator(TriggerTypingIndicatorRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -630,12 +1054,19 @@ public class RestService {
         }
     }
 
-    public List<MessageData> getPinnedMessages(final long botId, final long guildId,
-                                               final GetPinnedMessagesRequest request) throws GrpcRequestException {
+    public List<MessageData> getPinnedMessages(final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getPinnedMessages(getBotId(), guildId, channelId);
+    }
+
+    public List<MessageData> getPinnedMessages(final long botId, final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetPinnedMessagesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getPinnedMessages(request));
+                    .call(() -> client.getPinnedMessages(GetPinnedMessagesRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -646,7 +1077,29 @@ public class RestService {
         }
     }
 
-    public void pinMessage(final long botId, final long guildId, final AddPinnedChannelMessageRequest request) throws GrpcRequestException {
+    public void pinMessage(final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        pinMessage(getBotId(), channelId, messageId, null);
+    }
+
+    public void pinMessage(final long guildId, final long channelId, final long messageId,
+                           @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        pinMessage(getBotId(), channelId, messageId, reason);
+    }
+
+    public void pinMessage(final long botId, final long guildId, final long channelId, final long messageId,
+                           @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        pinMessage(botId, guildId, AddPinnedChannelMessageRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void pinMessage(final long botId, final long guildId, final AddPinnedChannelMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final AddPinnedChannelMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -659,7 +1112,29 @@ public class RestService {
         }
     }
 
-    public void unpinMessage(final long botId, final long guildId, final DeletePinnedChannelMessageRequest request) throws GrpcRequestException {
+    public void unpinMessage(final long guildId, final long channelId, final long messageId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        unpinMessage(guildId, channelId, messageId);
+    }
+
+    public void unpinMessage(final long guildId, final long channelId, final long messageId,
+                             @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        unpinMessage(getBotId(), guildId, channelId, messageId, reason);
+    }
+
+    public void unpinMessage(final long botId, final long guildId, final long channelId, final long messageId,
+                             @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        unpinMessage(botId, guildId, DeletePinnedChannelMessageRequest.newBuilder()
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void unpinMessage(final long botId, final long guildId, final DeletePinnedChannelMessageRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeletePinnedChannelMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -672,12 +1147,17 @@ public class RestService {
         }
     }
 
-    public List<Emoji> listGuildEmojis(final long botId, final long guildId,
-                                       final ListGuildEmojisRequest request) throws GrpcRequestException {
+    public List<Emoji> listGuildEmojis(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return listGuildEmojis(getBotId(), guildId);
+    }
+
+    public List<Emoji> listGuildEmojis(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ListGuildEmojisResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.listGuildEmojis(request));
+                    .call(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -690,11 +1170,21 @@ public class RestService {
         }
     }
 
-    public Emoji getGuildEmoji(final long botId, final long guildId, final GetGuildEmojiRequest request) throws GrpcRequestException {
+    @Nullable
+    public Emoji getGuildEmoji(final long guildId, final long emoteId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getGuildEmoji(getBotId(), guildId, emoteId);
+    }
+
+    @Nullable
+    public Emoji getGuildEmoji(final long botId, final long guildId, final long emoteId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getGuildEmoji(request));
+                    .call(() -> client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
+                            .setEmojiId(emoteId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -705,7 +1195,13 @@ public class RestService {
         }
     }
 
-    public Emoji createGuildEmoji(final long botId, final long guildId, final CreateGuildEmojiRequest request) throws GrpcRequestException {
+    public Emoji createGuildEmoji(final long guildId, final CreateGuildEmojiRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createGuildEmoji(getBotId(), guildId, request);
+    }
+
+    public Emoji createGuildEmoji(final long botId, final long guildId, final CreateGuildEmojiRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -720,7 +1216,29 @@ public class RestService {
         }
     }
 
-    public Emoji modifyGuildEmoji(final long botId, final long guildId, final ModifyGuildEmojiRequest request) throws GrpcRequestException {
+    public Emoji modifyGuildEmoji(final long guildId, final long emoteId, final String name)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuildEmoji(guildId, emoteId, name, null);
+    }
+
+    public Emoji modifyGuildEmoji(final long guildId, final long emoteId, final String name,
+                                  @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuildEmoji(getBotId(), guildId, emoteId, name, reason);
+    }
+
+    public Emoji modifyGuildEmoji(final long botId, final long guildId, final long emoteId, final String name,
+                                  @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifyGuildEmoji(botId, guildId, ModifyGuildEmojiRequest.newBuilder()
+                .setEmojiId(emoteId)
+                .setName(name)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public Emoji modifyGuildEmoji(final long botId, final long guildId, final ModifyGuildEmojiRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -735,7 +1253,27 @@ public class RestService {
         }
     }
 
-    public void deleteGuildEmoji(final long botId, final long guildId, final DeleteGuildEmojiRequest request) throws GrpcRequestException {
+    public void deleteGuildEmoji(final long guildId, final long emoteId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildEmoji(guildId, emoteId, (String) null);
+    }
+
+    public void deleteGuildEmoji(final long guildId, final long emoteId, @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildEmoji(getBotId(), guildId, emoteId, reason);
+    }
+
+    public void deleteGuildEmoji(final long botId, final long guildId, final long emoteId,
+                                 @Nullable final String reason)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        deleteGuildEmoji(botId, guildId, DeleteGuildEmojiRequest.newBuilder()
+                .setEmojiId(emoteId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    public void deleteGuildEmoji(final long botId, final long guildId, final DeleteGuildEmojiRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final DeleteGuildEmojiResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -748,11 +1286,17 @@ public class RestService {
         }
     }
 
-    public User getSelfUser(final long botId, final long guildId, final GetCurrentUserRequest request) throws GrpcRequestException {
+    public User getSelfUser(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getSelfUser(getBotId(), guildId);
+    }
+
+    public User getSelfUser(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetCurrentUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getCurrentUser(request));
+                    .call(() -> client.getCurrentUser(GetCurrentUserRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -763,11 +1307,21 @@ public class RestService {
         }
     }
 
-    public User getUser(final long botId, final long guildId, final GetUserRequest request) throws GrpcRequestException {
+    @Nullable
+    public User getUser(final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getUser(getBotId(), guildId, userId);
+    }
+
+    @Nullable
+    public User getUser(final long botId, final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.getUser(request));
+                    .call(() -> client.getUser(GetUserRequest.newBuilder()
+                            .setUserId(userId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -778,7 +1332,13 @@ public class RestService {
         }
     }
 
-    public User modifySelfUser(final long botId, final long guildId, final ModifyCurrentUserRequest request) throws GrpcRequestException {
+    public User modifySelfUser(final long guildId, final ModifyCurrentUserRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return modifySelfUser(getBotId(), guildId, request);
+    }
+
+    public User modifySelfUser(final long botId, final long guildId, final ModifyCurrentUserRequest request)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyCurrentUserResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
@@ -793,11 +1353,17 @@ public class RestService {
         }
     }
 
-    public void leaveGuild(final long botId, final long guildId, final LeaveGuildRequest request) throws GrpcRequestException {
+    public void leaveGuild(final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        leaveGuild(getBotId(), guildId);
+    }
+
+    public void leaveGuild(final long botId, final long guildId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final LeaveGuildResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.leaveGuild(request));
+                    .call(() -> client.leaveGuild(LeaveGuildRequest.newBuilder().build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
@@ -806,11 +1372,19 @@ public class RestService {
         }
     }
 
-    public Channel createDmChannel(final long botId, final long guildId, final CreateDmRequest request) throws GrpcRequestException {
+    public Channel createDmChannel(final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return createDmChannel(getBotId(), guildId, userId);
+    }
+
+    public Channel createDmChannel(final long botId, final long guildId, final long userId)
+            throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateDmResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
                     botId, Constants.CTX_GUILD_ID, guildId)
-                    .call(() -> client.createDm(request));
+                    .call(() -> client.createDm(CreateDmRequest.newBuilder()
+                            .setRecipientId(userId)
+                            .build()));
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
