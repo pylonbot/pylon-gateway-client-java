@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Channel;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.MessageData;
 
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ public interface MessageDeleteEvent extends Event<MessageDeleteEvent> {
         return event.getPreviouslyCached(); // todo wrap nicely
     }
     default Channel getChannel() {
-        return GatewayCacheService.getSingleton().getChannel(getGuildId(), getChannelId());
+        return CacheService.getSingleton().getChannel(getGuildId(), getChannelId());
     }
     default long getChannelId() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageDeleteEvent)) {

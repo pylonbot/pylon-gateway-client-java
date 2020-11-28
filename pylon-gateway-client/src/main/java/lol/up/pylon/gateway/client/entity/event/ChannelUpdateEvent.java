@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Channel;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,7 @@ public interface ChannelUpdateEvent extends Event<ChannelUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.ChannelUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.ChannelUpdateEvent) this;
-        return new Channel(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Channel(CacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 
     @Nullable
@@ -28,7 +28,7 @@ public interface ChannelUpdateEvent extends Event<ChannelUpdateEvent> {
         if (!event.hasPreviouslyCached()) {
             return null;
         }
-        return new Channel(GatewayCacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
+        return new Channel(CacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
     }
 
 }

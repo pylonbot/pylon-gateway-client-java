@@ -1,6 +1,6 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.ChannelData;
 
 import java.util.List;
@@ -9,16 +9,16 @@ public class Channel implements Entity<ChannelData> {
 
     private final long botId;
     private final ChannelData data;
-    private final GatewayCacheService cacheService;
+    private final CacheService cacheService;
 
-    public Channel(final GatewayCacheService cacheService, final long botId, final ChannelData data) {
+    public Channel(final CacheService cacheService, final long botId, final ChannelData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
-    public GatewayCacheService getGatewayCacheService() {
+    public CacheService getGatewayCacheService() {
         return cacheService;
     }
 

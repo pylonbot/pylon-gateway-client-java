@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Role;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,7 @@ public interface GuildRoleUpdateEvent extends Event<GuildRoleUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.GuildRoleUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.GuildRoleUpdateEvent) this;
-        return new Role(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Role(CacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 
     @Nullable
@@ -28,7 +28,7 @@ public interface GuildRoleUpdateEvent extends Event<GuildRoleUpdateEvent> {
         if (!event.hasPreviouslyCached()) {
             return null;
         }
-        return new Role(GatewayCacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
+        return new Role(CacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
     }
 
 }

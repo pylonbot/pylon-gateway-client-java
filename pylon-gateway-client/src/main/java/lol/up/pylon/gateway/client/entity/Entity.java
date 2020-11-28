@@ -1,10 +1,10 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface Entity<E> {
 
-    GatewayCacheService getGatewayCacheService();
+    CacheService getGatewayCacheService();
     long getBotId();
     long getGuildId();
     E getData();

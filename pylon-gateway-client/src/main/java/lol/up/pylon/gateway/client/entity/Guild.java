@@ -1,6 +1,6 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.GuildData;
 
 import java.util.List;
@@ -9,16 +9,16 @@ public class Guild implements Entity<GuildData> {
 
     private final long botId;
     private final GuildData data;
-    private final GatewayCacheService cacheService;
+    private final CacheService cacheService;
 
-    public Guild(final GatewayCacheService cacheService, final long botId, final GuildData data) {
+    public Guild(final CacheService cacheService, final long botId, final GuildData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
-    public GatewayCacheService getGatewayCacheService() {
+    public CacheService getGatewayCacheService() {
         return cacheService;
     }
 

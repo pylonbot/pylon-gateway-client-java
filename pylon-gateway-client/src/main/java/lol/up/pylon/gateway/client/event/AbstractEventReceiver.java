@@ -2,7 +2,7 @@ package lol.up.pylon.gateway.client.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.event.Event;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -12,8 +12,8 @@ public abstract class AbstractEventReceiver<E extends Event> {
     /**
      * If you want to spawn an asynchronous thread from this event receiver you have to use this async method
      * If you do not use this async method the new thread will not know about the {@link EventContext}
-     * Following this all requests to {@link GatewayCacheService} will not
-     * know about the related botId, so the {@link GatewayCacheService} will
+     * Following this all requests to {@link CacheService} will not
+     * know about the related botId, so the {@link CacheService} will
      * instead use the {@link GatewayGrpcClient}'s default botId
      *
      * @param runnable the new task to execute
@@ -26,8 +26,8 @@ public abstract class AbstractEventReceiver<E extends Event> {
     /**
      * If you want to spawn an asynchronous thread from this event receiver you have to use this async method
      * If you do not use this async method the new thread will not know about the {@link EventContext}
-     * Following this all requests to {@link GatewayCacheService} will not
-     * know about the related botId, so the {@link GatewayCacheService} will
+     * Following this all requests to {@link CacheService} will not
+     * know about the related botId, so the {@link CacheService} will
      * instead use the {@link GatewayGrpcClient}'s default botId
      *
      * @param callable the new task to execute

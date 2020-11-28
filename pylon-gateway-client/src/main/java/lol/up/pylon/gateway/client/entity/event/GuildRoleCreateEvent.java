@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Role;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface GuildRoleCreateEvent extends Event<GuildRoleCreateEvent> {
 
@@ -12,6 +12,6 @@ public interface GuildRoleCreateEvent extends Event<GuildRoleCreateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.GuildRoleCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.GuildRoleCreateEvent) this;
-        return new Role(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Role(CacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 }

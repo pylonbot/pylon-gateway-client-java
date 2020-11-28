@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Member;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,7 @@ public interface GuildMemberUpdateEvent extends Event<GuildMemberUpdateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.GuildMemberUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.GuildMemberUpdateEvent) this;
-        return new Member(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Member(CacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 
     @Nullable
@@ -28,7 +28,7 @@ public interface GuildMemberUpdateEvent extends Event<GuildMemberUpdateEvent> {
         if (!event.hasPreviouslyCached()) {
             return null;
         }
-        return new Member(GatewayCacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
+        return new Member(CacheService.getSingleton(), event.getBotId(), event.getPreviouslyCached());
     }
 
 }

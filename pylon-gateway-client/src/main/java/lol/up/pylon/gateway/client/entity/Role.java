@@ -1,22 +1,22 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.RoleData;
 
 public class Role implements Entity<RoleData> {
 
     private final long botId;
     private final RoleData data;
-    private final GatewayCacheService cacheService;
+    private final CacheService cacheService;
 
-    public Role(final GatewayCacheService cacheService, final long botId, final RoleData data) {
+    public Role(final CacheService cacheService, final long botId, final RoleData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
-    public GatewayCacheService getGatewayCacheService() {
+    public CacheService getGatewayCacheService() {
         return cacheService;
     }
 

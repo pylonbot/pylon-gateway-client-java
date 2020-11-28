@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.entity.Member;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 public interface GuildMemberAddEvent extends Event<GuildMemberAddEvent> {
 
@@ -12,7 +12,7 @@ public interface GuildMemberAddEvent extends Event<GuildMemberAddEvent> {
         }
         final bot.pylon.proto.discord.v1.event.GuildMemberAddEvent event =
                 (bot.pylon.proto.discord.v1.event.GuildMemberAddEvent) this;
-        return new Member(GatewayCacheService.getSingleton(), event.getBotId(), event.getPayload());
+        return new Member(CacheService.getSingleton(), event.getBotId(), event.getPayload());
     }
 
 }

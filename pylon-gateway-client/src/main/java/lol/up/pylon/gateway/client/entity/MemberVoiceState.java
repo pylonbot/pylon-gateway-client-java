@@ -1,22 +1,22 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.VoiceStateData;
-import lol.up.pylon.gateway.client.service.GatewayCacheService;
+import lol.up.pylon.gateway.client.service.CacheService;
 
 public class MemberVoiceState implements Entity<VoiceStateData> {
 
     private final long botId;
     private final VoiceStateData data;
-    private final GatewayCacheService cacheService;
+    private final CacheService cacheService;
 
-    public MemberVoiceState(final GatewayCacheService cacheService, final long botId, final VoiceStateData data) {
+    public MemberVoiceState(final CacheService cacheService, final long botId, final VoiceStateData data) {
         this.cacheService = cacheService;
         this.botId = botId;
         this.data = data;
     }
 
     @Override
-    public GatewayCacheService getGatewayCacheService() {
+    public CacheService getGatewayCacheService() {
         return cacheService;
     }
 

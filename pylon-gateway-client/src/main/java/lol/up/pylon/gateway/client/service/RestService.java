@@ -11,6 +11,7 @@ import io.grpc.Context;
 import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.entity.Guild;
 import lol.up.pylon.gateway.client.entity.Role;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcGatewayApiException;
@@ -21,19 +22,19 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-public class ApiService {
+public class RestService {
 
-    private static ApiService instance;
+    private static RestService instance;
 
-    public static ApiService getSingleton() {
+    public static RestService getSingleton() {
         return instance;
     }
 
     private final GatewayRestGrpc.GatewayRestBlockingStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
 
-    public ApiService(final GatewayGrpcClient gatewayGrpcClient,
-                      final GatewayRestGrpc.GatewayRestBlockingStub client) {
+    public RestService(final GatewayGrpcClient gatewayGrpcClient,
+                       final GatewayRestGrpc.GatewayRestBlockingStub client) {
         if (instance != null) {
             throw new IllegalStateException("You might only create GatewayCacheService once");
         }
@@ -70,7 +71,7 @@ public class ApiService {
                 "Message:" + apiError.getMessage();
     }
 
-    public GuildData modifyGuild(final long botId, final long guildId, final ModifyGuildRequest request) throws GrpcRequestException, GrpcGatewayApiException {
+    public Guild modifyGuild(final long botId, final long guildId, final ModifyGuildRequest request) throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyGuildResponse response = Context.current().withValues(Constants.CTX_BOT_ID, botId,
                     Constants.CTX_GUILD_ID, guildId)
@@ -78,7 +79,7 @@ public class ApiService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getGuild();
+            return new Guild(gatewayGrpcClient.getCacheService(), botId, response.getData().getGuild());
         } catch (final Throwable throwable) {
             throw new GrpcRequestException("An error occurred during modifyGuild gRPC", throwable);
         }
