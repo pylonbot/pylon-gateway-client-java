@@ -1,8 +1,8 @@
 package lol.up.pylon.gateway.client.entity;
 
+import bot.pylon.proto.discord.v1.model.GuildData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.CacheService;
-import bot.pylon.proto.discord.v1.model.GuildData;
 
 import java.util.List;
 
@@ -36,6 +36,10 @@ public class Guild implements Entity<GuildData> {
     @Override
     public GuildData getData() {
         return data;
+    }
+
+    public Member getSelfMember() {
+        return grpcClient.getCacheService().getMember(botId, getGuildId(), botId);
     }
 
     public Channel getChannelById(final long channelId) {

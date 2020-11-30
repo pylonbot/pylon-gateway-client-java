@@ -67,4 +67,9 @@ public class Channel implements Entity<ChannelData> {
     public void delete(@Nullable final String reason) {
         grpcClient.getRestService().deleteChannel(getBotId(), getGuildId(), data.getId(), reason);
     }
+
+    public Message getMessageById(long messageId) {
+        //return grpcClient.getRestService().message
+        return null; // TODO
+    }
 }

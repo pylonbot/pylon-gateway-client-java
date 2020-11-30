@@ -547,12 +547,12 @@ public class RestService {
         }
     }
 
-    public List<InviteData> getGuildInvites(final long guildId)
+    public List<GuildInvite> getGuildInvites(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildInvites(getBotId(), guildId);
     }
 
-    public List<InviteData> getGuildInvites(final long botId, final long guildId)
+    public List<GuildInvite> getGuildInvites(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetGuildInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -561,7 +561,9 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getInvitesList(); // todo wrap nicely
+            return response.getData().getInvitesList().stream()
+                    .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
+                    .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -621,12 +623,12 @@ public class RestService {
         }
     }
 
-    public MessageData createMessage(final long guildId, final CreateMessageRequest request)
+    public Message createMessage(final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createMessage(getBotId(), guildId, request);
     }
 
-    public MessageData createMessage(final long botId, final long guildId, final CreateMessageRequest request)
+    public Message createMessage(final long botId, final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -635,19 +637,19 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getMessage(); // todo wrap nicely
+            return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
         }
     }
 
-    public MessageData crosspostMessage(final long guildId, final long channelId, final long messageId)
+    public Message crosspostMessage(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return crosspostMessage(getBotId(), guildId, channelId, messageId);
     }
 
-    public MessageData crosspostMessage(final long botId, final long guildId, final long channelId,
+    public Message crosspostMessage(final long botId, final long guildId, final long channelId,
                                         final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return crosspostMessage(botId, guildId, CrosspostMessageRequest.newBuilder()
@@ -656,7 +658,7 @@ public class RestService {
                 .build());
     }
 
-    public MessageData crosspostMessage(final long botId, final long guildId, final CrosspostMessageRequest request)
+    public Message crosspostMessage(final long botId, final long guildId, final CrosspostMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CrosspostMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -665,7 +667,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getMessage(); // todo wrap nicely
+            return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -818,12 +820,12 @@ public class RestService {
         }
     }
 
-    public MessageData editMessage(final long guildId, final EditMessageRequest request)
+    public Message editMessage(final long guildId, final EditMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return editMessage(getBotId(), guildId, request);
     }
 
-    public MessageData editMessage(final long botId, final long guildId, final EditMessageRequest request)
+    public Message editMessage(final long botId, final long guildId, final EditMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final EditMessageResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -832,7 +834,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getMessage(); // todo wrap nicely
+            return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -929,12 +931,12 @@ public class RestService {
         }
     }
 
-    public List<InviteData> getChannelInvites(final long guildId, final long channelId)
+    public List<GuildInvite> getChannelInvites(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getChannelInvites(getBotId(), guildId, channelId);
     }
 
-    public List<InviteData> getChannelInvites(final long botId, final long guildId, final long channelId)
+    public List<GuildInvite> getChannelInvites(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetChannelInvitesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -945,19 +947,21 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getInvitesList(); // todo wrap nicely
+            return response.getData().getInvitesList().stream()
+                    .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
+                    .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
         }
     }
 
-    public InviteData createChannelInvite(final long guildId, final CreateChannelInviteRequest request)
+    public GuildInvite createChannelInvite(final long guildId, final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createChannelInvite(getBotId(), guildId, request);
     }
 
-    public InviteData createChannelInvite(final long botId, final long guildId,
+    public GuildInvite createChannelInvite(final long botId, final long guildId,
                                           final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
@@ -967,7 +971,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getInvite(); // todo wrap nicely
+            return new GuildInvite(gatewayGrpcClient, botId, response.getData().getInvite());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable
@@ -1044,12 +1048,12 @@ public class RestService {
         }
     }
 
-    public List<MessageData> getPinnedMessages(final long guildId, final long channelId)
+    public List<Message> getPinnedMessages(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getPinnedMessages(getBotId(), guildId, channelId);
     }
 
-    public List<MessageData> getPinnedMessages(final long botId, final long guildId, final long channelId)
+    public List<Message> getPinnedMessages(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final GetPinnedMessagesResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -1060,7 +1064,10 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return response.getData().getMessagesList(); // todo wrap nicely
+            return response.getData().getMessagesList()
+                    .stream()
+                    .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
+                    .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             ExceptionUtil.rethrowGrpcException(throwable);
             return null; // unreachable

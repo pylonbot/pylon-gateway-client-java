@@ -1,20 +1,21 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-import bot.pylon.proto.discord.v1.model.MessageData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Message;
 
 public interface MessageUpdateEvent extends Event<MessageUpdateEvent> {
 
-    default MessageData getMessage() {
+    default Message getMessage() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageUpdateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
         final bot.pylon.proto.discord.v1.event.MessageUpdateEvent event =
                 (bot.pylon.proto.discord.v1.event.MessageUpdateEvent) this;
-        return event.getCached(); // todo wrap nicely
+        return new Message(GatewayGrpcClient.getSingleton(), getBotId(), event.getCached());
     }
 
-    default MessageData getOldMessage() {
+    default Message getOldMessage() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.MessageUpdateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
@@ -24,6 +25,6 @@ public interface MessageUpdateEvent extends Event<MessageUpdateEvent> {
         if (!event.hasPreviouslyCached()) {
             return null;
         }
-        return event.getPreviouslyCached(); // todo wrap nicely
+        return new Message(GatewayGrpcClient.getSingleton(), getBotId(), event.getPreviouslyCached());
     }
 }
