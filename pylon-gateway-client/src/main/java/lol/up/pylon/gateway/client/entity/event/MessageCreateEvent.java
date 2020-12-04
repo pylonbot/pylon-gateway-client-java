@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.entity.Message;
 
 public interface MessageCreateEvent extends Event<MessageCreateEvent> {
@@ -12,7 +13,19 @@ public interface MessageCreateEvent extends Event<MessageCreateEvent> {
         }
         final bot.pylon.proto.discord.v1.event.MessageCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.MessageCreateEvent) this;
-        return new Message(GatewayGrpcClient.getSingleton(), getBotId(), event.getMessage());
+        return new Message(GatewayGrpcClient.getSingleton(), getBotId(), event.getMessageData());
+    }
+
+    default long getChannelId() {
+        return getMessage().getChannelId();
+    }
+
+    default Channel getChannel() {
+        return getMessage().getChannel();
+    }
+
+    default String getContent() {
+        return getMessage().getContent();
     }
 
 }

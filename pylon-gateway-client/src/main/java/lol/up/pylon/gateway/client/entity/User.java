@@ -35,4 +35,16 @@ public class User implements Entity<UserData> {
     public UserData getData() {
         return data;
     }
+
+    public long getUserId() {
+        return data.getId();
+    }
+
+    public Member getAsMember(final Guild guild) {
+        return getAsMember(guild.getGuildId());
+    }
+
+    public Member getAsMember(final long guildId) {
+        return grpcClient.getCacheService().getMember(botId, guildId, data.getId());
+    }
 }

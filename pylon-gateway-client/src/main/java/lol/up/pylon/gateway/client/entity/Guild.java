@@ -39,7 +39,15 @@ public class Guild implements Entity<GuildData> {
     }
 
     public Member getSelfMember() {
-        return grpcClient.getCacheService().getMember(botId, getGuildId(), botId);
+        return getMember(botId);
+    }
+
+    public Member getMember(final User user) {
+        return getMember(user.getUserId());
+    }
+
+    public Member getMember(final long userId) {
+        return getGatewayCacheService().getMember(botId, getGuildId(), userId);
     }
 
     public Channel getChannelById(final long channelId) {

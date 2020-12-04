@@ -73,7 +73,7 @@
                             <groupId>lol.up</groupId>
                             <artifactId>event-proto-gen</artifactId>
                             <version>1.0</version>
-                            <mainClass>lol.up.pylon.gateway.client.event.EventGenerator</mainClass>
+                            <mainClass>lol.up.pylon.gateway.client.event.ProtoCodeInjector</mainClass>
                         </protocPlugin>
                     </protocPlugins>
                 </configuration>

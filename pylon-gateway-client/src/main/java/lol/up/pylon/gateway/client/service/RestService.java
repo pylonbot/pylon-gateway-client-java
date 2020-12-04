@@ -1,8 +1,6 @@
 package lol.up.pylon.gateway.client.service;
 
 import bot.pylon.proto.discord.v1.model.GuildBanData;
-import bot.pylon.proto.discord.v1.model.InviteData;
-import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.model.SnowflakeListValue;
 import bot.pylon.proto.discord.v1.rest.*;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
@@ -16,6 +14,8 @@ import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcGatewayApiException;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -23,6 +23,8 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 public class RestService {
+
+    private static final Logger log = LoggerFactory.getLogger(RestService.class);
 
     private final GatewayRestGrpc.GatewayRestBlockingStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
@@ -51,6 +53,7 @@ public class RestService {
         if (current != null) {
             return current.getBotId();
         }
+        log.warn("Missing event context in current thread. Did you manually create threads? Consider using AbstractEventReceiver#async instead!");
         return gatewayGrpcClient.getDefaultBotId();
     }
 
@@ -650,7 +653,7 @@ public class RestService {
     }
 
     public Message crosspostMessage(final long botId, final long guildId, final long channelId,
-                                        final long messageId)
+                                    final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return crosspostMessage(botId, guildId, CrosspostMessageRequest.newBuilder()
                 .setChannelId(channelId)
@@ -962,7 +965,7 @@ public class RestService {
     }
 
     public GuildInvite createChannelInvite(final long botId, final long guildId,
-                                          final CreateChannelInviteRequest request)
+                                           final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateChannelInviteResponse response = Context.current().withValues(Constants.CTX_BOT_ID,

@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.ChannelData;
+import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
@@ -66,6 +67,13 @@ public class Channel implements Entity<ChannelData> {
 
     public void delete(@Nullable final String reason) {
         grpcClient.getRestService().deleteChannel(getBotId(), getGuildId(), data.getId(), reason);
+    }
+
+    public Message createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
+        final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
+        consumer.accept(builder);
+        builder.setChannelId(data.getId());
+        return grpcClient.getRestService().createMessage(getBotId(), getGuildId(), builder.build());
     }
 
     public Message getMessageById(long messageId) {

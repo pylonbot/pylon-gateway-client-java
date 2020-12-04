@@ -274,6 +274,13 @@ public class EventSuppliers {
                             eventDispatcher.dispatchEvent(request);
                             responseObserver.onNext(EventResponse.newBuilder().build());
                         }
+
+                        @Override
+                        public void interactionCreate(InteractionCreateEvent request,
+                                                      StreamObserver<InteractionResponse> responseObserver) {
+                            eventDispatcher.dispatchEvent(request);
+                            responseObserver.onNext(InteractionResponse.newBuilder().build());
+                        }
                     })
                     .build();
         }

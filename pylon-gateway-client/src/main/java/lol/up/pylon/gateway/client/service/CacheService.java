@@ -11,6 +11,8 @@ import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 public class CacheService {
+
+    private static final Logger log = LoggerFactory.getLogger(CacheService.class);
 
     private final GatewayCacheGrpc.GatewayCacheBlockingStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
@@ -46,6 +50,7 @@ public class CacheService {
         if (current != null) {
             return current.getBotId();
         }
+        log.warn("Missing event context in current thread. Did you manually create threads? Consider using AbstractEventReceiver#async instead!");
         return gatewayGrpcClient.getDefaultBotId();
     }
 

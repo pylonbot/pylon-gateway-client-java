@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EventGenerator extends Generator {
+public class ProtoCodeInjector extends Generator {
 
     public static void main(final String[] args) {
         if (args.length == 0) {
-            ProtocPlugin.generate(new EventGenerator());
+            ProtocPlugin.generate(new ProtoCodeInjector());
         } else {
-            ProtocPlugin.debug(new EventGenerator(), args[0]);
+            ProtocPlugin.debug(new ProtoCodeInjector(), args[0]);
         }
     }
 

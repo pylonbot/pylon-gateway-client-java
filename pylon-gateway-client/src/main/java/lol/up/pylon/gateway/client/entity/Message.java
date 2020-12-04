@@ -55,6 +55,14 @@ public class Message implements Entity<MessageData> {
         return new Member(grpcClient, botId, data.getMember());
     }
 
+    public long getChannelId() {
+        return data.getChannelId();
+    }
+
+    public Channel getChannel() {
+        return grpcClient.getCacheService().getChannel(botId, getChannelId());
+    }
+
     public String getContent() {
         return data.getContent();
     }
