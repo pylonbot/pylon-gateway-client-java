@@ -80,8 +80,7 @@ public class RestService {
             }
             return new Guild(gatewayGrpcClient, botId, response.getData().getGuild());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -101,8 +100,7 @@ public class RestService {
             }
             return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -122,7 +120,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -142,8 +140,7 @@ public class RestService {
             }
             return response.getData().getAdded();
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return false; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -162,7 +159,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -188,7 +185,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -222,7 +219,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -257,7 +254,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -271,7 +268,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -291,8 +288,7 @@ public class RestService {
             }
             return response.getData().getBansList();
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -325,8 +321,7 @@ public class RestService {
             }
             return response.getData().getBan();
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -361,7 +356,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -375,7 +370,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -395,8 +390,7 @@ public class RestService {
             }
             return new Role(gatewayGrpcClient, botId, response.getData().getRole());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -419,8 +413,7 @@ public class RestService {
                     .map(roleData -> new Role(gatewayGrpcClient, botId, roleData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -440,8 +433,7 @@ public class RestService {
             }
             return new Role(gatewayGrpcClient, botId, response.getData().getRole());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -473,7 +465,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -503,8 +495,7 @@ public class RestService {
             }
             return response.getData().getSerializedSize(); // todo ehhhhh?
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return 0; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -523,7 +514,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -545,8 +536,7 @@ public class RestService {
                     .map(ByteString::toStringUtf8)
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -568,8 +558,7 @@ public class RestService {
                     .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -589,8 +578,7 @@ public class RestService {
             }
             return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -622,7 +610,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -642,8 +630,7 @@ public class RestService {
             }
             return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -672,8 +659,7 @@ public class RestService {
             }
             return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -702,7 +688,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -731,7 +717,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -762,7 +748,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -789,7 +775,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -819,7 +805,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -839,8 +825,7 @@ public class RestService {
             }
             return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -875,7 +860,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -910,7 +895,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -930,7 +915,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -954,8 +939,7 @@ public class RestService {
                     .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -976,8 +960,7 @@ public class RestService {
             }
             return new GuildInvite(gatewayGrpcClient, botId, response.getData().getInvite());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -997,7 +980,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1025,8 +1008,7 @@ public class RestService {
             }
             return response.getData().getChannelId();
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return 0L; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1047,7 +1029,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1072,8 +1054,7 @@ public class RestService {
                     .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1108,7 +1089,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1143,7 +1124,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1165,8 +1146,7 @@ public class RestService {
                     .map(emojiData -> new Emoji(gatewayGrpcClient, botId, emojiData))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1190,8 +1170,7 @@ public class RestService {
             }
             return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1211,8 +1190,7 @@ public class RestService {
             }
             return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1248,8 +1226,7 @@ public class RestService {
             }
             return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1282,7 +1259,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1302,8 +1279,7 @@ public class RestService {
             }
             return new User(gatewayGrpcClient, botId, response.getData().getUser());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1327,8 +1303,7 @@ public class RestService {
             }
             return new User(gatewayGrpcClient, botId, response.getData().getUser());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1348,8 +1323,7 @@ public class RestService {
             }
             return new User(gatewayGrpcClient, botId, response.getData().getUser());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1368,7 +1342,7 @@ public class RestService {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
@@ -1390,8 +1364,7 @@ public class RestService {
             }
             return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
-            ExceptionUtil.rethrowGrpcException(throwable);
-            return null; // unreachable
+            throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 

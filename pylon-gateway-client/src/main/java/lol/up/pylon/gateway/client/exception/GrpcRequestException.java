@@ -1,6 +1,6 @@
 package lol.up.pylon.gateway.client.exception;
 
-public class GrpcRequestException extends RuntimeException {
+public class GrpcRequestException extends GrpcException {
 
     public GrpcRequestException(final String message) {
         super(message);
