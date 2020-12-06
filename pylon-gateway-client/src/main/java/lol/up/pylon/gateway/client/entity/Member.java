@@ -2,7 +2,6 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MemberData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -23,8 +22,8 @@ public class Member implements Entity<MemberData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -34,7 +33,7 @@ public class Member implements Entity<MemberData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId();
+        return getData().getGuildId();
     }
 
     @Override
@@ -47,7 +46,7 @@ public class Member implements Entity<MemberData> {
     }
 
     public void addRole(final long roleId, @Nullable final String reason) {
-        grpcClient.getRestService().addMemberRole(botId, getGuildId(), getUserId(), roleId, reason);
+        getClient().getRestService().addMemberRole(botId, getGuildId(), getUserId(), roleId, reason);
     }
 
     public void removeRole(final long roleId) {
@@ -55,15 +54,15 @@ public class Member implements Entity<MemberData> {
     }
 
     public void removeRole(final long roleId, @Nullable final String reason) {
-        grpcClient.getRestService().removeMemberRole(botId, getGuildId(), roleId, reason);
+        getClient().getRestService().removeMemberRole(botId, getGuildId(), roleId, reason);
     }
 
     public List<Long> getRoleIds() {
-        return data.getRolesList();
+        return getData().getRolesList();
     }
 
     public List<Role> getRoles() {
-        final List<Role> roles = getGatewayCacheService().listGuildRoles(getBotId(), getGuildId());
+        final List<Role> roles = getClient().getCacheService().listGuildRoles(getBotId(), getGuildId());
         final Map<Long, Role> roleMap = new HashMap<>();
         roles.forEach(role -> roleMap.put(role.getData().getId(), role));
         return getRoleIds().stream()
@@ -72,10 +71,10 @@ public class Member implements Entity<MemberData> {
     }
 
     public User getUser() {
-        return new User(grpcClient, getBotId(), data.getUser());
+        return new User(getClient(), getBotId(), getData().getUser());
     }
 
     public long getUserId() {
-        return data.getUser().getId();
+        return getData().getUser().getId();
     }
 }

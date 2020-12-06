@@ -2,7 +2,6 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.InviteData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 public class GuildInvite implements Entity<InviteData> {
 
@@ -17,8 +16,8 @@ public class GuildInvite implements Entity<InviteData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -28,7 +27,7 @@ public class GuildInvite implements Entity<InviteData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuild().getId();
+        return getData().getGuild().getId();
     }
 
     @Override

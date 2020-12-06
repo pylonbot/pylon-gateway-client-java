@@ -17,8 +17,8 @@ public class User implements Entity<UserData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class User implements Entity<UserData> {
     }
 
     public long getUserId() {
-        return data.getId();
+        return getData().getId();
     }
 
     public Member getAsMember(final Guild guild) {
@@ -45,6 +45,6 @@ public class User implements Entity<UserData> {
     }
 
     public Member getAsMember(final long guildId) {
-        return grpcClient.getCacheService().getMember(botId, guildId, data.getId());
+        return getClient().getCacheService().getMember(botId, guildId, getData().getId());
     }
 }

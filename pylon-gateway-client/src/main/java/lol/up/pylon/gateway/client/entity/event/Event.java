@@ -23,4 +23,8 @@ public interface Event<T extends Event> {
     default long getGuildId() {
         return getScope().getGuildId();
     }
+
+    default GatewayGrpcClient getClient() {
+        return GatewayGrpcClient.getSingleton();
+    }
 }

@@ -2,7 +2,11 @@ package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.entity.Member;
 import lol.up.pylon.gateway.client.entity.Message;
+import lol.up.pylon.gateway.client.entity.User;
+
+import javax.annotation.Nullable;
 
 public interface MessageCreateEvent extends Event<MessageCreateEvent> {
 
@@ -26,6 +30,19 @@ public interface MessageCreateEvent extends Event<MessageCreateEvent> {
 
     default String getContent() {
         return getMessage().getContent();
+    }
+
+    default User getAuthor() {
+        return getMessage().getAuthor();
+    }
+
+    @Nullable
+    default Member getMember() {
+        return getMessage().getMember();
+    }
+
+    default boolean isFromGuild() {
+        return getGuildId() > 0;
     }
 
 }

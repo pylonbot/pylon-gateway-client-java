@@ -17,8 +17,8 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId();
+        return getData().getGuildId();
     }
 
     @Override
@@ -37,10 +37,10 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
     }
 
     public Channel getChannel() {
-        return getGatewayCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
+        return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
     }
 
     public Member getMember() {
-        return new Member(grpcClient, getBotId(), getData().getMember());
+        return new Member(getClient(), getBotId(), getData().getMember());
     }
 }

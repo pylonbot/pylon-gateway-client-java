@@ -5,7 +5,6 @@ import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.CacheService;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,8 +23,8 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class Channel implements Entity<ChannelData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId().getValue();
+        return getData().getGuildId().getValue();
     }
 
     @Override
@@ -44,21 +43,21 @@ public class Channel implements Entity<ChannelData> {
     }
 
     public List<MemberVoiceState> getVoiceStates() {
-        return getGatewayCacheService().listChannelVoiceStates(getBotId(), getGuildId(), data.getId());
+        return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
     }
 
     public void edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
         final ModifyChannelRequest.Builder builder = ModifyChannelRequest.newBuilder();
         consumer.accept(builder);
-        builder.setChannelId(data.getId());
+        builder.setChannelId(getData().getId());
         this.data = grpcClient.getRestService().modifyChannel(getBotId(), getGuildId(), builder.build()).getData();
     }
 
     public void editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
         final EditChannelPermissionsRequest.Builder builder = EditChannelPermissionsRequest.newBuilder();
         consumer.accept(builder);
-        builder.setChannelId(data.getId());
-        grpcClient.getRestService().editChannelPermissions(getBotId(), getGuildId(), builder.build());
+        builder.setChannelId(getData().getId());
+        getClient().getRestService().editChannelPermissions(getBotId(), getGuildId(), builder.build());
     }
 
     public void delete() {
@@ -66,14 +65,14 @@ public class Channel implements Entity<ChannelData> {
     }
 
     public void delete(@Nullable final String reason) {
-        grpcClient.getRestService().deleteChannel(getBotId(), getGuildId(), data.getId(), reason);
+        getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
     }
 
     public Message createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
-        builder.setChannelId(data.getId());
-        return grpcClient.getRestService().createMessage(getBotId(), getGuildId(), builder.build());
+        builder.setChannelId(getData().getId());
+        return getClient().getRestService().createMessage(getBotId(), getGuildId(), builder.build());
     }
 
     public Message getMessageById(long messageId) {

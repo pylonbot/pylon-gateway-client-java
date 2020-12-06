@@ -17,8 +17,8 @@ public class Role implements Entity<RoleData> {
     }
 
     @Override
-    public CacheService getGatewayCacheService() {
-        return grpcClient.getCacheService();
+    public GatewayGrpcClient getClient() {
+        return grpcClient;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class Role implements Entity<RoleData> {
 
     @Override
     public long getGuildId() {
-        return data.getGuildId();
+        return getData().getGuildId();
     }
 
     @Override

@@ -1,15 +1,15 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.service.CacheService;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 public interface Entity<E> {
 
-    CacheService getGatewayCacheService();
+    GatewayGrpcClient getClient();
     long getBotId();
     long getGuildId();
     E getData();
 
     default Guild getGuild() {
-        return getGatewayCacheService().getGuild(getBotId(), getGuildId());
+        return getClient().getCacheService().getGuild(getBotId(), getGuildId());
     }
 }
