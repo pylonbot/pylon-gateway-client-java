@@ -17,7 +17,7 @@ public class Message implements Entity<MessageData> {
 
     @Override
     public GatewayGrpcClient getClient() {
-        return null;
+        return grpcClient;
     }
 
     @Override
