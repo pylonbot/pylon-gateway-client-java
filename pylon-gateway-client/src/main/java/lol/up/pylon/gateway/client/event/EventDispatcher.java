@@ -48,6 +48,7 @@ public class EventDispatcher {
                                 receiver.getClass().getCanonicalName(), throwable);
                     }
                 });
+                EventContext.localContext().set(null);
             } catch (final Throwable throwable) {
                 log.error("An error occurred when dispatching event {}", event, throwable);
             }
