@@ -25,7 +25,7 @@ public interface MessageCreateEvent extends Event<MessageCreateEvent> {
     }
 
     default Channel getChannel() {
-        return getMessage().getChannel();
+        return getMessage().getGuildChannel();
     }
 
     default String getContent() {
