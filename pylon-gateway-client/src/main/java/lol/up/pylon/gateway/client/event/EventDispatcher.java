@@ -32,14 +32,14 @@ public class EventDispatcher {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void dispatchEvent(Event<? extends Event> event) {
         log.trace("Dispatching event {}", event);
+        final Class<? extends Event> interfaceType = event.getInterfaceType();
+        final List<AbstractEventReceiver<? extends Event<?>>> receivers = receiverHolder.get(interfaceType);
+        if (receivers == null) {
+            return;
+        }
         executor.submit(() -> {
             try {
                 EventContext.localContext().set(new EventContext(executor, event.getBotId(), event.getGuildId()));
-                final Class<? extends Event> interfaceType = event.getInterfaceType();
-                final List<AbstractEventReceiver<? extends Event<?>>> receivers = receiverHolder.get(interfaceType);
-                if (receivers == null) {
-                    return;
-                }
                 receivers.forEach(receiver -> {
                     try {
                         ((AbstractEventReceiver) receiver).receive(event);
