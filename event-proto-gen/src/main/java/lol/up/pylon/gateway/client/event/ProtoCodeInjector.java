@@ -22,6 +22,21 @@ public class ProtoCodeInjector extends Generator {
         }
     }
 
+    @SafeVarargs
+    private static <T> Stream<T> concatStreams(Stream<T>... streams) {
+        if (streams.length < 1) {
+            throw new IllegalArgumentException("No streams provided");
+        }
+        if (streams.length == 1) {
+            return streams[0];
+        }
+        Stream<T> streamBase = streams[0];
+        for (int i = 1; i < streams.length; i++) {
+            streamBase = Stream.concat(streamBase, streams[i]);
+        }
+        return streamBase;
+    }
+
     @Override
     public List<PluginProtos.CodeGeneratorResponse.File> generateFiles(final PluginProtos.CodeGeneratorRequest request)
             throws GeneratorException {
@@ -31,17 +46,47 @@ public class ProtoCodeInjector extends Generator {
     }
 
     public Stream<PluginProtos.CodeGeneratorResponse.File> handleProtoFile(final DescriptorProtos.FileDescriptorProto fileDesc) {
-        return Stream.concat(
+        return concatStreams(
                 fileDesc.getMessageTypeList().stream()
                         .filter(descriptorProto -> descriptorProto.getName().contains("Event")
                                 && !descriptorProto.getName().contains("Builder")
                                 && !descriptorProto.getName().contains("Scope")
-                                && !descriptorProto.getName().contains("EventResponse"))
+                                && !descriptorProto.getName().contains("EventResponse")
+                                && !descriptorProto.getName().contains("EventEnvelope"))
                         .flatMap(descriptorProto -> handleEventClasses(fileDesc, descriptorProto)),
                 fileDesc.getMessageTypeList().stream()
                         .filter(descriptorProto -> fileDesc.getPackage().contains("pylon."))
-                        .flatMap(descriptorProto -> handleWrappedTypes(fileDesc, descriptorProto))
+                        .flatMap(descriptorProto -> handleWrappedTypes(fileDesc, descriptorProto)),
+                fileDesc.getMessageTypeList().stream()
+                        .filter(descriptorProto -> descriptorProto.getName().contains("EventEnvelope")
+                                && !descriptorProto.getName().contains("Ack"))
+                        .flatMap(descriptorProto -> handleEnvelopeClass(fileDesc, descriptorProto))
         );
+    }
+
+    private Stream<PluginProtos.CodeGeneratorResponse.File> handleEnvelopeClass(DescriptorProtos.FileDescriptorProto fileDesc,
+                                                                                DescriptorProtos.DescriptorProto messageTypeDesc) {
+        final String javaPackage;
+        if (fileDesc.getOptions().hasJavaPackage()) {
+            javaPackage = fileDesc.getOptions().getJavaPackage();
+        } else {
+            javaPackage = fileDesc.getPackage();
+        }
+        final String fileName = javaPackage.replace(".", "/") + "/" + messageTypeDesc.getName() + ".java";
+
+        final String messageType = fileDesc.getPackage() + "." + messageTypeDesc.getName();
+        final List<PluginProtos.CodeGeneratorResponse.File> files = new ArrayList<>();
+        files.add(PluginProtos.CodeGeneratorResponse.File.newBuilder()
+                .setName(fileName)
+                .setContent(
+                        "public lol.up.pylon.gateway.client.entity.event.Event<? super lol.up.pylon.gateway.client" +
+                                ".entity.event.Event> getEvent() {\n" +
+                                "  return (lol.up.pylon.gateway.client.entity.event.Event) eventData_;\n" +
+                                "}"
+                )
+                .setInsertionPoint("class_scope:" + messageType)
+                .build());
+        return files.stream();
     }
 
     public Stream<PluginProtos.CodeGeneratorResponse.File> handleEventClasses(final DescriptorProtos.FileDescriptorProto fileDesc,
@@ -148,8 +193,9 @@ public class ProtoCodeInjector extends Generator {
     }
 
     public String getSetterOf(final String fieldName, final String typeName, final String typeNameShort) {
-        if(typeNameShort.equals("SnowflakeValue")) {
-            return "set" + fieldName + "(bot.pylon.proto.discord.v1.model." + typeNameShort + ".newBuilder().setValue(value).build());";
+        if (typeNameShort.equals("SnowflakeValue")) {
+            return "set" + fieldName + "(bot.pylon.proto.discord.v1.model." + typeNameShort + ".newBuilder().setValue" +
+                    "(value).build());";
         } else {
             return "set" + fieldName + "(com" + typeName + ".of(value));";
         }

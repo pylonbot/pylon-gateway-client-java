@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.event;
 
 import bot.pylon.proto.discord.v1.event.*;
 import bot.pylon.proto.gateway.v1.service.GatewayDispatchGrpc;
+import bot.pylon.proto.gateway.v1.service.GatewayDispatchStreamingGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -29,6 +30,12 @@ public class EventSuppliers {
 
         private GrpcEventSupplierServer(final int port, final EventDispatcher eventDispatcher) {
             this.server = ServerBuilder.forPort(port)
+                    .addService(new GatewayDispatchStreamingGrpc.GatewayDispatchStreamingImplBase() {
+                        @Override
+                        public StreamObserver<EventEnvelope> event(StreamObserver<EventEnvelopeAck> responseObserver) {
+                            return new EventStreamObserver(responseObserver, eventDispatcher);
+                        }
+                    })
                     .addService(new GatewayDispatchGrpc.GatewayDispatchImplBase() {
 
                         private void dispatch(final lol.up.pylon.gateway.client.entity.event.Event<? extends
