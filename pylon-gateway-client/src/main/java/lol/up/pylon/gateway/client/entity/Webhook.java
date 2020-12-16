@@ -35,7 +35,7 @@ public class Webhook implements Entity<WebhookData> {
         return data;
     }
 
-    public Channel getChannel() {
+    public GuildChannel getChannel() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId());
     }
 

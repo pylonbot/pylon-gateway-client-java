@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.entity.GuildChannel;
 import lol.up.pylon.gateway.client.entity.Message;
 
 import javax.annotation.Nullable;
@@ -21,7 +21,7 @@ public interface MessageDeleteEvent extends Event<MessageDeleteEvent> {
         }
         return new Message(GatewayGrpcClient.getSingleton(), getBotId(), event.getPreviouslyCached());
     }
-    default Channel getChannel() {
+    default GuildChannel getChannel() {
         return GatewayGrpcClient.getSingleton().getCacheService().getChannel(getGuildId(), getChannelId());
     }
     default long getChannelId() {
