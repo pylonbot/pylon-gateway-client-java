@@ -10,13 +10,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class GuildChannel implements Entity<ChannelData> {
+public class Channel implements Entity<ChannelData> {
 
     private final GatewayGrpcClient grpcClient;
     private final long botId;
     private ChannelData data;
 
-    public GuildChannel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data) {
+    public Channel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data) {
         this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;

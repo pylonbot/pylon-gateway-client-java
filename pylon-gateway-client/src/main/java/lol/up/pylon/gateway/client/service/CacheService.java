@@ -80,12 +80,12 @@ public class CacheService {
     // Channels (2x + Overloads)
     // - Get (1 Overload)
     @Nullable
-    public GuildChannel getChannel(final long guildId, final long channelId) throws GrpcRequestException {
+    public Channel getChannel(final long guildId, final long channelId) throws GrpcRequestException {
         return getChannel(getBotId(), guildId, channelId);
     }
 
     @Nullable
-    public GuildChannel getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
+    public Channel getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
         try {
             final ChannelData data = Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID,
                     guildId).call(() -> {
@@ -97,18 +97,18 @@ public class CacheService {
             if (data == null) {
                 return null;
             }
-            return new GuildChannel(gatewayGrpcClient, botId, data);
+            return new Channel(gatewayGrpcClient, botId, data);
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
     }
 
     // - List (1 Overload)
-    public List<GuildChannel> listGuildChannels(final long guildId) throws GrpcRequestException {
+    public List<Channel> listGuildChannels(final long guildId) throws GrpcRequestException {
         return listGuildChannels(getBotId(), guildId);
     }
 
-    public List<GuildChannel> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
+    public List<Channel> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
         try {
             final List<ChannelData> dataList = Context.current().withValues(Constants.CTX_BOT_ID, botId,
                     Constants.CTX_GUILD_ID, guildId).call(() -> {
@@ -117,7 +117,7 @@ public class CacheService {
                 return response.getChannelsList();
             });
             return dataList.stream()
-                    .map(channel -> new GuildChannel(gatewayGrpcClient, botId, channel))
+                    .map(channel -> new Channel(gatewayGrpcClient, botId, channel))
                     .collect(Collectors.toList());
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);

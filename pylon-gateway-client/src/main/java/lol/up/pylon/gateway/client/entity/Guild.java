@@ -49,7 +49,7 @@ public class Guild implements Entity<GuildData> {
         return getClient().getCacheService().getMember(botId, getGuildId(), userId);
     }
 
-    public GuildChannel getChannelById(final long channelId) {
+    public Channel getChannelById(final long channelId) {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), channelId);
     }
 
@@ -65,7 +65,7 @@ public class Guild implements Entity<GuildData> {
         return getClient().getCacheService().getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
-    public List<GuildChannel> listChannels() {
+    public List<Channel> listChannels() {
         return getClient().getCacheService().listGuildChannels(getBotId(), getGuildId());
     }
 
