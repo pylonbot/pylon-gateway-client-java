@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MemberData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.util.PermissionUtil;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -41,6 +42,76 @@ public class Member implements Entity<MemberData> {
         return data;
     }
 
+    // DATA
+
+    public long getId() {
+        return getData().getId();
+    }
+
+    public String getNickname() {
+        return getData().getNick().getValue();
+    }
+
+    public boolean isOwner() {
+        return getGuild().getOwnerId() == getId();
+    }
+
+    public List<Long> getRoleIds() {
+        return getData().getRolesList();
+    }
+
+    public User getUser() {
+        return new User(getClient(), getBotId(), getData().getUser());
+    }
+
+    public long getUserId() {
+        return getData().getUser().getId();
+    }
+
+    public String getEffectiveName() {
+        final String nickname = getNickname();
+        if (nickname != null && !nickname.isEmpty()) {
+            return nickname;
+        }
+        return getUser().getName();
+    }
+
+    // DATA UTILITY
+
+    public boolean hasPermission(final Permission... permissions) {
+        return hasPermission(null, permissions);
+    }
+
+    public boolean hasPermission(@Nullable final Channel channel, final Permission... permissions) {
+        if (channel == null) {
+            return PermissionUtil.checkPermission(this, permissions);
+        } else {
+            return PermissionUtil.checkPermission(channel, this, permissions);
+        }
+    }
+
+    public boolean canInteract(final Member member) {
+        return PermissionUtil.canInteract(this, member);
+    }
+
+    public boolean canInteract(final Role role) {
+        return PermissionUtil.canInteract(this, role);
+    }
+
+    public boolean canInteract(final Emoji emoji) {
+        return PermissionUtil.canInteract(this, emoji);
+    }
+
+    // REST
+
+    public void changeNickname(final String nickname) {
+        changeNickname(nickname, null);
+    }
+
+    public void changeNickname(final String nickname, @Nullable final String reason) {
+        // TODO: Implementation missing
+    }
+
     public void addRole(final long roleId) {
         addRole(roleId, null);
     }
@@ -57,9 +128,7 @@ public class Member implements Entity<MemberData> {
         getClient().getRestService().removeMemberRole(botId, getGuildId(), roleId, reason);
     }
 
-    public List<Long> getRoleIds() {
-        return getData().getRolesList();
-    }
+    // CACHE
 
     public List<Role> getRoles() {
         final List<Role> roles = getClient().getCacheService().listGuildRoles(getBotId(), getGuildId());
@@ -70,11 +139,4 @@ public class Member implements Entity<MemberData> {
                 .collect(Collectors.toList());
     }
 
-    public User getUser() {
-        return new User(getClient(), getBotId(), getData().getUser());
-    }
-
-    public long getUserId() {
-        return getData().getUser().getId();
-    }
 }

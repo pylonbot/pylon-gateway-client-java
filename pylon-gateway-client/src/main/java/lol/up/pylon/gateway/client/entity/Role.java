@@ -1,8 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.RoleData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 public class Role implements Entity<RoleData> {
 
@@ -34,6 +33,24 @@ public class Role implements Entity<RoleData> {
     @Override
     public RoleData getData() {
         return data;
+    }
+
+    // DATA
+
+    public long getId() {
+        return getData().getId();
+    }
+
+    public int getPosition() {
+        return getData().getPosition();
+    }
+
+    public long getPermissions() {
+        return getData().getPermissions();
+    }
+
+    public boolean isPublicRole() {
+        return getGuildId() == getId();
     }
 
 }

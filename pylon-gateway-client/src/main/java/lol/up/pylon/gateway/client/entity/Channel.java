@@ -10,13 +10,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class GuildChannel implements Entity<ChannelData> {
+public class Channel implements Entity<ChannelData> {
 
     private final GatewayGrpcClient grpcClient;
     private final long botId;
     private ChannelData data;
 
-    public GuildChannel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data) {
+    public Channel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data) {
         this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
@@ -42,9 +42,55 @@ public class GuildChannel implements Entity<ChannelData> {
         return data;
     }
 
-    public List<MemberVoiceState> getVoiceStates() {
-        return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
+    // DATA
+
+    public long getId() {
+        return getData().getId();
     }
+
+    public int getPosition() {
+        return getData().getPosition();
+    }
+
+    public long getParentId() {
+        return getData().getParentId().getValue();
+    }
+
+    public List<ChannelData.ChannelPermissionOverwriteData> getPermissionOverwrites() {
+        return getData().getPermissionOverwritesList();
+    }
+
+    public ChannelData.ChannelPermissionOverwriteData getPermissionOverwrite(final Role role) {
+        return getRolePermissionOverwrite(role.getId());
+    }
+
+    public ChannelData.ChannelPermissionOverwriteData getPermissionOverwrite(final Member member) {
+        return getUserPermissionOverwrite(member.getId());
+    }
+
+    public ChannelData.ChannelPermissionOverwriteData getRolePermissionOverwrite(final long roleId) {
+        return getPermissionOverwrites().stream()
+                .filter(overwrite -> overwrite.getType() == ChannelData.ChannelPermissionOverwriteData.ChannelPermissionOverwriteType.ROLE)
+                .filter(overwrite -> overwrite.getId() == roleId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public ChannelData.ChannelPermissionOverwriteData getUserPermissionOverwrite(final long userId) {
+        return getPermissionOverwrites().stream()
+                .filter(overwrite -> overwrite.getType() == ChannelData.ChannelPermissionOverwriteData.ChannelPermissionOverwriteType.MEMBER)
+                .filter(overwrite -> overwrite.getId() == userId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    // DATA UTIL
+
+    public Channel getParent() {
+        return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getParentId());
+    }
+
+    // REST
 
     public void edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
         final ModifyChannelRequest.Builder builder = ModifyChannelRequest.newBuilder();
@@ -78,5 +124,11 @@ public class GuildChannel implements Entity<ChannelData> {
     public Message getMessageById(long messageId) {
         //return grpcClient.getRestService().message
         return null; // TODO
+    }
+
+    // CACHE
+
+    public List<MemberVoiceState> getVoiceStates() {
+        return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
     }
 }

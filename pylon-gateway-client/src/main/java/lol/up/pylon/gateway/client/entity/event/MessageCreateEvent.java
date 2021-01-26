@@ -1,7 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.entity.GuildChannel;
+import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.entity.Member;
 import lol.up.pylon.gateway.client.entity.Message;
 import lol.up.pylon.gateway.client.entity.User;
@@ -24,8 +24,8 @@ public interface MessageCreateEvent extends Event<MessageCreateEvent> {
         return getMessage().getChannelId();
     }
 
-    default GuildChannel getGuildChannel() {
-        return getMessage().getGuildChannel();
+    default Channel getChannel() {
+        return getMessage().getChannel();
     }
 
     default String getContent() {

@@ -84,12 +84,12 @@ public class RestService {
         }
     }
 
-    public GuildChannel createChannel(final long guildId, final CreateGuildChannelRequest request)
+    public Channel createChannel(final long guildId, final CreateGuildChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createChannel(getBotId(), guildId, request);
     }
 
-    public GuildChannel createChannel(final long botId, final long guildId, final CreateGuildChannelRequest request)
+    public Channel createChannel(final long botId, final long guildId, final CreateGuildChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateGuildChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID, botId,
@@ -98,7 +98,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new GuildChannel(gatewayGrpcClient, botId, response.getData().getChannel());
+            return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -562,12 +562,12 @@ public class RestService {
         }
     }
 
-    public GuildChannel modifyChannel(final long guildId, final ModifyChannelRequest request)
+    public Channel modifyChannel(final long guildId, final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyChannel(getBotId(), guildId, request);
     }
 
-    public GuildChannel modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
+    public Channel modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final ModifyChannelResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -576,7 +576,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new GuildChannel(gatewayGrpcClient, botId, response.getData().getChannel());
+            return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1346,12 +1346,12 @@ public class RestService {
         }
     }
 
-    public GuildChannel createDmChannel(final long guildId, final long userId)
+    public Channel createDmChannel(final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createDmChannel(getBotId(), guildId, userId);
     }
 
-    public GuildChannel createDmChannel(final long botId, final long guildId, final long userId)
+    public Channel createDmChannel(final long botId, final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CreateDmResponse response = Context.current().withValues(Constants.CTX_BOT_ID,
@@ -1362,7 +1362,7 @@ public class RestService {
             if (response.hasError()) {
                 throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
             }
-            return new GuildChannel(gatewayGrpcClient, botId, response.getData().getChannel());
+            return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
