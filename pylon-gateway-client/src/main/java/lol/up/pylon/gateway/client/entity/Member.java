@@ -90,6 +90,18 @@ public class Member implements Entity<MemberData> {
         }
     }
 
+    public boolean canInteract(final Member member) {
+        return PermissionUtil.canInteract(this, member);
+    }
+
+    public boolean canInteract(final Role role) {
+        return PermissionUtil.canInteract(this, role);
+    }
+
+    public boolean canInteract(final Emoji emoji) {
+        return PermissionUtil.canInteract(this, emoji);
+    }
+
     // REST
 
     public void changeNickname(final String nickname) {

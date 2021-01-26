@@ -53,6 +53,12 @@ public class User implements Entity<UserData> {
         return getData().getId();
     }
 
+    // DATA UTIL
+
+    public String getAsTag() {
+        return getData().getUsername() + "#" + getData().getDiscriminator(); // todo: discrim fix (either format or passed as str)
+    }
+
     // CACHE
 
     public Member getAsMember(final Guild guild) {

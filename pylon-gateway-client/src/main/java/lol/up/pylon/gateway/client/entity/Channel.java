@@ -44,6 +44,10 @@ public class Channel implements Entity<ChannelData> {
 
     // DATA
 
+    public long getId() {
+        return getData().getId();
+    }
+
     public int getPosition() {
         return getData().getPosition();
     }
