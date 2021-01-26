@@ -42,6 +42,10 @@ public class Channel implements Entity<ChannelData> {
         return data;
     }
 
+    public int getPosition() {
+        return getData().getPosition();
+    }
+
     public List<MemberVoiceState> getVoiceStates() {
         return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
     }

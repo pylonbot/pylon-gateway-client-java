@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.GuildData;
+import bot.pylon.proto.discord.v1.rest.CreateGuildChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 import java.util.List;
@@ -37,16 +38,26 @@ public class Guild implements Entity<GuildData> {
         return data;
     }
 
+    // DATA
+
     public Member getSelfMember() {
         return getMember(botId);
     }
+
+    // REST
+
+    public Channel createChannel(final CreateGuildChannelRequest request) {
+        return getClient().getRestService().createChannel(getBotId(), getGuildId(), request);
+    }
+
+    // CACHE
 
     public Member getMember(final User user) {
         return getMember(user.getUserId());
     }
 
     public Member getMember(final long userId) {
-        return getClient().getCacheService().getMember(botId, getGuildId(), userId);
+        return getClient().getCacheService().getMember(getBotId(), getGuildId(), userId);
     }
 
     public Channel getChannelById(final long channelId) {
