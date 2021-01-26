@@ -41,6 +41,26 @@ public class Member implements Entity<MemberData> {
         return data;
     }
 
+    public String getNickname() {
+        return getData().getNick().getValue();
+    }
+
+    public String getEffectiveName() {
+        final String nickname = getNickname();
+        if(nickname != null && !nickname.isEmpty()) {
+            return nickname;
+        }
+        return getUser().getName();
+    }
+
+    public void changeNickname(final String nickname) {
+        changeNickname(nickname, null);
+    }
+
+    public void changeNickname(final String nickname, @Nullable final String reason) {
+        // TODO: Implementation missing
+    }
+
     public void addRole(final long roleId) {
         addRole(roleId, null);
     }

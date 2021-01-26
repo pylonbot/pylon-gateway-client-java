@@ -65,19 +65,19 @@ public class Guild implements Entity<GuildData> {
         return getClient().getCacheService().getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
-    public List<Channel> listChannels() {
+    public List<Channel> getChannels() {
         return getClient().getCacheService().listGuildChannels(getBotId(), getGuildId());
     }
 
-    public List<Role> listRoles() {
+    public List<Role> getRoles() {
         return getClient().getCacheService().listGuildRoles(getBotId(), getGuildId());
     }
 
-    public List<Member> listMembers() {
+    public List<Member> getMembers() {
         return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
     }
 
-    public List<Emoji> listEmojis() {
+    public List<Emoji> getEmojis() {
         return getClient().getCacheService().listGuildEmojis(getBotId(), getGuildId());
     }
 }

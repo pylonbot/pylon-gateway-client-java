@@ -36,6 +36,10 @@ public class User implements Entity<UserData> {
         return data;
     }
 
+    public String getName() {
+        return data.getUsername();
+    }
+
     public long getUserId() {
         return getData().getId();
     }
