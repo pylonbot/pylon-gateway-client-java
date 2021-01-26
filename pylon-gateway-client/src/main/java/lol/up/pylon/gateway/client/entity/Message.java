@@ -58,7 +58,7 @@ public class Message implements Entity<MessageData> {
         return getData().getChannelId();
     }
 
-    public Channel getGuildChannel() {
+    public Channel getChannel() {
         return getClient().getCacheService().getChannel(botId, getGuildId(), getChannelId());
     }
 
