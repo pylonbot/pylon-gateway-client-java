@@ -40,8 +40,35 @@ public class Guild implements Entity<GuildData> {
 
     // DATA
 
+    public long getId() {
+        return getData().getId();
+    }
+
     public Member getSelfMember() {
         return getMember(botId);
+    }
+
+    public long getOwnerId() {
+        return getData().getOwnerId();
+    }
+
+
+    // DATA UTIL
+
+    public boolean isMember(final User user) {
+        return isMember(user.getId());
+    }
+
+    public boolean isMember(final long memberId) {
+        return getMemberById(memberId) != null;
+    }
+
+    public long getPublicRoleId() {
+        return getGuildId();
+    }
+
+    public Role getPublicRole() {
+        return getRoleById(getPublicRoleId());
     }
 
     // REST

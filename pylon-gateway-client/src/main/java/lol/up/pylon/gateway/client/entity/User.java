@@ -1,8 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
-import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.CacheService;
 import bot.pylon.proto.discord.v1.model.UserData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 public class User implements Entity<UserData> {
 
@@ -36,6 +35,16 @@ public class User implements Entity<UserData> {
         return data;
     }
 
+    // DATA
+
+    public long getId() {
+        return getData().getId();
+    }
+
+    public boolean isBot() {
+        return getData().getBot();
+    }
+
     public String getName() {
         return data.getUsername();
     }
@@ -43,6 +52,8 @@ public class User implements Entity<UserData> {
     public long getUserId() {
         return getData().getId();
     }
+
+    // CACHE
 
     public Member getAsMember(final Guild guild) {
         return getAsMember(guild.getGuildId());

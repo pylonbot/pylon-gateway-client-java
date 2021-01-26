@@ -4,6 +4,7 @@ import bot.pylon.proto.discord.v1.model.EmojiData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class Emoji implements Entity<EmojiData> {
 
@@ -37,6 +38,22 @@ public class Emoji implements Entity<EmojiData> {
         return data;
     }
 
+    // DATA
+
+    public boolean isAnimated() {
+        return getData().getAnimated();
+    }
+
+    public List<Long> getRoleIds() {
+        return getData().getRolesList();
+    }
+
+    public boolean isManaged() {
+        return getData().getManaged();
+    }
+
+    // REST
+
     public void changeName(final String name) {
         changeName(name, null);
     }
@@ -53,5 +70,6 @@ public class Emoji implements Entity<EmojiData> {
     public void delete(@Nullable final String reason) {
         getClient().getRestService().deleteGuildEmoji(getBotId(), getGuildId(), getData().getId(), reason);
     }
+
 
 }

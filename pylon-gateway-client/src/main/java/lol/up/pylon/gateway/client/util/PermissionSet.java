@@ -39,6 +39,10 @@ public class PermissionSet extends AbstractSet<Permission> {
         this.value = value;
     }
 
+    public long getValue() {
+        return value;
+    }
+
     @Override
     public boolean add(Permission permission) {
         throw new UnsupportedOperationException();
