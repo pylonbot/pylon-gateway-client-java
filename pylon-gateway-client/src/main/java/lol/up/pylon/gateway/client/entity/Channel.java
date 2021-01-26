@@ -48,12 +48,20 @@ public class Channel implements Entity<ChannelData> {
         return getData().getId();
     }
 
+    public String getName() {
+        return getData().getName();
+    }
+
     public int getPosition() {
         return getData().getPosition();
     }
 
     public long getParentId() {
         return getData().getParentId().getValue();
+    }
+
+    public ChannelData.ChannelType getType() {
+        return getData().getType();
     }
 
     public List<ChannelData.ChannelPermissionOverwriteData> getPermissionOverwrites() {
@@ -88,6 +96,18 @@ public class Channel implements Entity<ChannelData> {
 
     public Channel getParent() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getParentId());
+    }
+
+    public boolean canTalk() {
+        final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId());
+        if (member == null) {
+            return false;
+        }
+        return canTalk(member);
+    }
+
+    public boolean canTalk(final Member member) {
+        return member.hasPermission(this, Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
     }
 
     // REST

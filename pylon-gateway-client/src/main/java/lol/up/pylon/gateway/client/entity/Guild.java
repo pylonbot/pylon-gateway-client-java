@@ -44,6 +44,10 @@ public class Guild implements Entity<GuildData> {
         return getData().getId();
     }
 
+    public String getName() {
+        return getData().getName();
+    }
+
     public Member getSelfMember() {
         return getMember(botId);
     }

@@ -4,6 +4,7 @@ import bot.pylon.proto.gateway.v1.service.GatewayCacheGrpc;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
@@ -137,6 +138,10 @@ public class GatewayGrpcClient implements Closeable {
 
     public RestService getRestService() {
         return restService;
+    }
+
+    public User getSelfUser() {
+        return getRestService().getSelfUser(0); // todo
     }
 
     public <E extends Event<E>> void registerReceiver(final Class<E> eventClass,

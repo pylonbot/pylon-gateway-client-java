@@ -46,6 +46,20 @@ public class Message implements Entity<MessageData> {
         return data;
     }
 
+    // DATA
+
+    public long getId() {
+        return getData().getId();
+    }
+
+    public long getChannelId() {
+        return getData().getChannelId();
+    }
+
+    public String getContent() {
+        return getData().getContent();
+    }
+
     public User getAuthor() {
         return new User(getClient(), botId, getData().getAuthor());
     }
@@ -54,15 +68,12 @@ public class Message implements Entity<MessageData> {
         return new Member(getClient(), botId, getData().getMember());
     }
 
-    public long getChannelId() {
-        return getData().getChannelId();
-    }
+
+    // REST
+
+    // CACHE
 
     public Channel getChannel() {
         return getClient().getCacheService().getChannel(botId, getGuildId(), getChannelId());
-    }
-
-    public String getContent() {
-        return getData().getContent();
     }
 }
