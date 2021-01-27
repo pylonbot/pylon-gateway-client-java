@@ -5,6 +5,7 @@ import lol.up.pylon.gateway.client.entity.Channel;
 import lol.up.pylon.gateway.client.entity.Member;
 import lol.up.pylon.gateway.client.entity.Message;
 import lol.up.pylon.gateway.client.entity.User;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +25,7 @@ public interface MessageCreateEvent extends Event<MessageCreateEvent> {
         return getMessage().getChannelId();
     }
 
-    default Channel getChannel() {
+    default GrpcRequest<Channel> getChannel() {
         return getMessage().getChannel();
     }
 

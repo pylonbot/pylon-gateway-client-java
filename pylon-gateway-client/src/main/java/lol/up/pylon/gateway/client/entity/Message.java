@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public class Message implements Entity<MessageData> {
 
@@ -34,11 +35,11 @@ public class Message implements Entity<MessageData> {
     }
 
     @Override
-    public Guild getGuild() {
+    public GrpcRequest<Guild> getGuild() {
         if (data.getGuildId().isInitialized()) {
             return getClient().getCacheService().getGuild(getBotId(), getGuildId());
         }
-        return null;
+        return null; // todo: not null
     }
 
     @Override
@@ -73,7 +74,7 @@ public class Message implements Entity<MessageData> {
 
     // CACHE
 
-    public Channel getChannel() {
+    public GrpcRequest<Channel> getChannel() {
         return getClient().getCacheService().getChannel(botId, getGuildId(), getChannelId());
     }
 }

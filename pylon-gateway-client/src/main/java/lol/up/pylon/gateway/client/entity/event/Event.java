@@ -3,8 +3,7 @@ package lol.up.pylon.gateway.client.entity.event;
 import bot.pylon.proto.discord.v1.event.EventScope;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Guild;
-
-import javax.annotation.Nullable;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public interface Event<T extends Event> {
 
@@ -13,8 +12,8 @@ public interface Event<T extends Event> {
         return getScope().getBotId();
     }
     EventScope getScope();
-    @Nullable
-    default Guild getGuild() {
+
+    default GrpcRequest<Guild> getGuild() {
         if (getGuildId() == 0) {
             return null;
         }

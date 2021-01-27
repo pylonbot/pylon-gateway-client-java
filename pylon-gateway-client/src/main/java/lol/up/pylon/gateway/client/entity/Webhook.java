@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.WebhookData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public class Webhook implements Entity<WebhookData> {
 
@@ -35,7 +36,7 @@ public class Webhook implements Entity<WebhookData> {
         return data;
     }
 
-    public Channel getChannel() {
+    public GrpcRequest<Channel> getChannel() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId());
     }
 

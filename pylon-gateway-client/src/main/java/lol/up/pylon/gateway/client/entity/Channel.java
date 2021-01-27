@@ -5,6 +5,7 @@ import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -94,16 +95,18 @@ public class Channel implements Entity<ChannelData> {
 
     // DATA UTIL
 
-    public Channel getParent() {
+    public GrpcRequest<Channel> getParent() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getParentId());
     }
 
-    public boolean canTalk() {
-        final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId());
-        if (member == null) {
-            return false;
-        }
-        return canTalk(member);
+    public GrpcRequest<Boolean> canTalk() {
+        return getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                .transform(member -> {
+                    if (member == null) {
+                        return false;
+                    }
+                    return canTalk(member);
+                });
     }
 
     public boolean canTalk(final Member member) {
@@ -112,43 +115,47 @@ public class Channel implements Entity<ChannelData> {
 
     // REST
 
-    public void edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
+    public GrpcRequest<Void> edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
         final ModifyChannelRequest.Builder builder = ModifyChannelRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
-        this.data = grpcClient.getRestService().modifyChannel(getBotId(), getGuildId(), builder.build()).getData();
+        return grpcClient.getRestService().modifyChannel(getBotId(), getGuildId(), builder.build())
+                .transform(channel -> {
+                    this.data = channel.getData();
+                    return null;
+                });
     }
 
-    public void editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
+    public GrpcRequest<Void> editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
         final EditChannelPermissionsRequest.Builder builder = EditChannelPermissionsRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
-        getClient().getRestService().editChannelPermissions(getBotId(), getGuildId(), builder.build());
+        return getClient().getRestService().editChannelPermissions(getBotId(), getGuildId(), builder.build());
     }
 
-    public void delete() {
-        delete(null);
+    public GrpcRequest<Void> delete() {
+        return delete(null);
     }
 
-    public void delete(@Nullable final String reason) {
-        getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
+    public GrpcRequest<Void> delete(@Nullable final String reason) {
+        return getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
     }
 
-    public Message createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
+    public GrpcRequest<Message> createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
         return getClient().getRestService().createMessage(getBotId(), getGuildId(), builder.build());
     }
 
-    public Message getMessageById(long messageId) {
+    public GrpcRequest<Message> getMessageById(long messageId) {
         //return grpcClient.getRestService().message
         return null; // TODO
     }
 
     // CACHE
 
-    public List<MemberVoiceState> getVoiceStates() {
+    public GrpcRequest<List<MemberVoiceState>> getVoiceStates() {
         return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
     }
 }
