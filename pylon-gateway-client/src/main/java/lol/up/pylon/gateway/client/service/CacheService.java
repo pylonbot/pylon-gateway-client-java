@@ -18,6 +18,7 @@ import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckReturnValue;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -63,10 +64,12 @@ public class CacheService {
     }
 
     // Guilds (1x + Overload)
+    @CheckReturnValue
     public GrpcRequest<Guild> getGuild(final long guildId) throws GrpcRequestException {
         return getGuild(getBotId(), guildId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Guild> getGuild(final long botId, final long guildId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildResponse> asyncResponse =
@@ -89,10 +92,12 @@ public class CacheService {
 
     // Channels (2x + Overloads)
     // - Get (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<Channel> getChannel(final long guildId, final long channelId) throws GrpcRequestException {
         return getChannel(getBotId(), guildId, channelId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Channel> getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildChannelResponse> asyncResponse =
@@ -113,10 +118,12 @@ public class CacheService {
     }
 
     // - List (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<List<Channel>> listGuildChannels(final long guildId) throws GrpcRequestException {
         return listGuildChannels(getBotId(), guildId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Channel>> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
         try {
             final ListenableFuture<ListGuildChannelsResponse> asyncResponse =
@@ -133,10 +140,12 @@ public class CacheService {
 
     // Guild Members (2x + Overloads)
     // - Get (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<Member> getMember(final long guildId, final long userId) throws GrpcRequestException {
         return getMember(getBotId(), guildId, userId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Member> getMember(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildMemberResponse> asyncResponse =
@@ -157,26 +166,32 @@ public class CacheService {
     }
 
     // - List (5 Overloads)
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembers(final long guildId) throws GrpcRequestException {
         return listGuildMembers(getBotId(), guildId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long guildId, final long after) throws GrpcRequestException {
         return listGuildMembersAfter(getBotId(), guildId, after);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long guildId, long after, int limit) throws GrpcRequestException {
         return listGuildMembersAfter(getBotId(), guildId, after, limit);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembers(final long botId, final long guildId) throws GrpcRequestException {
         return listGuildMembersAfter(botId, guildId, 0);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long botId, final long guildId, final long after) throws GrpcRequestException {
         return listGuildMembersAfter(botId, guildId, after, 0);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long botId, final long guildId, final long after,
                                                            final int limit) throws GrpcRequestException {
         try {
@@ -196,10 +211,12 @@ public class CacheService {
 
     // Guild Member Properties (2x + Overloads)
     // - Get ( 1 Overload)
+    @CheckReturnValue
     public GrpcRequest<Role> getRole(final long guildId, final long roleId) throws GrpcRequestException {
         return getRole(getBotId(), guildId, roleId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Role> getRole(final long botId, final long guildId, final long roleId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildRoleResponse> asyncResponse =
@@ -220,10 +237,12 @@ public class CacheService {
     }
 
     // - List (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<List<Role>> listGuildRoles(final long guildId) throws GrpcRequestException {
         return listGuildRoles(getBotId(), guildId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Role>> listGuildRoles(final long botId, final long guildId) throws GrpcRequestException {
         try {
             final ListenableFuture<ListGuildRolesResponse> asyncResponse =
@@ -239,10 +258,12 @@ public class CacheService {
 
     // Emojis (2x + Overloads)
     // - Get (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<Emoji> getEmoji(final long guildId, final long emojiId) throws GrpcRequestException {
         return getEmoji(getBotId(), guildId, emojiId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Emoji> getEmoji(final long botId, final long guildId, final long emojiId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildEmojiResponse> asyncResponse =
@@ -263,10 +284,12 @@ public class CacheService {
     }
 
     // - List (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<List<Emoji>> listGuildEmojis(final long guildId) throws GrpcRequestException {
         return listGuildEmojis(getBotId(), guildId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId) throws GrpcRequestException {
         try {
             final ListenableFuture<ListGuildEmojisResponse> asyncResponse =
@@ -281,10 +304,12 @@ public class CacheService {
     }
 
     // Users (1x + 1 Overload)
+    @CheckReturnValue
     public GrpcRequest<User> getUser(final long userId) throws GrpcRequestException {
         return getUser(getBotId(), userId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<User> getUser(final long botId, final long userId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetUserResponse> asyncResponse =
@@ -306,10 +331,12 @@ public class CacheService {
 
     // VoiceStates (2x + Overloads)
     // - Get (Overload)
+    @CheckReturnValue
     public GrpcRequest<MemberVoiceState> getVoiceState(final long guildId, final long userId) throws GrpcRequestException {
         return getVoiceState(getBotId(), guildId, userId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<MemberVoiceState> getVoiceState(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         try {
             final ListenableFuture<GetGuildMemberVoiceStateResponse> asyncResponse =
@@ -330,10 +357,12 @@ public class CacheService {
     }
 
     // - List (1 Overload)
+    @CheckReturnValue
     public GrpcRequest<List<MemberVoiceState>> listChannelVoiceStates(final long guildId, final long channelId) throws GrpcRequestException {
         return listChannelVoiceStates(getBotId(), guildId, channelId);
     }
 
+    @CheckReturnValue
     public GrpcRequest<List<MemberVoiceState>> listChannelVoiceStates(final long botId, final long guildId,
                                                                       final long channelId) throws GrpcRequestException {
         try {

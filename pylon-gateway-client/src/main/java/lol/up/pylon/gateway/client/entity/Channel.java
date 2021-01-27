@@ -7,6 +7,7 @@ import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
@@ -95,10 +96,12 @@ public class Channel implements Entity<ChannelData> {
 
     // DATA UTIL
 
+    @CheckReturnValue
     public GrpcRequest<Channel> getParent() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getParentId());
     }
 
+    @CheckReturnValue
     public GrpcRequest<Boolean> canTalk() {
         return getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                 .transform(member -> {
@@ -115,6 +118,7 @@ public class Channel implements Entity<ChannelData> {
 
     // REST
 
+    @CheckReturnValue
     public GrpcRequest<Void> edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
         final ModifyChannelRequest.Builder builder = ModifyChannelRequest.newBuilder();
         consumer.accept(builder);
@@ -126,6 +130,7 @@ public class Channel implements Entity<ChannelData> {
                 });
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
         final EditChannelPermissionsRequest.Builder builder = EditChannelPermissionsRequest.newBuilder();
         consumer.accept(builder);
@@ -133,14 +138,17 @@ public class Channel implements Entity<ChannelData> {
         return getClient().getRestService().editChannelPermissions(getBotId(), getGuildId(), builder.build());
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> delete() {
         return delete(null);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> delete(@Nullable final String reason) {
         return getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Message> createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
@@ -148,6 +156,7 @@ public class Channel implements Entity<ChannelData> {
         return getClient().getRestService().createMessage(getBotId(), getGuildId(), builder.build());
     }
 
+    @CheckReturnValue
     public GrpcRequest<Message> getMessageById(long messageId) {
         //return grpcClient.getRestService().message
         return null; // TODO
@@ -155,6 +164,7 @@ public class Channel implements Entity<ChannelData> {
 
     // CACHE
 
+    @CheckReturnValue
     public GrpcRequest<List<MemberVoiceState>> getVoiceStates() {
         return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
     }

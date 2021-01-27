@@ -5,6 +5,8 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Guild;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
+import javax.annotation.CheckReturnValue;
+
 public interface Event<T extends Event> {
 
     Class<T> getInterfaceType();
@@ -13,6 +15,7 @@ public interface Event<T extends Event> {
     }
     EventScope getScope();
 
+    @CheckReturnValue
     default GrpcRequest<Guild> getGuild() {
         if (getGuildId() == 0) {
             return null;

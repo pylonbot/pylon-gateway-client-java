@@ -5,6 +5,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ public class Member implements Entity<MemberData> {
         return getData().getNick().getValue();
     }
 
+    @CheckReturnValue
     public GrpcRequest<Boolean> isOwner() {
         return getGuild().transform(guild -> guild.getOwnerId() == getId());
     }
@@ -112,33 +114,40 @@ public class Member implements Entity<MemberData> {
 
     // REST
 
+    @CheckReturnValue
     public GrpcRequest<Void> changeNickname(final String nickname) {
         return changeNickname(nickname, null);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
         // TODO: Implementation missing
         return null;
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> addRole(final long roleId) {
         return addRole(roleId, null);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> addRole(final long roleId, @Nullable final String reason) {
         return getClient().getRestService().addMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> removeRole(final long roleId) {
         return removeRole(roleId, null);
     }
 
+    @CheckReturnValue
     public GrpcRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
         return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), roleId, reason);
     }
 
     // CACHE
 
+    @CheckReturnValue
     public GrpcRequest<List<Role>> getRoles() {
         return getClient().getCacheService().listGuildRoles(getBotId(), getGuildId())
                 .transform(roles -> {

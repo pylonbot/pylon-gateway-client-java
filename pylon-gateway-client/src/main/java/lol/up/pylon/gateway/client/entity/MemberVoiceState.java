@@ -4,6 +4,8 @@ import bot.pylon.proto.discord.v1.model.VoiceStateData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
+import javax.annotation.CheckReturnValue;
+
 public class MemberVoiceState implements Entity<VoiceStateData> {
 
     private final GatewayGrpcClient grpcClient;
@@ -36,6 +38,7 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
         return data;
     }
 
+    @CheckReturnValue
     public GrpcRequest<Channel> getChannel() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
     }

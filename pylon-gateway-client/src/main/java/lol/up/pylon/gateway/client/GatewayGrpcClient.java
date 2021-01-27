@@ -16,6 +16,7 @@ import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
@@ -150,6 +151,7 @@ public class GatewayGrpcClient implements Closeable {
         return restService;
     }
 
+    @CheckReturnValue
     public GrpcRequest<User> getSelfUser() {
         return getRestService().getSelfUser(0); // todo
     }

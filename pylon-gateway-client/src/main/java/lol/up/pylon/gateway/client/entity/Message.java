@@ -4,6 +4,8 @@ import bot.pylon.proto.discord.v1.model.MessageData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
+import javax.annotation.CheckReturnValue;
+
 public class Message implements Entity<MessageData> {
 
     private final GatewayGrpcClient grpcClient;
@@ -35,6 +37,7 @@ public class Message implements Entity<MessageData> {
     }
 
     @Override
+    @CheckReturnValue
     public GrpcRequest<Guild> getGuild() {
         if (data.getGuildId().isInitialized()) {
             return getClient().getCacheService().getGuild(getBotId(), getGuildId());
@@ -74,6 +77,7 @@ public class Message implements Entity<MessageData> {
 
     // CACHE
 
+    @CheckReturnValue
     public GrpcRequest<Channel> getChannel() {
         return getClient().getCacheService().getChannel(botId, getGuildId(), getChannelId());
     }
