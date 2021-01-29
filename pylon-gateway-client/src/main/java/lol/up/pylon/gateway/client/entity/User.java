@@ -62,6 +62,13 @@ public class User implements Entity<UserData> {
         return getData().getUsername() + "#" + getData().getDiscriminator(); // todo: discrim fix (either format or passed as str)
     }
 
+    // REST
+
+    @CheckReturnValue
+    public GrpcRequest<Channel> openPrivateChannel() {
+        return getClient().getRestService().createDmChannel(getBotId(), getGuildId(), getId());
+    }
+
     // CACHE
 
     @CheckReturnValue
