@@ -78,14 +78,14 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
             } catch (final Exception ex) {
                 log.error("An error occurred in callback", ex);
             }
-        }, executor).exceptionallyAsync(throwable -> {
+        }, executor).exceptionally(throwable -> {
             try {
                 error.accept(throwable);
             } catch (final Exception ex) {
                 log.error("An error occurred in callback", ex);
             }
             return null;
-        }, executor);
+        });
     }
 
     public T complete() {
