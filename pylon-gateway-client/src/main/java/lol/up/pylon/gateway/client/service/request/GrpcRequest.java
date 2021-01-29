@@ -11,6 +11,7 @@ public interface GrpcRequest<T> {
     @CheckReturnValue
     <V> GrpcRequest<V> transform(Function<T, V> transformer);
 
+    @CheckReturnValue
     <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer);
 
     @CheckReturnValue
