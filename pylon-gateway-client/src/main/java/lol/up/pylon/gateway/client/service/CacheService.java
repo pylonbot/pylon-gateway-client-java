@@ -3,7 +3,6 @@ package lol.up.pylon.gateway.client.service;
 import bot.pylon.proto.discord.v1.cache.*;
 import bot.pylon.proto.discord.v1.model.*;
 import bot.pylon.proto.gateway.v1.service.GatewayCacheGrpc;
-import com.google.common.util.concurrent.ListenableFuture;
 import io.grpc.CallCredentials;
 import io.grpc.Context;
 import io.grpc.Metadata;
@@ -14,6 +13,7 @@ import lol.up.pylon.gateway.client.event.EventExecutorService;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
+import lol.up.pylon.gateway.client.util.CompletableFutureStreamObserver;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +28,12 @@ public class CacheService {
 
     private static final Logger log = LoggerFactory.getLogger(CacheService.class);
 
-    private final GatewayCacheGrpc.GatewayCacheFutureStub client;
+    private final GatewayCacheGrpc.GatewayCacheStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
     private final ExecutorService executorService;
 
     public CacheService(final GatewayGrpcClient gatewayGrpcClient,
-                        final GatewayCacheGrpc.GatewayCacheFutureStub client,
+                        final GatewayCacheGrpc.GatewayCacheStub client,
                         final ExecutorService executorService) {
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.executorService = new EventExecutorService(executorService, EventContext.localContext());
@@ -72,9 +72,10 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<Guild> getGuild(final long botId, final long guildId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuild(GetGuildRequest.newBuilder().build()));
+            final CompletableFutureStreamObserver<GetGuildResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuild(GetGuildRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasGuild()) {
                     return null;
@@ -100,11 +101,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<Channel> getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildChannelResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuildChannel(GetGuildChannelRequest.newBuilder()
-                                    .setChannelId(channelId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetGuildChannelResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildChannel(GetGuildChannelRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasChannel()) {
                     return null;
@@ -126,9 +128,10 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<List<Channel>> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
         try {
-            final ListenableFuture<ListGuildChannelsResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.listGuildChannels(ListGuildChannelsRequest.newBuilder().build()));
+            final CompletableFutureStreamObserver<ListGuildChannelsResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildChannels(ListGuildChannelsRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getChannelsList().stream()
                     .map(channel -> new Channel(gatewayGrpcClient, botId, channel))
                     .collect(Collectors.toList()));
@@ -148,11 +151,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<Member> getMember(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildMemberResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuildMember(GetGuildMemberRequest.newBuilder()
-                                    .setUserId(userId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetGuildMemberResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildMember(GetGuildMemberRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasMember()) {
                     return null;
@@ -195,12 +199,13 @@ public class CacheService {
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long botId, final long guildId, final long after,
                                                            final int limit) throws GrpcRequestException {
         try {
-            final ListenableFuture<ListGuildMembersResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.listGuildMembers(ListGuildMembersRequest.newBuilder()
-                                    .setAfter(after)
-                                    .setLimit(limit)
-                                    .build()));
+            final CompletableFutureStreamObserver<ListGuildMembersResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildMembers(ListGuildMembersRequest.newBuilder()
+                            .setAfter(after)
+                            .setLimit(limit)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getMembersList().stream()
                     .map(member -> new Member(gatewayGrpcClient, botId, member))
                     .collect(Collectors.toList()));
@@ -219,11 +224,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<Role> getRole(final long botId, final long guildId, final long roleId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildRoleResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuildRole(GetGuildRoleRequest.newBuilder()
-                                    .setRoleId(roleId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetGuildRoleResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildRole(GetGuildRoleRequest.newBuilder()
+                            .setRoleId(roleId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasRole()) {
                     return null;
@@ -245,9 +251,10 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<List<Role>> listGuildRoles(final long botId, final long guildId) throws GrpcRequestException {
         try {
-            final ListenableFuture<ListGuildRolesResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.listGuildRoles(ListGuildRolesRequest.newBuilder().build()));
+            final CompletableFutureStreamObserver<ListGuildRolesResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildRoles(ListGuildRolesRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getRolesList().stream()
                     .map(role -> new Role(gatewayGrpcClient, botId, role))
                     .collect(Collectors.toList()));
@@ -266,11 +273,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<Emoji> getEmoji(final long botId, final long guildId, final long emojiId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildEmojiResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
-                                    .setEmojiId(emojiId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetGuildEmojiResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
+                            .setEmojiId(emojiId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasEmoji()) {
                     return null;
@@ -292,9 +300,10 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId) throws GrpcRequestException {
         try {
-            final ListenableFuture<ListGuildEmojisResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build()));
+            final CompletableFutureStreamObserver<ListGuildEmojisResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getEmojisList().stream()
                     .map(emoji -> new Emoji(gatewayGrpcClient, botId, emoji))
                     .collect(Collectors.toList()));
@@ -312,11 +321,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<User> getUser(final long botId, final long userId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetUserResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
-                            .call(() -> client.getUser(GetUserRequest.newBuilder()
-                                    .setUserId(userId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetUserResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.getUser(GetUserRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasUser()) {
                     return null;
@@ -339,11 +349,12 @@ public class CacheService {
     @CheckReturnValue
     public GrpcRequest<MemberVoiceState> getVoiceState(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         try {
-            final ListenableFuture<GetGuildMemberVoiceStateResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.getGuildMemberVoiceState(GetGuildMemberVoiceStateRequest.newBuilder()
-                                    .setUserId(userId)
-                                    .build()));
+            final CompletableFutureStreamObserver<GetGuildMemberVoiceStateResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildMemberVoiceState(GetGuildMemberVoiceStateRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (!response.hasVoiceStateData()) {
                     return null;
@@ -366,11 +377,12 @@ public class CacheService {
     public GrpcRequest<List<MemberVoiceState>> listChannelVoiceStates(final long botId, final long guildId,
                                                                       final long channelId) throws GrpcRequestException {
         try {
-            final ListenableFuture<ListGuildChannelVoiceStatesResponse> asyncResponse =
-                    Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                            .call(() -> client.listGuildChannelVoiceStates(ListGuildChannelVoiceStatesRequest.newBuilder()
-                                    .setChannelId(channelId)
-                                    .build()));
+            final CompletableFutureStreamObserver<ListGuildChannelVoiceStatesResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildChannelVoiceStates(ListGuildChannelVoiceStatesRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse,
                     response -> response.getVoiceStatesDataList().stream()
                             .map(voiceStateData -> new MemberVoiceState(gatewayGrpcClient, botId, voiceStateData))

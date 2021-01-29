@@ -129,8 +129,8 @@ public class GatewayGrpcClient implements Closeable {
         }
         instance = this;
         this.channel = channel;
-        this.cacheService = new CacheService(this, GatewayCacheGrpc.newFutureStub(channel), grpc);
-        this.restService = new RestService(this, GatewayRestGrpc.newFutureStub(channel), grpc);
+        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc);
+        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc);
         this.defaultBotId = defaultBotId;
         this.eventDispatcher = new EventDispatcher(event);
     }

@@ -1,12 +1,12 @@
 package lol.up.pylon.gateway.client.service.request;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -15,7 +15,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     private static final Logger log = LoggerFactory.getLogger(GrpcRequestImpl.class);
 
     private static final Consumer<Object> SUCCESS = o -> {};
-    private static final Consumer<Throwable> ERROR = error -> log.error("An error occurred in grpc request", error);
+    private static final Consumer<Throwable> ERROR = error -> log.error("An error occurred during grpc request", error);
 
     private static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
     private static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
@@ -36,27 +36,31 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         }
     }
 
-    private final ListenableFuture<?> future;
-    private final Function<Object, T> transformer;
+    private final CompletableFuture<T> future;
     private final Executor executor;
 
-    public <V> GrpcRequestImpl(final ExecutorService executor, final ListenableFuture<V> future,
+    public <V> GrpcRequestImpl(final Executor executor, final CompletableFuture<V> future,
                                final Function<V, T> transformer) {
         this.executor = executor;
-        this.future = future;
-        //noinspection unchecked
-        this.transformer = (Function<Object, T>) transformer;
+        this.future = future.thenApply(transformer);
     }
 
-    private GrpcRequestImpl(final Executor executor, final ListenableFuture<?> future, final Function<?, T> transformer) {
+    public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future) {
         this.executor = executor;
         this.future = future;
-        //noinspection unchecked
-        this.transformer = (Function<Object, T>) transformer;
+    }
+
+    public CompletableFuture<T> getFuture() {
+        return future;
     }
 
     public <V> GrpcRequestImpl<V> transform(Function<T, V> transformer) {
-        return new GrpcRequestImpl<>(executor, future, this.transformer.andThen(transformer));
+        return new GrpcRequestImpl<>(executor, future.thenApply(transformer));
+    }
+
+    public <V, P> GrpcRequestImpl<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
+        final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
+        return new GrpcRequestImpl<>(executor, future);
     }
 
     public void queue() {
@@ -68,21 +72,25 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     public void queue(final Consumer<? super T> success, final Consumer<Throwable> error) {
-        future.addListener(() -> {
+        future.thenAcceptAsync(result -> {
             try {
-                final Object response = future.get();
-                final T entity = transformer.apply(response);
-                success.accept(entity);
-            } catch (final Throwable throwable) {
-                error.accept(throwable);
+                success.accept(result);
+            } catch (final Exception ex) {
+                log.error("An error occurred in callback", ex);
             }
+        }, executor).exceptionallyAsync(throwable -> {
+            try {
+                error.accept(throwable);
+            } catch (final Exception ex) {
+                log.error("An error occurred in callback", ex);
+            }
+            return null;
         }, executor);
     }
 
     public T complete() {
         try {
-            final Object response = future.get();
-            return transformer.apply(response);
+            return future.get();
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
