@@ -2,6 +2,9 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.UserData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+
+import javax.annotation.CheckReturnValue;
 
 public class User implements Entity<UserData> {
 
@@ -61,11 +64,13 @@ public class User implements Entity<UserData> {
 
     // CACHE
 
-    public Member getAsMember(final Guild guild) {
+    @CheckReturnValue
+    public GrpcRequest<Member> getAsMember(final Guild guild) {
         return getAsMember(guild.getGuildId());
     }
 
-    public Member getAsMember(final long guildId) {
+    @CheckReturnValue
+    public GrpcRequest<Member> getAsMember(final long guildId) {
         return getClient().getCacheService().getMember(botId, guildId, getData().getId());
     }
 }

@@ -11,10 +11,12 @@ import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.CacheService;
 import lol.up.pylon.gateway.client.service.RestService;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
@@ -33,10 +35,13 @@ public class GatewayGrpcClient implements Closeable {
         private int routerPort;
         private boolean enableRetry;
         private ExecutorService eventExecutor;
+        private ExecutorService grpcExecutor;
 
         private GatewayGrpcClientBuilder(final long defaultBotId) {
             this.defaultBotId = defaultBotId;
-            this.eventExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            this.eventExecutor = Executors.newFixedThreadPool(Math.max(8, Runtime.getRuntime().availableProcessors()));
+            this.grpcExecutor = Executors.newFixedThreadPool(
+                    Math.max(8, Runtime.getRuntime().availableProcessors() / 2));
         }
 
         public GatewayGrpcClientBuilder setDefaultBotId(long defaultBotId) {
@@ -64,6 +69,11 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        public GatewayGrpcClientBuilder setGrpcExecutor(final ExecutorService grpcExecutor) {
+            this.grpcExecutor = grpcExecutor;
+            return this;
+        }
+
         public GatewayGrpcClient build() {
             if (defaultBotId == 0) {
                 throw new NullPointerException("The default bot id must not be 0");
@@ -77,7 +87,8 @@ public class GatewayGrpcClient implements Closeable {
                     routerHost,
                     routerPort,
                     enableRetry,
-                    eventExecutor
+                    eventExecutor,
+                    grpcExecutor
             );
         }
     }
@@ -92,6 +103,7 @@ public class GatewayGrpcClient implements Closeable {
         return instance;
     }
 
+    private final ExecutorService grpcExecutor;
     private final ManagedChannel channel;
     private final CacheService cacheService;
     private final RestService restService;
@@ -100,8 +112,8 @@ public class GatewayGrpcClient implements Closeable {
     private long defaultBotId;
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
-                             final ExecutorService eventExecutor) {
-        this(defaultBotId, eventExecutor, enableRetry ?
+                             final ExecutorService event, final ExecutorService grpc) {
+        this(defaultBotId, event, grpc, enableRetry ?
                 ManagedChannelBuilder.forAddress(host, port)
                         .usePlaintext()
                         .enableRetry()
@@ -111,17 +123,18 @@ public class GatewayGrpcClient implements Closeable {
                         .build());
     }
 
-    private GatewayGrpcClient(final long defaultBotId, final ExecutorService eventExecutor,
+    private GatewayGrpcClient(final long defaultBotId, final ExecutorService event, final ExecutorService grpc,
                               final ManagedChannel channel) {
         if (instance != null) {
             throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
         }
         instance = this;
+        this.grpcExecutor = grpc;
         this.channel = channel;
-        this.cacheService = new CacheService(this, GatewayCacheGrpc.newBlockingStub(channel));
-        this.restService = new RestService(this, GatewayRestGrpc.newBlockingStub(channel));
+        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc);
+        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc);
         this.defaultBotId = defaultBotId;
-        this.eventDispatcher = new EventDispatcher(eventExecutor);
+        this.eventDispatcher = new EventDispatcher(event);
     }
 
     public void setDefaultBotId(final long defaultBotId) {
@@ -140,7 +153,12 @@ public class GatewayGrpcClient implements Closeable {
         return restService;
     }
 
-    public User getSelfUser() {
+    public ExecutorService getGrpcExecutor() {
+        return grpcExecutor;
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<User> getSelfUser() {
         return getRestService().getSelfUser(0); // todo
     }
 

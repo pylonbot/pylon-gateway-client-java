@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public interface Entity<E> {
 
@@ -9,7 +10,7 @@ public interface Entity<E> {
     long getGuildId();
     E getData();
 
-    default Guild getGuild() {
+    default GrpcRequest<Guild> getGuild() {
         return getClient().getCacheService().getGuild(getBotId(), getGuildId());
     }
 }

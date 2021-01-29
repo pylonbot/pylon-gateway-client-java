@@ -6,7 +6,7 @@ public class EventContext {
 
     private static final ThreadLocal<EventContext> localContext = new ThreadLocal<>();
 
-    static ThreadLocal<EventContext> localContext() {
+    public static ThreadLocal<EventContext> localContext() {
         return localContext;
     }
 

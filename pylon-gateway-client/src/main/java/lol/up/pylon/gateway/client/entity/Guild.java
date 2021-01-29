@@ -3,8 +3,11 @@ package lol.up.pylon.gateway.client.entity;
 import bot.pylon.proto.discord.v1.model.GuildData;
 import bot.pylon.proto.discord.v1.rest.CreateGuildChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
+import javax.annotation.CheckReturnValue;
 import java.util.List;
+import java.util.Objects;
 
 public class Guild implements Entity<GuildData> {
 
@@ -48,7 +51,8 @@ public class Guild implements Entity<GuildData> {
         return getData().getName();
     }
 
-    public Member getSelfMember() {
+    @CheckReturnValue
+    public GrpcRequest<Member> getSelfMember() {
         return getMember(botId);
     }
 
@@ -71,55 +75,84 @@ public class Guild implements Entity<GuildData> {
         return getGuildId();
     }
 
-    public Role getPublicRole() {
+    @CheckReturnValue
+    public GrpcRequest<Role> getPublicRole() {
         return getRoleById(getPublicRoleId());
     }
 
     // REST
 
-    public Channel createChannel(final CreateGuildChannelRequest request) {
+    @CheckReturnValue
+    public GrpcRequest<Channel> createChannel(final CreateGuildChannelRequest request) {
         return getClient().getRestService().createChannel(getBotId(), getGuildId(), request);
     }
 
     // CACHE
 
-    public Member getMember(final User user) {
+    @CheckReturnValue
+    public GrpcRequest<Member> getMember(final User user) {
         return getMember(user.getUserId());
     }
 
-    public Member getMember(final long userId) {
+    @CheckReturnValue
+    public GrpcRequest<Member> getMember(final long userId) {
         return getClient().getCacheService().getMember(getBotId(), getGuildId(), userId);
     }
 
-    public Channel getChannelById(final long channelId) {
+    @CheckReturnValue
+    public GrpcRequest<Channel> getChannelById(final long channelId) {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), channelId);
     }
 
-    public Role getRoleById(final long roleId) {
+    @CheckReturnValue
+    public GrpcRequest<Role> getRoleById(final long roleId) {
         return getClient().getCacheService().getRole(getBotId(), getGuildId(), roleId);
     }
 
-    public Member getMemberById(final long memberId) {
+    @CheckReturnValue
+    public GrpcRequest<Member> getMemberById(final long memberId) {
         return getClient().getCacheService().getMember(getBotId(), getGuildId(), memberId);
     }
 
-    public Emoji getEmojiById(final long emojiId) {
+    @CheckReturnValue
+    public GrpcRequest<Emoji> getEmojiById(final long emojiId) {
         return getClient().getCacheService().getEmoji(getBotId(), getGuildId(), emojiId);
     }
 
-    public List<Channel> getChannels() {
+    @CheckReturnValue
+    public GrpcRequest<List<Channel>> getChannels() {
         return getClient().getCacheService().listGuildChannels(getBotId(), getGuildId());
     }
 
-    public List<Role> getRoles() {
+    @CheckReturnValue
+    public GrpcRequest<List<Role>> getRoles() {
         return getClient().getCacheService().listGuildRoles(getBotId(), getGuildId());
     }
 
-    public List<Member> getMembers() {
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> getMembers() {
         return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
     }
 
-    public List<Emoji> getEmojis() {
+    @CheckReturnValue
+    public GrpcRequest<List<Emoji>> getEmojis() {
         return getClient().getCacheService().listGuildEmojis(getBotId(), getGuildId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Guild guild = (Guild) o;
+        return getId() == guild.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(grpcClient, botId, data);
     }
 }

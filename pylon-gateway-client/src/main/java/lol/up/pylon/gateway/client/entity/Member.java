@@ -2,8 +2,10 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MemberData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +54,16 @@ public class Member implements Entity<MemberData> {
         return getData().getNick().getValue();
     }
 
-    public boolean isOwner() {
-        return getGuild().getOwnerId() == getId();
+    @CheckReturnValue
+    public GrpcRequest<Boolean> isOwner() {
+        return getGuild().transform(guild -> guild.getOwnerId() == getId());
+    }
+
+    public boolean isOwner(final Guild guild) {
+        if (guild.getId() != getGuildId()) {
+            throw new IllegalArgumentException("Given guild is not the members guild");
+        }
+        return guild.getOwnerId() == getId();
     }
 
     public List<Long> getRoleIds() {
@@ -104,39 +114,49 @@ public class Member implements Entity<MemberData> {
 
     // REST
 
-    public void changeNickname(final String nickname) {
-        changeNickname(nickname, null);
+    @CheckReturnValue
+    public GrpcRequest<Void> changeNickname(final String nickname) {
+        return changeNickname(nickname, null);
     }
 
-    public void changeNickname(final String nickname, @Nullable final String reason) {
+    @CheckReturnValue
+    public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
         // TODO: Implementation missing
+        return null;
     }
 
-    public void addRole(final long roleId) {
-        addRole(roleId, null);
+    @CheckReturnValue
+    public GrpcRequest<Void> addRole(final long roleId) {
+        return addRole(roleId, null);
     }
 
-    public void addRole(final long roleId, @Nullable final String reason) {
-        getClient().getRestService().addMemberRole(botId, getGuildId(), getUserId(), roleId, reason);
+    @CheckReturnValue
+    public GrpcRequest<Void> addRole(final long roleId, @Nullable final String reason) {
+        return getClient().getRestService().addMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
-    public void removeRole(final long roleId) {
-        removeRole(roleId, null);
+    @CheckReturnValue
+    public GrpcRequest<Void> removeRole(final long roleId) {
+        return removeRole(roleId, null);
     }
 
-    public void removeRole(final long roleId, @Nullable final String reason) {
-        getClient().getRestService().removeMemberRole(botId, getGuildId(), roleId, reason);
+    @CheckReturnValue
+    public GrpcRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
+        return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), roleId, reason);
     }
 
     // CACHE
 
-    public List<Role> getRoles() {
-        final List<Role> roles = getClient().getCacheService().listGuildRoles(getBotId(), getGuildId());
-        final Map<Long, Role> roleMap = new HashMap<>();
-        roles.forEach(role -> roleMap.put(role.getData().getId(), role));
-        return getRoleIds().stream()
-                .map(roleMap::get)
-                .collect(Collectors.toList());
+    @CheckReturnValue
+    public GrpcRequest<List<Role>> getRoles() {
+        return getClient().getCacheService().listGuildRoles(getBotId(), getGuildId())
+                .transform(roles -> {
+                    final Map<Long, Role> roleMap = new HashMap<>();
+                    roles.forEach(role -> roleMap.put(role.getData().getId(), role));
+                    return getRoleIds().stream()
+                            .map(roleMap::get)
+                            .collect(Collectors.toList());
+                });
     }
 
 }
