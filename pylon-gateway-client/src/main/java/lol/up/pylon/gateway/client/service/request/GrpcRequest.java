@@ -11,6 +11,8 @@ public interface GrpcRequest<T> {
     @CheckReturnValue
     <V> GrpcRequest<V> transform(Function<T, V> transformer);
 
+    <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer);
+
     @CheckReturnValue
     <V, P> GrpcRequest<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer);
 

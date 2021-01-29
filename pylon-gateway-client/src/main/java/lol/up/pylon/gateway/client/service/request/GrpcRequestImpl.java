@@ -50,27 +50,40 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         this.future = future;
     }
 
+    @Override
     public CompletableFuture<T> getFuture() {
         return future;
     }
 
+    @Override
     public <V> GrpcRequestImpl<V> transform(Function<T, V> transformer) {
         return new GrpcRequestImpl<>(executor, future.thenApply(transformer));
     }
 
+    @Override
+    public <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer) {
+        final CompletableFuture<V> future = getFuture().thenApplyAsync(transformer, executor)
+                .thenComposeAsync(GrpcRequest::getFuture, executor);
+        return new GrpcRequestImpl<V>(executor, future);
+    }
+
+    @Override
     public <V, P> GrpcRequestImpl<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
         final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
         return new GrpcRequestImpl<>(executor, future);
     }
 
+    @Override
     public void queue() {
         queue(DEFAULT_SUCCESS_HANDLER);
     }
 
+    @Override
     public void queue(final Consumer<? super T> success) {
         queue(success, DEFAULT_ERROR_HANDLER);
     }
 
+    @Override
     public void queue(final Consumer<? super T> success, final Consumer<Throwable> error) {
         future.thenAcceptAsync(result -> {
             try {
@@ -88,6 +101,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         });
     }
 
+    @Override
     public T complete() {
         try {
             return future.get();

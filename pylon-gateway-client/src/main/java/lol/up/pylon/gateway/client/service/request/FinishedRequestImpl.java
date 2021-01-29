@@ -3,7 +3,6 @@ package lol.up.pylon.gateway.client.service.request;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -20,6 +19,11 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
     @Override
     public <V> GrpcRequest<V> transform(Function<T, V> transformer) {
         return new FinishedRequestImpl<>(transformer.apply(entity));
+    }
+
+    @Override
+    public <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer) {
+        return transformer.apply(entity);
     }
 
     @Override
