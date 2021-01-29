@@ -103,6 +103,7 @@ public class GatewayGrpcClient implements Closeable {
         return instance;
     }
 
+    private final ExecutorService grpcExecutor;
     private final ManagedChannel channel;
     private final CacheService cacheService;
     private final RestService restService;
@@ -128,6 +129,7 @@ public class GatewayGrpcClient implements Closeable {
             throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
         }
         instance = this;
+        this.grpcExecutor = grpc;
         this.channel = channel;
         this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc);
         this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc);
@@ -149,6 +151,10 @@ public class GatewayGrpcClient implements Closeable {
 
     public RestService getRestService() {
         return restService;
+    }
+
+    public ExecutorService getGrpcExecutor() {
+        return grpcExecutor;
     }
 
     @CheckReturnValue
