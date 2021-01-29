@@ -64,7 +64,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     public <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer) {
         final CompletableFuture<V> future = getFuture().thenApplyAsync(transformer, executor)
                 .thenComposeAsync(GrpcRequest::getFuture, executor);
-        return new GrpcRequestImpl<V>(executor, future);
+        return new GrpcRequestImpl<>(executor, future);
     }
 
     @Override
