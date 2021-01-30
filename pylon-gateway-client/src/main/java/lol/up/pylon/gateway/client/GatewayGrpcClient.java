@@ -7,6 +7,7 @@ import io.grpc.ManagedChannelBuilder;
 import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
+import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.CacheService;
@@ -34,11 +35,13 @@ public class GatewayGrpcClient implements Closeable {
         private String routerHost;
         private int routerPort;
         private boolean enableRetry;
+        private boolean enableContextCache;
         private ExecutorService eventExecutor;
         private ExecutorService grpcExecutor;
 
         private GatewayGrpcClientBuilder(final long defaultBotId) {
             this.defaultBotId = defaultBotId;
+            this.enableContextCache = true;
             this.eventExecutor = Executors.newFixedThreadPool(Math.max(8, Runtime.getRuntime().availableProcessors()));
             this.grpcExecutor = Executors.newFixedThreadPool(
                     Math.max(8, Runtime.getRuntime().availableProcessors() / 2));
@@ -64,6 +67,11 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        public GatewayGrpcClientBuilder setContextCacheEnabled(boolean enableContextCache) {
+            this.enableContextCache = enableContextCache;
+            return this;
+        }
+
         public GatewayGrpcClientBuilder setEventExecutor(ExecutorService eventExecutor) {
             this.eventExecutor = eventExecutor;
             return this;
@@ -82,6 +90,7 @@ public class GatewayGrpcClient implements Closeable {
                 throw new IllegalArgumentException("The port must be greater than 0 and less than or equal to 65535");
             }
             Objects.requireNonNull(routerHost, "A routerHost is mandatory");
+            EventContext.setContextRequestCacheEnabled(enableContextCache);
             return new GatewayGrpcClient(
                     defaultBotId,
                     routerHost,

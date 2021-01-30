@@ -25,6 +25,12 @@ public class EventContext {
         return sb.toString();
     }
 
+    private static boolean cacheEnabled = true;
+
+    public static void setContextRequestCacheEnabled(final boolean enabled) {
+        cacheEnabled = enabled;
+    }
+
     private final ExecutorService executorService;
     private final long botId;
     private final long guildId;
@@ -40,11 +46,16 @@ public class EventContext {
     @SuppressWarnings("unchecked")
     @Nullable
     public <T> T getContextObject(final String key) {
-        return (T) contextCache.get(key);
+        if (cacheEnabled) {
+            return (T) contextCache.get(key);
+        }
+        return null;
     }
 
     public void populateContext(final String key, final Object object) {
-        contextCache.put(key, object);
+        if (cacheEnabled) {
+            contextCache.put(key, object);
+        }
     }
 
     public long getBotId() {
