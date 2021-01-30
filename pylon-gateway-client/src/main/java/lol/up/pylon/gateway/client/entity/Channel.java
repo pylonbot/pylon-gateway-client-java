@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.ChannelData;
+import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
@@ -159,6 +160,11 @@ public class Channel implements Entity<ChannelData> {
     @CheckReturnValue
     public GrpcRequest<Message> createMessage(final String text) {
         return createMessage(builder -> builder.setContent(text));
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> createMessage(final MessageData.MessageEmbedData embedData) {
+        return createMessage(builder -> builder.setEmbed(embedData));
     }
 
     @CheckReturnValue
