@@ -24,7 +24,7 @@ public class CompletableFutureStreamObserver<T> extends CompletableFuture<T> imp
 
     @Override
     public void onError(Throwable throwable) {
-        completeWithContext(() -> completeExceptionally(throwable));
+        completeWithContext(() -> completeExceptionally(ExceptionUtil.asGrpcException(throwable)));
     }
 
     @Override
