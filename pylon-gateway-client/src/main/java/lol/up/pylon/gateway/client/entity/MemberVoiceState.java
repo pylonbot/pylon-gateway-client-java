@@ -38,9 +38,30 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
         return data;
     }
 
+    // DATA
+
+    public boolean isInVoiceChannel() {
+        return getData().hasChannelId();
+    }
+
+    public long getChannelId() {
+        if(!isInVoiceChannel()) {
+            throw new IllegalArgumentException("Not connected to a voice channel!");
+        }
+        return getData().getChannelId().getValue();
+    }
+
+    // DATA UTIL
+
+
+    // REST
+
+
+    // CACHE
+
     @CheckReturnValue
     public GrpcRequest<Channel> getChannel() {
-        return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getData().getChannelId().getValue());
+        return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getChannelId());
     }
 
     public Member getMember() {

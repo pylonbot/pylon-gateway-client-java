@@ -163,4 +163,9 @@ public class Member implements Entity<MemberData> {
                 });
     }
 
+    @CheckReturnValue
+    public GrpcRequest<MemberVoiceState> getVoiceState() {
+        return getClient().getCacheService().getVoiceState(getBotId(), getGuildId(), getUserId());
+    }
+
 }

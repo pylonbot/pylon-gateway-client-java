@@ -73,6 +73,13 @@ public class Channel implements Entity<ChannelData> {
         return getData().getParentId().getValue();
     }
 
+    public boolean isNsfw() {
+        if(getType() != ChannelData.ChannelType.GUILD_TEXT) {
+            throw new IllegalArgumentException("Channel is not a guild channel");
+        }
+        return getData().getNsfw();
+    }
+
     public long getUserId() {
         if(getType() != ChannelData.ChannelType.DM) {
             throw new IllegalArgumentException("Channel is not a DM channel");
