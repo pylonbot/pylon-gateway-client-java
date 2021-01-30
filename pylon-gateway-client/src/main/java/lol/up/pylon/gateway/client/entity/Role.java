@@ -53,4 +53,8 @@ public class Role implements Entity<RoleData> {
         return getGuildId() == getId();
     }
 
+    public String getName() {
+        return getData().getName();
+    }
+
 }
