@@ -17,6 +17,14 @@ public class EventContext {
         return localContext().get();
     }
 
+    public static String buildContextKey(final String method, final long... params) {
+        final StringBuilder sb = new StringBuilder(method);
+        for (long param : params) {
+            sb.append("-").append(param);
+        }
+        return sb.toString();
+    }
+
     private final ExecutorService executorService;
     private final long botId;
     private final long guildId;
@@ -55,11 +63,7 @@ public class EventContext {
         this.contextCache.clear();
     }
 
-    public void clearCache(final String method) {
-        clearCache(getBotId(), getGuildId(), method);
-    }
-
-    public void clearCache(final long botId, final long guildId, final String method) {
-        this.contextCache.remove(botId + "-" + guildId + "-" + method);
+    public void clearCache(final String contextKey) {
+        this.contextCache.remove(contextKey);
     }
 }

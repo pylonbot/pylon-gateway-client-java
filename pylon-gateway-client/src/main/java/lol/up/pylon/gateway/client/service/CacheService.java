@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -64,10 +65,6 @@ public class CacheService {
         return gatewayGrpcClient.getDefaultBotId();
     }
 
-    private String buildContextKey(final EventContext context, final String method) {
-        return context.getBotId() + "-" + context.getGuildId() + "-" + method;
-    }
-
     // Guilds (1x + Overload)
     @CheckReturnValue
     public GrpcRequest<Guild> getGuild(final long guildId) throws GrpcRequestException {
@@ -79,7 +76,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "guild");
+            ctxKey = EventContext.buildContextKey("guild", botId, guildId);
             final Guild guild = context.getContextObject(ctxKey);
             if(guild != null)
                 return new FinishedRequestImpl<>(guild);
@@ -122,7 +119,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "channel");
+            ctxKey = EventContext.buildContextKey("channel", botId, guildId, channelId);
             final Channel channel = context.getContextObject(ctxKey);
             if(channel != null)
                 return new FinishedRequestImpl<>(channel);
@@ -163,7 +160,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "list_channels");
+            ctxKey = EventContext.buildContextKey("list_channels", botId, guildId);
             final List<Channel> channelList = context.getContextObject(ctxKey);
             if(channelList != null)
                 return new FinishedRequestImpl<>(channelList);
@@ -201,7 +198,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "dm_channel");
+            ctxKey = EventContext.buildContextKey("dm_channel", botId, channelId, userId);
             final Channel channel = context.getContextObject(ctxKey);
             if(channel != null)
                 return new FinishedRequestImpl<>(channel);
@@ -244,7 +241,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "member");
+            ctxKey = EventContext.buildContextKey("member", botId, guildId, userId);
             final Member member = context.getContextObject(ctxKey);
             if(member != null)
                 return new FinishedRequestImpl<>(member);
@@ -331,7 +328,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "role");
+            ctxKey = EventContext.buildContextKey("role", botId, guildId, roleId);
             final Role role = context.getContextObject(ctxKey);
             if(role != null)
                 return new FinishedRequestImpl<>(role);
@@ -372,7 +369,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "list_roles");
+            ctxKey = EventContext.buildContextKey("list_roles", botId, guildId);
             final List<Role> roleList = context.getContextObject(ctxKey);
             if(roleList != null)
                 return new FinishedRequestImpl<>(roleList);
@@ -410,7 +407,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "emoji");
+            ctxKey = EventContext.buildContextKey("emoji", botId, guildId, emojiId);
             final Emoji emoji = context.getContextObject(ctxKey);
             if(emoji != null)
                 return new FinishedRequestImpl<>(emoji);
@@ -451,7 +448,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "list_emojis");
+            ctxKey = EventContext.buildContextKey("list_emojis", botId, guildId);
             final List<Emoji> emojiList = context.getContextObject(ctxKey);
             if(emojiList != null)
                 return new FinishedRequestImpl<>(emojiList);
@@ -488,7 +485,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "user");
+            ctxKey = EventContext.buildContextKey("user", botId, userId);
             final User user = context.getContextObject(ctxKey);
             if(user != null)
                 return new FinishedRequestImpl<>(user);
@@ -530,7 +527,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "voice_state");
+            ctxKey = EventContext.buildContextKey("voice_state", botId, guildId, userId);
             final MemberVoiceState voiceState = context.getContextObject(ctxKey);
             if(voiceState != null)
                 return new FinishedRequestImpl<>(voiceState);
@@ -572,7 +569,7 @@ public class CacheService {
         final EventContext context = EventContext.current();
         final String ctxKey;
         if(context != null) {
-            ctxKey = buildContextKey(context, "list_voice_states");
+            ctxKey = EventContext.buildContextKey("list_voice_states", botId, guildId);
             final List<MemberVoiceState> voiceStateList = context.getContextObject(ctxKey);
             if(voiceStateList != null)
                 return new FinishedRequestImpl<>(voiceStateList);
