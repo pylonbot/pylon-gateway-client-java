@@ -157,6 +157,11 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
+    public GrpcRequest<Message> createMessage(final String text) {
+        return createMessage(builder -> builder.setContent(text));
+    }
+
+    @CheckReturnValue
     public GrpcRequest<Message> getMessageById(long messageId) {
         //return grpcClient.getRestService().message
         return null; // TODO
