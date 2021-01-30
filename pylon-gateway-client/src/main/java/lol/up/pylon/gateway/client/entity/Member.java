@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MemberData;
+import bot.pylon.proto.discord.v1.rest.ModifyGuildMemberRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
@@ -121,8 +122,11 @@ public class Member implements Entity<MemberData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
-        // TODO: Implementation missing
-        return null;
+        return getClient().getRestService().modifyGuildMember(getBotId(), getGuildId(), ModifyGuildMemberRequest.newBuilder()
+                .setUserId(getUserId())
+                .setNick(nickname)
+                .setAuditLogReason(reason)
+                .build());
     }
 
     @CheckReturnValue
