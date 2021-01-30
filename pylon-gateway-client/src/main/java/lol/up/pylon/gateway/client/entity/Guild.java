@@ -71,6 +71,11 @@ public class Guild implements Entity<GuildData> {
         return getMemberById(memberId) != null;
     }
 
+    @CheckReturnValue
+    public GrpcRequest<Member> getOwner() {
+        return getMember(getOwnerId());
+    }
+
     public long getPublicRoleId() {
         return getGuildId();
     }
