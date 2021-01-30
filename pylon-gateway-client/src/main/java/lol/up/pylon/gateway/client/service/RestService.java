@@ -1778,7 +1778,7 @@ public class RestService {
                 if (response.hasError()) {
                     throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
                 }
-                return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
+                return new Channel(gatewayGrpcClient, botId, response.getData().getChannel(), userId);
             });
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);

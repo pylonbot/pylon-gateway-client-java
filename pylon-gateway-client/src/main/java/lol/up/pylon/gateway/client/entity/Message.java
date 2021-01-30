@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
@@ -33,7 +34,7 @@ public class Message implements Entity<MessageData> {
         if (data.getGuildId().isInitialized()) {
             return data.getGuildId().getValue();
         }
-        return -1L;
+        return 0L;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class Message implements Entity<MessageData> {
         if (data.getGuildId().isInitialized()) {
             return getClient().getCacheService().getGuild(getBotId(), getGuildId());
         }
-        return null; // todo: not null
+        return new FinishedRequestImpl<>(null);
     }
 
     @Override
@@ -65,11 +66,11 @@ public class Message implements Entity<MessageData> {
     }
 
     public User getAuthor() {
-        return new User(getClient(), botId, getData().getAuthor());
+        return new User(getClient(), getBotId(), getData().getAuthor());
     }
 
     public Member getMember() {
-        return new Member(getClient(), botId, getData().getMember());
+        return new Member(getClient(), getBotId(), getData().getMember());
     }
 
 
@@ -79,6 +80,10 @@ public class Message implements Entity<MessageData> {
 
     @CheckReturnValue
     public GrpcRequest<Channel> getChannel() {
-        return getClient().getCacheService().getChannel(botId, getGuildId(), getChannelId());
+        if (getGuildId() > 0) {
+            return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getChannelId());
+        } else {
+            return getClient().getCacheService().getDmChannel(getBotId(), getChannelId(), getAuthor().getId());
+        }
     }
 }

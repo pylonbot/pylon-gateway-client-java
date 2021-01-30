@@ -6,6 +6,7 @@ import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
@@ -18,11 +19,20 @@ public class Channel implements Entity<ChannelData> {
     private final GatewayGrpcClient grpcClient;
     private final long botId;
     private ChannelData data;
+    private final long userId;
 
     public Channel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data) {
         this.grpcClient = grpcClient;
         this.botId = botId;
         this.data = data;
+        this.userId = -1;
+    }
+
+    public Channel(final GatewayGrpcClient grpcClient, final long botId, final ChannelData data, final long userId) {
+        this.grpcClient = grpcClient;
+        this.botId = botId;
+        this.data = data;
+        this.userId = userId;
     }
 
     @Override
@@ -61,6 +71,13 @@ public class Channel implements Entity<ChannelData> {
 
     public long getParentId() {
         return getData().getParentId().getValue();
+    }
+
+    public long getUserId() {
+        if(getType() != ChannelData.ChannelType.DM) {
+            throw new IllegalArgumentException("Channel is not a DM channel");
+        }
+        return userId;
     }
 
     public ChannelData.ChannelType getType() {
@@ -104,6 +121,9 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Boolean> canTalk() {
+        if(getType() == ChannelData.ChannelType.DM) {
+            return new FinishedRequestImpl<>(true);
+        }
         return getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                 .transform(member -> {
                     if (member == null) {
@@ -113,7 +133,14 @@ public class Channel implements Entity<ChannelData> {
                 });
     }
 
+    public GrpcRequest<User> getUser() {
+        return getClient().getCacheService().getUser(getBotId(), getUserId());
+    }
+
     public boolean canTalk(final Member member) {
+        if(getType() == ChannelData.ChannelType.DM) {
+            return true;
+        }
         return member.hasPermission(this, Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
     }
 
@@ -146,6 +173,9 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> delete(@Nullable final String reason) {
+        if(getType() == ChannelData.ChannelType.DM) {
+            throw new IllegalArgumentException("Cannot delete a DM channel");
+        }
         return getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
     }
 

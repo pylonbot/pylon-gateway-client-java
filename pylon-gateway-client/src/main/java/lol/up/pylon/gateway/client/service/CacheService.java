@@ -91,7 +91,7 @@ public class CacheService {
         }
     }
 
-    // Channels (2x + Overloads)
+    // Channels (3x + Overloads)
     // - Get (1 Overload)
     @CheckReturnValue
     public GrpcRequest<Channel> getChannel(final long guildId, final long channelId) throws GrpcRequestException {
@@ -135,6 +135,34 @@ public class CacheService {
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getChannelsList().stream()
                     .map(channel -> new Channel(gatewayGrpcClient, botId, channel))
                     .collect(Collectors.toList()));
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    // - DM (1 Overload)
+    @CheckReturnValue
+    public GrpcRequest<Channel> getDmChannel(final long channelId, final long userId) throws GrpcRequestException {
+        return getDmChannel(getBotId(), channelId, userId);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Channel> getDmChannel(final long botId, final long channelId, final long userId) throws GrpcRequestException {
+        // TODO: fix dm channel impl
+        try {
+            final CompletableFutureStreamObserver<GetGuildChannelResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.getGuildChannel(GetGuildChannelRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+                if (!response.hasChannel()) {
+                    return null;
+                }
+                final ChannelData data = response.getChannel();
+                return new Channel(gatewayGrpcClient, botId, data, userId);
+            });
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }

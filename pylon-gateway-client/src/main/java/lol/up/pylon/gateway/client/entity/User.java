@@ -8,6 +8,9 @@ import javax.annotation.CheckReturnValue;
 
 public class User implements Entity<UserData> {
 
+    private static String AVATAR_URL = "https://cdn.discordapp.com/avatars/%s/%s.%s";
+    private static String DEFAULT_AVATAR_URL = "https://cdn.discordapp.com/embed/avatars/%s.png";
+
     private final GatewayGrpcClient grpcClient;
     private final long botId;
     private final UserData data;
@@ -49,17 +52,42 @@ public class User implements Entity<UserData> {
     }
 
     public String getName() {
-        return data.getUsername();
+        return getData().getUsername();
+    }
+
+    public int getDiscriminator() {
+        return getData().getDiscriminator();
+    }
+
+    public String getPaddedDiscriminator() {
+        return String.valueOf(getDiscriminator()); // todo: discrim fix (either format or passed as str)
     }
 
     public long getUserId() {
         return getData().getId();
     }
 
+    public String getAvatarId() {
+        if(getData().getAvatar().isInitialized()) {
+            return getData().getAvatar().getValue();
+        }
+        return null;
+    }
+
     // DATA UTIL
 
     public String getAsTag() {
-        return getData().getUsername() + "#" + getData().getDiscriminator(); // todo: discrim fix (either format or passed as str)
+        return getName() + "#" + getPaddedDiscriminator();
+    }
+
+    public String getAvatarUrl() {
+        final String avatarId = getAvatarId();
+        if(avatarId == null) {
+            final String defaultAvatarId = String.valueOf(getDiscriminator() % 5);
+            return String.format(DEFAULT_AVATAR_URL, defaultAvatarId);
+        } else {
+            return String.format(AVATAR_URL, getId(), avatarId, avatarId.startsWith("a_") ? "gif" : "png");
+        }
     }
 
     // REST
