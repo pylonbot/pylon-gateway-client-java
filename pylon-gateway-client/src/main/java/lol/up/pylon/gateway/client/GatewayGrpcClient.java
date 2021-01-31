@@ -7,6 +7,7 @@ import io.grpc.ManagedChannelBuilder;
 import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
+import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.CacheService;
@@ -34,11 +35,13 @@ public class GatewayGrpcClient implements Closeable {
         private String routerHost;
         private int routerPort;
         private boolean enableRetry;
+        private boolean enableContextCache;
         private ExecutorService eventExecutor;
         private ExecutorService grpcExecutor;
 
         private GatewayGrpcClientBuilder(final long defaultBotId) {
             this.defaultBotId = defaultBotId;
+            this.enableContextCache = true;
             this.eventExecutor = Executors.newFixedThreadPool(Math.max(8, Runtime.getRuntime().availableProcessors()));
             this.grpcExecutor = Executors.newFixedThreadPool(
                     Math.max(8, Runtime.getRuntime().availableProcessors() / 2));
@@ -64,6 +67,27 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        /**
+         * Cache repeated calls on the same cache entity during one {@link EventContext EventContext} if set to true
+         * One {@link EventContext EventContext} is valid for all listeners and is cleared as the listeners completed.
+         * See {@link EventDispatcher#dispatchEvent(Event) EventDispatcher#dispatchEvent(Event)} for implementation
+         * details regarding the {@link EventContext EventContext} lifetime.
+         * <p>
+         * To manually clear an {@link EventContext EventContext} you can use {@link EventContext#clearCache()}.
+         * To manually clear one specific entity from the {@link EventContext EventContext} cache, you can use
+         * {@link EventContext#clearCache(String) EventContext#clearCache(String)} with the String being a generated
+         * context key from {@link EventContext#buildContextKey(String, long...) EventContext#buildContextKey(String,
+         * long...)} with the longs being all related snowflakes (botId, guildId, and so on), see {@link CacheService
+         * CacheService} implementation
+         *
+         * @param enableContextCache whether the described context-cache should be enabled
+         * @return builder object for the {@link GatewayGrpcClient GatewayGrpcClient}
+         */
+        public GatewayGrpcClientBuilder setContextCacheEnabled(boolean enableContextCache) {
+            this.enableContextCache = enableContextCache;
+            return this;
+        }
+
         public GatewayGrpcClientBuilder setEventExecutor(ExecutorService eventExecutor) {
             this.eventExecutor = eventExecutor;
             return this;
@@ -82,6 +106,7 @@ public class GatewayGrpcClient implements Closeable {
                 throw new IllegalArgumentException("The port must be greater than 0 and less than or equal to 65535");
             }
             Objects.requireNonNull(routerHost, "A routerHost is mandatory");
+            EventContext.setContextRequestCacheEnabled(enableContextCache);
             return new GatewayGrpcClient(
                     defaultBotId,
                     routerHost,
