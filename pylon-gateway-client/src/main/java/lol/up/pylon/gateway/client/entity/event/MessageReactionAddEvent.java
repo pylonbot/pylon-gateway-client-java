@@ -56,11 +56,13 @@ public interface MessageReactionAddEvent extends Event<MessageReactionAddEvent>,
     }
 
     @Override
+    @CheckReturnValue
     default GrpcRequest<Channel> getChannel() {
         return GatewayGrpcClient.getSingleton().getCacheService().getChannel(getBotId(), getGuildId(), getChannelId());
     }
 
     @Override
+    @CheckReturnValue
     default GrpcRequest<User> getUser() {
         return GatewayGrpcClient.getSingleton().getCacheService().getUser(getBotId(), getUserId());
     }
@@ -74,6 +76,7 @@ public interface MessageReactionAddEvent extends Event<MessageReactionAddEvent>,
         return GatewayGrpcClient.getSingleton().getCacheService().getGuild(getGuildId());
     }
 
+    @Override
     default long getGuildId() {
         return getScope().getGuildId();
     }
