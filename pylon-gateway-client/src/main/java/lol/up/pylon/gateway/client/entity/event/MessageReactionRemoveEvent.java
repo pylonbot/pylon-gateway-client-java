@@ -1,6 +1,10 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.entity.User;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public interface MessageReactionRemoveEvent extends Event<MessageReactionRemoveEvent>, MessageReactionEvent {
 
@@ -48,4 +52,13 @@ public interface MessageReactionRemoveEvent extends Event<MessageReactionRemoveE
         return event.getPayload().getEmoji();
     }
 
+    @Override
+    default GrpcRequest<Channel> getChannel() {
+        return GatewayGrpcClient.getSingleton().getCacheService().getChannel(getBotId(), getGuildId(), getChannelId());
+    }
+
+    @Override
+    default GrpcRequest<User> getUser() {
+        return GatewayGrpcClient.getSingleton().getCacheService().getUser(getBotId(), getUserId());
+    }
 }

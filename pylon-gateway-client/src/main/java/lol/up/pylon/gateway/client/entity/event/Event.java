@@ -10,9 +10,11 @@ import javax.annotation.CheckReturnValue;
 public interface Event<T extends Event> {
 
     Class<T> getInterfaceType();
+
     default long getBotId() {
         return getScope().getBotId();
     }
+
     EventScope getScope();
 
     @CheckReturnValue
