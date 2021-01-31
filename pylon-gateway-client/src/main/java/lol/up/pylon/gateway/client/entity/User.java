@@ -80,6 +80,10 @@ public class User implements Entity<UserData> {
         return getName() + "#" + getPaddedDiscriminator();
     }
 
+    public String getAsMention() {
+        return "<@" + getId() + ">";
+    }
+
     public String getAvatarUrl() {
         final String avatarId = getAvatarId();
         if(avatarId == null) {

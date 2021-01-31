@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
+import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
@@ -11,7 +12,7 @@ public class Message implements Entity<MessageData> {
 
     private final GatewayGrpcClient grpcClient;
     private final long botId;
-    private final MessageData data;
+    private MessageData data;
 
     public Message(final GatewayGrpcClient grpcClient, final long botId, final MessageData data) {
         this.grpcClient = grpcClient;
@@ -75,6 +76,30 @@ public class Message implements Entity<MessageData> {
 
 
     // REST
+
+    @CheckReturnValue
+    public GrpcRequest<Void> editMessage(final String message) {
+        return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
+                .setChannelId(getChannelId())
+                .setMessageId(getId())
+                .setContent(message)
+                .build()).transform(msg -> {
+            this.data = msg.getData();
+            return null;
+        });
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> editMessage(final MessageData.MessageEmbedData embed) {
+        return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
+                .setChannelId(getChannelId())
+                .setMessageId(getId())
+                .setEmbed(embed)
+                .build()).transform(msg -> {
+            this.data = msg.getData();
+            return null;
+        });
+    }
 
     // CACHE
 
