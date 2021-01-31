@@ -1,5 +1,11 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+
+import javax.annotation.CheckReturnValue;
+
 public interface MessageReactionRemoveAllEvent extends Event<MessageReactionRemoveAllEvent> {
 
     default long getChannelId() {
@@ -20,6 +26,11 @@ public interface MessageReactionRemoveAllEvent extends Event<MessageReactionRemo
         final bot.pylon.proto.discord.v1.event.MessageReactionRemoveAllEvent event =
                 (bot.pylon.proto.discord.v1.event.MessageReactionRemoveAllEvent) this;
         return event.getPayload().getMessageId();
+    }
+
+    @CheckReturnValue
+    default GrpcRequest<Channel> getChannel() {
+        return GatewayGrpcClient.getSingleton().getCacheService().getChannel(getBotId(), getGuildId(), getChannelId());
     }
 
 }
