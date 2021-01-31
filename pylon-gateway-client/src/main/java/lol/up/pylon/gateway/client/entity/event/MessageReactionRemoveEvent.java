@@ -3,8 +3,11 @@ package lol.up.pylon.gateway.client.entity.event;
 import bot.pylon.proto.discord.v1.model.MessageData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
+import lol.up.pylon.gateway.client.entity.Guild;
 import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+
+import javax.annotation.CheckReturnValue;
 
 public interface MessageReactionRemoveEvent extends Event<MessageReactionRemoveEvent>, MessageReactionEvent {
 
@@ -60,5 +63,18 @@ public interface MessageReactionRemoveEvent extends Event<MessageReactionRemoveE
     @Override
     default GrpcRequest<User> getUser() {
         return GatewayGrpcClient.getSingleton().getCacheService().getUser(getBotId(), getUserId());
+    }
+
+    @Override
+    @CheckReturnValue
+    default GrpcRequest<Guild> getGuild() {
+        if (getGuildId() == 0) {
+            return null;
+        }
+        return GatewayGrpcClient.getSingleton().getCacheService().getGuild(getGuildId());
+    }
+
+    default long getGuildId() {
+        return getScope().getGuildId();
     }
 }
