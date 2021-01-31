@@ -5,6 +5,7 @@ import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
+import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
@@ -202,6 +203,14 @@ public class Channel implements Entity<ChannelData> {
     @CheckReturnValue
     public GrpcRequest<Message> createMessage(final MessageData.MessageEmbedData embedData) {
         return createMessage(builder -> builder.setEmbed(embedData));
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> sendFile(final byte[] data, final String fileName) {
+        return createMessage(builder -> builder.setAttachment(CreateMessageRequest.Attachment.newBuilder()
+                .setContent(ByteString.copyFrom(data))
+                .setName(fileName)
+                .build()));
     }
 
     @CheckReturnValue
