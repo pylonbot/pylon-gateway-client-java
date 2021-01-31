@@ -4,6 +4,7 @@ import bot.pylon.proto.discord.v1.model.ChannelData;
 import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import bot.pylon.proto.discord.v1.rest.EditChannelPermissionsRequest;
+import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
@@ -211,6 +212,25 @@ public class Channel implements Entity<ChannelData> {
                 .setContent(ByteString.copyFrom(data))
                 .setName(fileName)
                 .build()));
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> editMessageById(final long messageId, Consumer<EditMessageRequest.Builder> consumer) {
+        final EditMessageRequest.Builder builder = EditMessageRequest.newBuilder()
+                .setMessageId(messageId)
+                .setChannelId(getId());
+        consumer.accept(builder);
+        return getClient().getRestService().editMessage(getBotId(), getGuildId(), builder.build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> editMessageById(final long messageId, final String content) {
+        return editMessageById(messageId, builder -> builder.setContent(content));
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> editMessageById(final long messageId, final MessageData.MessageEmbedData embedData) {
+        return editMessageById(messageId, builder -> builder.setEmbed(embedData));
     }
 
     @CheckReturnValue
