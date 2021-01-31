@@ -12,8 +12,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventExecutorService;
-import lol.up.pylon.gateway.client.exception.GrpcGatewayApiException;
-import lol.up.pylon.gateway.client.exception.GrpcRequestException;
+import lol.up.pylon.gateway.client.exception.*;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
 import lol.up.pylon.gateway.client.util.CompletableFutureStreamObserver;
@@ -67,11 +66,46 @@ public class RestService {
         return gatewayGrpcClient.getDefaultBotId();
     }
 
-    private String getErrorMessage(final RestError apiError) {
-        return "An error occurred during REST request: " +
-                "HTTPStatus:" + apiError.getStatus() + " | " +
-                "ErrorCode:" + apiError.getCode() + " | " +
-                "Message:" + apiError.getMessage();
+    private GrpcGatewayApiException createApiException(final RestError apiError) {
+        switch (apiError.getErrorTypeCase()) {
+            case UNKNOWN_ERROR:
+                return new GrpcGatewayApiUnknownErrorException(apiError,
+                        "An unknown error occurred during REST request: " +
+                                "HTTPStatus: " + apiError.getUnknownError().getHttpStatus() + " | " +
+                                "ErrorCode: " + apiError.getUnknownError().getCode() + " | " +
+                                "Message: " + apiError.getUnknownError().getMessage());
+            case VALIDATION_ERROR:
+                final StringBuilder fieldsError = new StringBuilder("Fields:");
+                apiError.getValidationError().getFieldsList().forEach(field -> {
+                    fieldsError.append(" Field(")
+                            .append("path=").append(field.getPath()).append(",")
+                            .append("code=").append(field.getCode()).append(",")
+                            .append("message=").append(field.getMessage())
+                            .append(")");
+                });
+                return new GrpcGatewayApiValidationErrorException(apiError,
+                        "A validation error occurred during REST request: " +
+                                "Message: " + apiError.getValidationError().getMessage() + " | " +
+                                "Fields: " + fieldsError.toString());
+            case RESOURCE_NOT_FOUND:
+                return new GrpcGatewayApiResourceNotFoundException(apiError,
+                        "A resource was not found during REST request: " +
+                                "ErrorCode: " + apiError.getResourceNotFound().getCode() + " | " +
+                                "Message: " + apiError.getResourceNotFound().getMessage());
+            case ACCESS_DENIED:
+                return new GrpcGatewayApiAccessDeniedException(apiError,
+                        "Access to a resource was denied during REST request: " +
+                                "ErrorCode: " + apiError.getAccessDenied().getCode() + " | " +
+                                "Message: " + apiError.getAccessDenied().getMessage());
+            case RATE_LIMITED:
+                return new GrpcGatewayApiRateLimitedException(apiError,
+                        "A request was rate-limited during REST request: " +
+                                "Global: " + apiError.getRateLimited().getGlobal() + " | " +
+                                "Retry-At: " + apiError.getRateLimited().getRetryAt());
+            case ERRORTYPE_NOT_SET:
+            default:
+                return new GrpcGatewayApiException(apiError, "An unknown error type occurred!");
+        }
     }
 
     @CheckReturnValue
@@ -93,7 +127,7 @@ public class RestService {
                     .run(() -> client.modifyGuild(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Guild(gatewayGrpcClient, botId, response.getData().getGuild());
             });
@@ -121,7 +155,7 @@ public class RestService {
                     .run(() -> client.createGuildChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
             });
@@ -150,7 +184,7 @@ public class RestService {
                     .run(() -> client.modifyGuildChannelPositions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -177,7 +211,7 @@ public class RestService {
                     .run(() -> client.addGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getAdded();
             });
@@ -204,7 +238,7 @@ public class RestService {
                     .run(() -> client.modifyGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -239,7 +273,7 @@ public class RestService {
                     .run(() -> client.modifyCurrentUserNick(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -284,7 +318,7 @@ public class RestService {
                     .run(() -> client.addGuildMemberRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -330,7 +364,7 @@ public class RestService {
                     .run(() -> client.removeGuildMemberRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -351,7 +385,7 @@ public class RestService {
                     .run(() -> client.removeGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -377,7 +411,7 @@ public class RestService {
                     .run(() -> client.getGuildBans(GetGuildBansRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getBansList();
             });
@@ -411,7 +445,7 @@ public class RestService {
                     .run(() -> client.getGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 if (!response.hasData() || !response.getData().hasBan()) {
                     return null;
@@ -459,7 +493,7 @@ public class RestService {
                     .run(() -> client.createGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -479,7 +513,7 @@ public class RestService {
                     .run(() -> client.removeGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -505,7 +539,7 @@ public class RestService {
                     .run(() -> client.createGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
             });
@@ -533,7 +567,7 @@ public class RestService {
                     .run(() -> client.modifyGuildRolePositions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getRolesList().stream()
                         .map(roleData -> new Role(gatewayGrpcClient, botId, roleData))
@@ -561,7 +595,7 @@ public class RestService {
                     .run(() -> client.modifyGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
             });
@@ -603,7 +637,7 @@ public class RestService {
                     .run(() -> client.deleteGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -642,7 +676,7 @@ public class RestService {
                     .run(() -> client.getGuildPruneCount(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getSerializedSize(); // todo ehhhhh?
             });
@@ -668,7 +702,7 @@ public class RestService {
                     .run(() -> client.beginGuildPrune(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -695,7 +729,7 @@ public class RestService {
                             asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getRegionsList().asByteStringList().stream()
                         .map(ByteString::toStringUtf8)
@@ -723,7 +757,7 @@ public class RestService {
                     .run(() -> client.getGuildInvites(GetGuildInvitesRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
@@ -751,7 +785,7 @@ public class RestService {
                     .run(() -> client.modifyChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
             });
@@ -793,7 +827,7 @@ public class RestService {
                     .run(() -> client.deleteChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -819,7 +853,7 @@ public class RestService {
                     .run(() -> client.createMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -856,7 +890,7 @@ public class RestService {
                     .run(() -> client.crosspostMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -895,7 +929,7 @@ public class RestService {
                     .run(() -> client.createReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -935,7 +969,7 @@ public class RestService {
                     .run(() -> client.deleteOwnReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -977,7 +1011,7 @@ public class RestService {
                     .run(() -> client.deleteUserReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1014,7 +1048,7 @@ public class RestService {
                     .run(() -> client.deleteAllReactions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1054,7 +1088,7 @@ public class RestService {
                     .run(() -> client.deleteAllReactionsForEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1080,7 +1114,7 @@ public class RestService {
                     .run(() -> client.editMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -1125,7 +1159,7 @@ public class RestService {
                     .run(() -> client.deleteMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1170,7 +1204,7 @@ public class RestService {
                     .run(() -> client.bulkDeleteMessages(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1197,7 +1231,7 @@ public class RestService {
                     .run(() -> client.editChannelPermissions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1225,7 +1259,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
@@ -1254,7 +1288,7 @@ public class RestService {
                     .run(() -> client.createChannelInvite(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new GuildInvite(gatewayGrpcClient, botId, response.getData().getInvite());
             });
@@ -1281,7 +1315,7 @@ public class RestService {
                     .run(() -> client.deleteChannelPermission(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1318,7 +1352,7 @@ public class RestService {
                     .run(() -> client.followNewsChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getChannelId();
             });
@@ -1346,7 +1380,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1374,7 +1408,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getMessagesList()
                         .stream()
@@ -1423,7 +1457,7 @@ public class RestService {
                     .run(() -> client.addPinnedChannelMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1469,7 +1503,7 @@ public class RestService {
                     .run(() -> client.deletePinnedChannelMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1495,7 +1529,7 @@ public class RestService {
                     .run(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return response.getData().getEmojisList().stream()
                         .map(emojiData -> new Emoji(gatewayGrpcClient, botId, emojiData))
@@ -1525,7 +1559,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1552,7 +1586,7 @@ public class RestService {
                     .run(() -> client.createGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1598,7 +1632,7 @@ public class RestService {
                     .run(() -> client.modifyGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1641,7 +1675,7 @@ public class RestService {
                     .run(() -> client.deleteGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1667,7 +1701,7 @@ public class RestService {
                     .run(() -> client.getCurrentUser(GetCurrentUserRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1695,7 +1729,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1722,7 +1756,7 @@ public class RestService {
                     .run(() -> client.modifyCurrentUser(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1748,7 +1782,7 @@ public class RestService {
                     .run(() -> client.leaveGuild(LeaveGuildRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return null;
             });
@@ -1776,7 +1810,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw new GrpcGatewayApiException(response.getError(), getErrorMessage(response.getError()));
+                    throw createApiException(response.getError());
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel(), userId);
             });
