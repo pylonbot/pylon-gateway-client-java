@@ -55,6 +55,22 @@ public interface MessageReactionAddEvent extends Event<MessageReactionAddEvent>,
         return event.getPayload().getEmoji();
     }
 
+    /**
+     * @return true if {@link MessageReactionAddEvent#getEmoji() MessageReactionAddEvent#getEmoji()} returns a
+     * standard emoji
+     */
+    default boolean isEmoji() {
+        return getEmoji().getId() == 0L;
+    }
+
+    /**
+     * @return true if {@link MessageReactionAddEvent#getEmoji() MessageReactionAddEvent#getEmoji()} returns a
+     * custom emote
+     */
+    default boolean isEmote() {
+        return getEmoji().getId() > 0L;
+    }
+
     @Override
     @CheckReturnValue
     default GrpcRequest<Channel> getChannel() {

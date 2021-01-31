@@ -34,4 +34,20 @@ public interface MessageReactionRemoveEmojiEvent extends Event<MessageReactionRe
         return event.getPayload().getEmoji();
     }
 
+    /**
+     * @return true if {@link MessageReactionRemoveEmojiEvent#getEmoji() MessageReactionRemoveEmojiEvent#getEmoji()}
+     * returns a standard emoji
+     */
+    default boolean isEmoji() {
+        return getEmoji().getId() == 0L;
+    }
+
+    /**
+     * @return true if {@link MessageReactionRemoveEmojiEvent#getEmoji() MessageReactionRemoveEmojiEvent#getEmoji()}
+     * returns a custom emote
+     */
+    default boolean isEmote() {
+        return getEmoji().getId() > 0L;
+    }
+
 }
