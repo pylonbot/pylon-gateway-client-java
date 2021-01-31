@@ -67,6 +67,22 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        /**
+         * Cache repeated calls on the same cache entity during one {@link EventContext EventContext} if set to true
+         * One {@link EventContext EventContext} is valid for all listeners and is cleared as the listeners completed.
+         * See {@link EventDispatcher#dispatchEvent(Event) EventDispatcher#dispatchEvent(Event)} for implementation
+         * details regarding the {@link EventContext EventContext} lifetime.
+         * <p>
+         * To manually clear an {@link EventContext EventContext} you can use {@link EventContext#clearCache()}.
+         * To manually clear one specific entity from the {@link EventContext EventContext} cache, you can use
+         * {@link EventContext#clearCache(String) EventContext#clearCache(String)} with the String being a generated
+         * context key from {@link EventContext#buildContextKey(String, long...) EventContext#buildContextKey(String,
+         * long...)} with the longs being all related snowflakes (botId, guildId, and so on), see {@link CacheService
+         * CacheService} implementation
+         *
+         * @param enableContextCache whether the described context-cache should be enabled
+         * @return builder object for the {@link GatewayGrpcClient GatewayGrpcClient}
+         */
         public GatewayGrpcClientBuilder setContextCacheEnabled(boolean enableContextCache) {
             this.enableContextCache = enableContextCache;
             return this;
