@@ -42,6 +42,14 @@ public class Emoji implements Entity<EmojiData> {
 
     // DATA
 
+    public long getId() {
+        return getData().getId();
+    }
+
+    public String getName() {
+        return getData().getName();
+    }
+
     public boolean isAnimated() {
         return getData().getAnimated();
     }
@@ -52,6 +60,16 @@ public class Emoji implements Entity<EmojiData> {
 
     public boolean isManaged() {
         return getData().getManaged();
+    }
+
+    // DATA UTIL
+
+    public String getAsMention() {
+        if (isAnimated()) {
+            return "<a:" + getName() + ":" + getId() + ">";
+        } else {
+            return "<:" + getName() + ":" + getId() + ">";
+        }
     }
 
     // REST
