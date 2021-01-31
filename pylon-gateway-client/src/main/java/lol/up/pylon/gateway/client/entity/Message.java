@@ -78,6 +78,37 @@ public class Message implements Entity<MessageData> {
     // REST
 
     @CheckReturnValue
+    public GrpcRequest<Void> addReaction(final String emoji) {
+        return getClient().getRestService().createReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> addReaction(final Emoji emoji) {
+        return addReaction(emoji.getName() + ":" + emoji.getId());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> removeReaction(final String emoji) {
+        return getClient().getRestService().deleteOwnReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> removeReaction(final Emoji emoji) {
+        return removeReaction(emoji.getName() + ":" + emoji.getId());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> removeReaction(final long userId, final String emoji) {
+        return getClient().getRestService().deleteReaction(getBotId(), getGuildId(), getChannelId(), getId(), userId,
+                emoji);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> removeReaction(final long userId, final Emoji emoji) {
+        return removeReaction(userId, emoji.getName() + ":" + emoji.getId());
+    }
+
+    @CheckReturnValue
     public GrpcRequest<Void> editMessage(final String message) {
         return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
                 .setChannelId(getChannelId())
