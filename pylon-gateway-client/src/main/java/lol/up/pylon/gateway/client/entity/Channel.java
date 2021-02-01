@@ -13,6 +13,7 @@ import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -151,6 +152,16 @@ public class Channel implements Entity<ChannelData> {
             return true;
         }
         return member.hasPermission(this, Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> getMembers() {
+        return getGuild().flatTransform(Guild::getMembers)
+                .transform(members -> {
+                    final List<Member> filtered = new ArrayList<>(members);
+                    filtered.removeIf(member -> member.hasPermission(this, Permission.VIEW_CHANNEL));
+                    return filtered;
+                });
     }
 
     // REST
