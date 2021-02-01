@@ -5,6 +5,7 @@ import bot.pylon.proto.discord.v1.rest.ModifyGuildMemberRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
+import lol.up.pylon.gateway.client.util.TimeUtil;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -79,6 +80,12 @@ public class Member implements Entity<MemberData> {
         return getData().getUser().getId();
     }
 
+    public long getTimeJoined() {
+        return TimeUtil.timestampToLong(getData().getJoinedAt());
+    }
+
+    // DATA UTILITY
+
     public String getEffectiveName() {
         final String nickname = getNickname();
         if (nickname != null && !nickname.isEmpty()) {
@@ -86,8 +93,6 @@ public class Member implements Entity<MemberData> {
         }
         return getUser().getName();
     }
-
-    // DATA UTILITY
 
     public boolean hasPermission(final Permission... permissions) {
         return hasPermission(null, permissions);
@@ -122,7 +127,8 @@ public class Member implements Entity<MemberData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
-        return getClient().getRestService().modifyGuildMember(getBotId(), getGuildId(), ModifyGuildMemberRequest.newBuilder()
+        return getClient().getRestService().modifyGuildMember(getBotId(), getGuildId(),
+                ModifyGuildMemberRequest.newBuilder()
                 .setUserId(getUserId())
                 .setNick(nickname)
                 .setAuditLogReason(reason)

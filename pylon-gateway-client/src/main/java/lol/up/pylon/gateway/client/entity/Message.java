@@ -132,6 +132,16 @@ public class Message implements Entity<MessageData> {
         });
     }
 
+    @CheckReturnValue
+    public GrpcRequest<Void> delete() {
+        return delete(null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> delete(final String reason) {
+        return getClient().getRestService().deleteMessage(getBotId(), getGuildId(), getChannelId(), getId(), reason);
+    }
+
     // CACHE
 
     @CheckReturnValue
