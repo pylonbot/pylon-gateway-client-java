@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.GuildData;
 import bot.pylon.proto.discord.v1.rest.CreateGuildChannelRequest;
+import com.google.protobuf.StringValue;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
@@ -51,6 +52,14 @@ public class Guild implements Entity<GuildData> {
         return getData().getName();
     }
 
+    public String getIconId() {
+        final StringValue icon = getData().getIcon();
+        if (icon.isInitialized()) {
+            return icon.getValue();
+        }
+        return null;
+    }
+
     @CheckReturnValue
     public GrpcRequest<Member> getSelfMember() {
         return getMember(botId);
@@ -69,6 +78,15 @@ public class Guild implements Entity<GuildData> {
 
     public boolean isMember(final long memberId) {
         return getMemberById(memberId) != null;
+    }
+
+    public String getIconUrl() {
+        final String icon = getIconId();
+        if (icon == null) {
+            return null;
+        }
+        return "https://cdn.discordapp.com/icon/" + getId() + "/" + icon + "." +
+                (icon.startsWith("a_") ? "gif" : "png");
     }
 
     @CheckReturnValue
