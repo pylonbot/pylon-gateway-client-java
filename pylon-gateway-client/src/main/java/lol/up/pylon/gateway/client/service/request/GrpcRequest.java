@@ -23,7 +23,7 @@ public interface GrpcRequest<T> {
 
     void queue(final Consumer<? super T> success);
 
-    void queue(final Consumer<? super T> success, final Consumer<Throwable> error);
+    void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error);
 
     T complete();
 

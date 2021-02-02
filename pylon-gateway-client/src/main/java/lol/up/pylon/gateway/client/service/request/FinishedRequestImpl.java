@@ -49,7 +49,7 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public void queue(Consumer<? super T> success, Consumer<Throwable> error) {
+    public void queue(Consumer<? super T> success, Consumer<? super Throwable> error) {
         success.accept(entity);
     }
 

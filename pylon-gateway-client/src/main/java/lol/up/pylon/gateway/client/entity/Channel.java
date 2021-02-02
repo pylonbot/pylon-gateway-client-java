@@ -124,6 +124,10 @@ public class Channel implements Entity<ChannelData> {
 
     // DATA UTIL
 
+    public String getAsMention() {
+        return "<#" + getId() + ">";
+    }
+
     @CheckReturnValue
     public GrpcRequest<Channel> getParent() {
         return getClient().getCacheService().getChannel(getBotId(), getGuildId(), getParentId());

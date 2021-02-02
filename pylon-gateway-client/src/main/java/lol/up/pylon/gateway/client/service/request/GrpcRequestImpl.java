@@ -84,7 +84,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public void queue(final Consumer<? super T> success, final Consumer<Throwable> error) {
+    public void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error) {
         future.thenAcceptAsync(result -> {
             try {
                 success.accept(result);
