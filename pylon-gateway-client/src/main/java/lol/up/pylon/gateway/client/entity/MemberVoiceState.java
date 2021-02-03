@@ -51,6 +51,30 @@ public class MemberVoiceState implements Entity<VoiceStateData> {
         return getData().getChannelId().getValue();
     }
 
+    public boolean isDeafened() {
+        return getData().getSelfDeaf();
+    }
+
+    public boolean isGuildDeafened() {
+        return getData().getDeaf();
+    }
+
+    public boolean isMuted() {
+        return getData().getSelfMute();
+    }
+
+    public boolean isGuildMuted() {
+        return getData().getMute();
+    }
+
+    public boolean isGameStreaming() {
+        return getData().getSelfStream();
+    }
+
+    public boolean isVideoStreaming() {
+        return getData().getSelfVideo();
+    }
+
     // DATA UTIL
 
 

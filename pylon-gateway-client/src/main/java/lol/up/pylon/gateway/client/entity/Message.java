@@ -2,9 +2,11 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
+import com.google.protobuf.Timestamp;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+import lol.up.pylon.gateway.client.util.TimeUtil;
 
 import javax.annotation.CheckReturnValue;
 
@@ -72,6 +74,22 @@ public class Message implements Entity<MessageData> {
 
     public Member getMember() {
         return new Member(getClient(), getBotId(), getData().getMember());
+    }
+
+    public boolean isEdited() {
+        return getData().hasEditedTimestamp();
+    }
+
+    public long getTimeCreated() {
+        return TimeUtil.timestampToLong(getData().getTimestamp());
+    }
+
+    public long getTimeEdited() {
+        final Timestamp timestamp = getData().getEditedTimestamp();
+        if (timestamp == null) {
+            return 0;
+        }
+        return TimeUtil.timestampToLong(timestamp);
     }
 
 
