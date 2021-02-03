@@ -63,7 +63,11 @@ public class User implements Entity<UserData> {
     }
 
     public String getPaddedDiscriminator() {
-        return String.valueOf(getDiscriminator()); // todo: discrim fix (either format or passed as str)
+        final StringBuilder padded = new StringBuilder(String.valueOf(getDiscriminator()));
+        while (padded.length() < 4) {
+            padded.insert(0, "0");
+        }
+        return padded.toString();
     }
 
     public long getUserId() {
