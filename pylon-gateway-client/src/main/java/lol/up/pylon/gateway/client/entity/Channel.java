@@ -77,14 +77,14 @@ public class Channel implements Entity<ChannelData> {
     }
 
     public boolean isNsfw() {
-        if(getType() != ChannelData.ChannelType.GUILD_TEXT) {
+        if (getType() != ChannelData.ChannelType.GUILD_TEXT) {
             throw new IllegalArgumentException("Channel is not a guild channel");
         }
         return getData().getNsfw();
     }
 
     public long getUserId() {
-        if(getType() != ChannelData.ChannelType.DM) {
+        if (getType() != ChannelData.ChannelType.DM) {
             throw new IllegalArgumentException("Channel is not a DM channel");
         }
         return userId;
@@ -135,7 +135,7 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Boolean> canTalk() {
-        if(getType() == ChannelData.ChannelType.DM) {
+        if (getType() == ChannelData.ChannelType.DM) {
             return new FinishedRequestImpl<>(true);
         }
         return getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
@@ -152,7 +152,7 @@ public class Channel implements Entity<ChannelData> {
     }
 
     public boolean canTalk(final Member member) {
-        if(getType() == ChannelData.ChannelType.DM) {
+        if (getType() == ChannelData.ChannelType.DM) {
             return true;
         }
         return member.hasPermission(this, Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
@@ -197,10 +197,30 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> delete(@Nullable final String reason) {
-        if(getType() == ChannelData.ChannelType.DM) {
+        if (getType() == ChannelData.ChannelType.DM) {
             throw new IllegalArgumentException("Cannot delete a DM channel");
         }
         return getClient().getRestService().deleteChannel(getBotId(), getGuildId(), getData().getId(), reason);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> deleteMessages(final List<Long> messageIds) {
+        return deleteMessages(messageIds, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
+        return getClient().getRestService().bulkDeleteMessages(getBotId(), getGuildId(), getId(), messageIds, reason);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> deleteMessageById(final long messageId) {
+        return deleteMessageById(messageId, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> deleteMessageById(final long messageId, @Nullable final String reason) {
+        return getClient().getRestService().deleteMessage(getBotId(), getGuildId(), getId(), messageId, reason);
     }
 
     @CheckReturnValue
