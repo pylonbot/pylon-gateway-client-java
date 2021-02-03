@@ -271,7 +271,12 @@ public class Channel implements Entity<ChannelData> {
     @CheckReturnValue
     public GrpcRequest<Message> getMessageById(long messageId) {
         //return grpcClient.getRestService().message
-        return null; // TODO
+        return new FinishedRequestImpl<>(null); // TODO
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessages(final long before, final int limit) {
+        return new FinishedRequestImpl<>(new ArrayList<>(0)); // TODO
     }
 
     // CACHE
