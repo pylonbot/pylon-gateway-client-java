@@ -1,6 +1,5 @@
 package lol.up.pylon.gateway.client.service;
 
-import bot.pylon.proto.discord.v1.model.GuildBanData;
 import bot.pylon.proto.discord.v1.model.SnowflakeListValue;
 import bot.pylon.proto.discord.v1.rest.*;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
@@ -395,13 +394,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildBanData>> getGuildBans(final long guildId)
+    public GrpcRequest<List<Ban>> getGuildBans(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBans(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildBanData>> getGuildBans(final long botId, final long guildId)
+    public GrpcRequest<List<Ban>> getGuildBans(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CompletableFutureStreamObserver<GetGuildBansResponse> asyncResponse =
@@ -413,7 +412,10 @@ public class RestService {
                 if (response.hasError()) {
                     throw createApiException(response.getError());
                 }
-                return response.getData().getBansList();
+                return response.getData().getBansList()
+                        .stream()
+                        .map(guildBanData -> new Ban(gatewayGrpcClient, botId, guildId, guildBanData))
+                        .collect(Collectors.toList());
             });
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
@@ -421,13 +423,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<GuildBanData> getGuildBan(final long guildId, final long userId)
+    public GrpcRequest<Ban> getGuildBan(final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBan(getBotId(), guildId, userId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<GuildBanData> getGuildBan(final long botId, final long guildId, final long userId)
+    public GrpcRequest<Ban> getGuildBan(final long botId, final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBan(botId, guildId, GetGuildBanRequest.newBuilder()
                 .setUserId(userId)
@@ -435,7 +437,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<GuildBanData> getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
+    public GrpcRequest<Ban> getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CompletableFutureStreamObserver<GetGuildBanResponse> asyncResponse =
@@ -450,7 +452,7 @@ public class RestService {
                 if (!response.hasData() || !response.getData().hasBan()) {
                     return null;
                 }
-                return response.getData().getBan();
+                return new Ban(gatewayGrpcClient, botId, guildId, response.getData().getBan());
             });
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);

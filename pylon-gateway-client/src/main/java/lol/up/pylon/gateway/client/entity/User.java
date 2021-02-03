@@ -2,9 +2,12 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.UserData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User implements Entity<UserData> {
 
@@ -111,5 +114,10 @@ public class User implements Entity<UserData> {
     @CheckReturnValue
     public GrpcRequest<Member> getAsMember(final long guildId) {
         return getClient().getCacheService().getMember(botId, guildId, getData().getId());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Guild>> getMutualGuilds() {
+        return new FinishedRequestImpl<>(new ArrayList<>()); // todo implement
     }
 }

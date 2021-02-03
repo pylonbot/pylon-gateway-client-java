@@ -9,6 +9,7 @@ import lol.up.pylon.gateway.client.util.TimeUtil;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +119,12 @@ public class Member implements Entity<MemberData> {
         return PermissionUtil.canInteract(this, emoji);
     }
 
+    public GrpcRequest<Integer> getColorRaw() {
+        return getRoles()
+                .transform(roles -> roles.stream().max(Comparator.comparingInt(Role::getPosition)).orElse(null))
+                .transform(Role::getColorRaw);
+    }
+
     // REST
 
     @CheckReturnValue
@@ -129,10 +136,10 @@ public class Member implements Entity<MemberData> {
     public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
         return getClient().getRestService().modifyGuildMember(getBotId(), getGuildId(),
                 ModifyGuildMemberRequest.newBuilder()
-                .setUserId(getUserId())
-                .setNick(nickname)
-                .setAuditLogReason(reason)
-                .build());
+                        .setUserId(getUserId())
+                        .setNick(nickname)
+                        .setAuditLogReason(reason)
+                        .build());
     }
 
     @CheckReturnValue

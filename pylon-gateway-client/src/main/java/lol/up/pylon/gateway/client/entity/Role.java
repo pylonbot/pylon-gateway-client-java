@@ -49,12 +49,22 @@ public class Role implements Entity<RoleData> {
         return getData().getPermissions();
     }
 
+    public int getColorRaw() {
+        return getData().getColor();
+    }
+
     public boolean isPublicRole() {
         return getGuildId() == getId();
     }
 
     public String getName() {
         return getData().getName();
+    }
+
+    // DATA UTILS
+
+    public String getAsMention() {
+        return "<@&" + getId() + ">";
     }
 
 }

@@ -2,11 +2,14 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.GuildData;
 import bot.pylon.proto.discord.v1.rest.CreateGuildChannelRequest;
+import bot.pylon.proto.discord.v1.rest.RemoveGuildBanRequest;
+import bot.pylon.proto.discord.v1.rest.RemoveGuildMemberRequest;
 import com.google.protobuf.StringValue;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,17 +63,25 @@ public class Guild implements Entity<GuildData> {
         return null;
     }
 
-    @CheckReturnValue
-    public GrpcRequest<Member> getSelfMember() {
-        return getMember(botId);
-    }
-
     public long getOwnerId() {
         return getData().getOwnerId();
     }
 
+    public String getRegionRaw() {
+        return getData().getRegion();
+    }
+
+    public int getVerificationLevel() {
+        return getData().getVerificationLevel();
+    }
+
 
     // DATA UTIL
+
+    @CheckReturnValue
+    public GrpcRequest<Member> getSelfMember() {
+        return getMember(getBotId());
+    }
 
     public boolean isMember(final User user) {
         return isMember(user.getId());
@@ -108,6 +119,57 @@ public class Guild implements Entity<GuildData> {
     @CheckReturnValue
     public GrpcRequest<Channel> createChannel(final CreateGuildChannelRequest request) {
         return getClient().getRestService().createChannel(getBotId(), getGuildId(), request);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> ban(final long userId) {
+        return ban(userId, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> ban(final long userId, @Nullable final String reason) {
+        return ban(userId, 7, reason);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> ban(final long userId, final int deleteDays) {
+        return ban(userId, deleteDays, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> ban(final long userId, final int deleteDays, @Nullable final String reason) {
+        return getClient().getRestService().createGuildBan(getBotId(), getId(), userId, deleteDays, reason);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> unban(final long userId) {
+        return unban(userId, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> unban(final long userId, @Nullable final String reason) {
+        return getClient().getRestService().removeGuildBan(getBotId(), getId(), RemoveGuildBanRequest.newBuilder()
+                .setUserId(userId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> kick(final long userId) {
+        return kick(userId, null);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> kick(final long userId, @Nullable final String reason) {
+        return getClient().getRestService().removeGuildMember(getBotId(), getGuildId(), RemoveGuildMemberRequest.newBuilder()
+                .setUserId(userId)
+                .setAuditLogReason(reason)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Ban> retrieveBan(final long userId) {
+        return getClient().getRestService().getGuildBan(getBotId(), getGuildId(), userId);
     }
 
     // CACHE
