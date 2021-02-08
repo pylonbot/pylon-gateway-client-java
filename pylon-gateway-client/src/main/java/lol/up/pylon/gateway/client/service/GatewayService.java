@@ -58,7 +58,7 @@ public class GatewayService {
             return current.getBotId();
         }
         log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
-                "AbstractEventReceiver#async instead!");
+                "AbstractEventReceiver#async instead!", new RuntimeException());
         return gatewayGrpcClient.getDefaultBotId();
     }
 
