@@ -172,6 +172,11 @@ public class Guild implements Entity<GuildData> {
         return getClient().getRestService().getGuildBan(getBotId(), getGuildId(), userId);
     }
 
+    @CheckReturnValue
+    public GrpcRequest<Void> disconnectVoice() {
+        return getClient().getGatewayService().updateVoiceState(getBotId(), getGuildId(), 0);
+    }
+
     // CACHE
 
     @CheckReturnValue

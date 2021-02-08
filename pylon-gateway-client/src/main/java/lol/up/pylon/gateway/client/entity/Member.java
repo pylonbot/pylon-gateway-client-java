@@ -181,4 +181,8 @@ public class Member implements Entity<MemberData> {
         return getClient().getCacheService().getVoiceState(getBotId(), getGuildId(), getUserId());
     }
 
+    @CheckReturnValue
+    public GrpcRequest<Presence> getPresence() {
+        return getClient().getCacheService().getPresence(getBotId(), getGuildId(), getUserId());
+    }
 }
