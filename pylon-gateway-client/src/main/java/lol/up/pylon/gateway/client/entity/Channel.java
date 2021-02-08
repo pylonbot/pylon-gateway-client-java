@@ -270,13 +270,28 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Message> getMessageById(long messageId) {
-        //return grpcClient.getRestService().message
-        return new FinishedRequestImpl<>(null); // TODO
+        return getClient().getRestService().getMessage(getBotId(), getGuildId(), getId(), messageId);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessages(final long before, final int limit) {
-        return new FinishedRequestImpl<>(new ArrayList<>(0)); // TODO
+        if (before <= 0) {
+            return getClient().getRestService().getMessages(getBotId(), getGuildId(), getId(), limit);
+        }
+        return getClient().getRestService().getMessagesBefore(getBotId(), getGuildId(), getId(), before, limit);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> connectVoice() {
+        return connectVoice(false, false);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Void> connectVoice(final boolean mute, final boolean deaf) {
+        if (getType() != ChannelData.ChannelType.GUILD_VOICE) {
+            throw new IllegalArgumentException("Not a voice channel!");
+        }
+        return getClient().getGatewayService().updateVoiceState(getBotId(), getGuildId(), getId(), mute, deaf);
     }
 
     // CACHE

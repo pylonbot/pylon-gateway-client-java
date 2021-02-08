@@ -839,6 +839,147 @@ public class RestService {
     }
 
     @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAround(final long guildId, final long channelId,
+                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesAround(getBotId(), guildId, channelId, snowflake);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
+                                                       final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesAround(botId, guildId, channelId, snowflake, 100);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
+                                                       final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
+                .setChannelId(channelId)
+                .setAround(snowflake)
+                .setLimit(limit)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAfter(final long guildId, final long channelId,
+                                                       final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesAfter(getBotId(), guildId, channelId, snowflake);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
+                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesAfter(botId, guildId, channelId, snowflake, 100);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
+                                                        final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
+                .setChannelId(channelId)
+                .setAfter(snowflake)
+                .setLimit(limit)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesBefore(final long guildId, final long channelId,
+                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesBefore(getBotId(), guildId, channelId, snowflake);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
+                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessagesBefore(botId, guildId, channelId, snowflake, 100);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
+                                                        final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
+                .setChannelId(channelId)
+                .setBefore(snowflake)
+                .setLimit(limit)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessages(final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessages(getBotId(), guildId, channelId);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId)
+            throws GrpcRequestException, GrpcGatewayApiException {
+        return getMessages(botId, guildId, channelId, 100);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId,
+                                                  final int limit) throws GrpcRequestException,
+            GrpcGatewayApiException {
+        return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
+                .setChannelId(channelId)
+                .setLimit(limit)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId,
+                                                  final GetChannelMessagesRequest request) throws GrpcRequestException, GrpcGatewayApiException {
+        try {
+            final CompletableFutureStreamObserver<GetChannelMessagesResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getChannelMessages(request, asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+                if (response.hasError()) {
+                    throw createApiException(response.getError());
+                }
+                return response.getData().getMessagesList().stream()
+                        .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
+                        .collect(Collectors.toList());
+            });
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> getMessage(final long guildId, final long channelId, final long messageId) {
+        return getMessage(getBotId(), guildId, channelId, messageId);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Message> getMessage(final long botId, final long guildId, final long channelId,
+                                           final long messageId) throws GrpcRequestException, GrpcGatewayApiException {
+        try {
+            final CompletableFutureStreamObserver<GetChannelMessageResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getChannelMessage(GetChannelMessageRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .setMessageId(messageId)
+                            .build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+                if (response.hasError()) {
+                    throw createApiException(response.getError());
+                }
+                if (!response.getData().hasMessage()) {
+                    return null;
+                }
+                return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
+            });
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
     public GrpcRequest<Message> createMessage(final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createMessage(getBotId(), guildId, request);

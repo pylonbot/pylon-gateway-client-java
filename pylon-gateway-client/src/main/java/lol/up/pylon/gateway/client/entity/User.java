@@ -122,6 +122,6 @@ public class User implements Entity<UserData> {
 
     @CheckReturnValue
     public GrpcRequest<List<Guild>> getMutualGuilds() {
-        return new FinishedRequestImpl<>(new ArrayList<>()); // todo implement
+        return getClient().getGatewayService().getMutualGuilds(getBotId(), getGuildId());
     }
 }

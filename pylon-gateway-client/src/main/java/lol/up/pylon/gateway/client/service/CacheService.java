@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -75,11 +74,12 @@ public class CacheService {
     public GrpcRequest<Guild> getGuild(final long botId, final long guildId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("guild", botId, guildId);
             final Guild guild = context.getContextObject(ctxKey);
-            if(guild != null)
+            if (guild != null) {
                 return new FinishedRequestImpl<>(guild);
+            }
         } else {
             ctxKey = null;
         }
@@ -97,7 +97,7 @@ public class CacheService {
                     return null;
                 }
                 final Guild guild = new Guild(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, guild);
                 }
                 return guild;
@@ -118,11 +118,12 @@ public class CacheService {
     public GrpcRequest<Channel> getChannel(final long botId, final long guildId, final long channelId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("channel", botId, guildId, channelId);
             final Channel channel = context.getContextObject(ctxKey);
-            if(channel != null)
+            if (channel != null) {
                 return new FinishedRequestImpl<>(channel);
+            }
         } else {
             ctxKey = null;
         }
@@ -139,7 +140,7 @@ public class CacheService {
                 }
                 final ChannelData data = response.getChannel();
                 final Channel channel = new Channel(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, channel);
                 }
                 return channel;
@@ -159,11 +160,12 @@ public class CacheService {
     public GrpcRequest<List<Channel>> listGuildChannels(final long botId, final long guildId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("list_channels", botId, guildId);
             final List<Channel> channelList = context.getContextObject(ctxKey);
-            if(channelList != null)
+            if (channelList != null) {
                 return new FinishedRequestImpl<>(channelList);
+            }
         } else {
             ctxKey = null;
         }
@@ -176,7 +178,7 @@ public class CacheService {
                 final List<Channel> channelList = response.getChannelsList().stream()
                         .map(channel -> new Channel(gatewayGrpcClient, botId, channel))
                         .collect(Collectors.toList());
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, channelList);
                 }
                 return channelList;
@@ -197,11 +199,12 @@ public class CacheService {
         // TODO: fix dm channel impl
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("dm_channel", botId, channelId, userId);
             final Channel channel = context.getContextObject(ctxKey);
-            if(channel != null)
+            if (channel != null) {
                 return new FinishedRequestImpl<>(channel);
+            }
         } else {
             ctxKey = null;
         }
@@ -218,7 +221,7 @@ public class CacheService {
                 }
                 final ChannelData data = response.getChannel();
                 final Channel channel = new Channel(gatewayGrpcClient, botId, data, userId);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, channel);
                 }
                 return channel;
@@ -228,6 +231,47 @@ public class CacheService {
         }
     }
 
+    // Guild Member Presences (1x + Overloads)
+    @CheckReturnValue
+    public GrpcRequest<Presence> getPresence(final long guildId, final long userId) throws GrpcRequestException {
+        return getPresence(getBotId(), guildId, userId);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<Presence> getPresence(final long botId, final long guildId, final long userId) throws GrpcRequestException {
+        final EventContext context = EventContext.current();
+        final String ctxKey;
+        if (context != null) {
+            ctxKey = EventContext.buildContextKey("presence", botId, guildId, userId);
+            final Presence presence = context.getContextObject(ctxKey);
+            if (presence != null) {
+                return new FinishedRequestImpl<>(presence);
+            }
+        } else {
+            ctxKey = null;
+        }
+        try {
+            final CompletableFutureStreamObserver<GetGuildMemberPresenceResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildMemberPresence(GetGuildMemberPresenceRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+                if (!response.hasPresence()) {
+                    return null;
+                }
+                final PresenceData data = response.getPresence();
+                final Presence presence = new Presence(gatewayGrpcClient, botId, data);
+                if (context != null) {
+                    context.populateContext(ctxKey, presence);
+                }
+                return presence;
+            });
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
 
     // Guild Members (2x + Overloads)
     // - Get (1 Overload)
@@ -240,11 +284,12 @@ public class CacheService {
     public GrpcRequest<Member> getMember(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("member", botId, guildId, userId);
             final Member member = context.getContextObject(ctxKey);
-            if(member != null)
+            if (member != null) {
                 return new FinishedRequestImpl<>(member);
+            }
         } else {
             ctxKey = null;
         }
@@ -261,7 +306,7 @@ public class CacheService {
                 }
                 final MemberData data = response.getMember();
                 final Member member = new Member(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, member);
                 }
                 return member;
@@ -327,11 +372,12 @@ public class CacheService {
     public GrpcRequest<Role> getRole(final long botId, final long guildId, final long roleId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("role", botId, guildId, roleId);
             final Role role = context.getContextObject(ctxKey);
-            if(role != null)
+            if (role != null) {
                 return new FinishedRequestImpl<>(role);
+            }
         } else {
             ctxKey = null;
         }
@@ -348,7 +394,7 @@ public class CacheService {
                 }
                 final RoleData data = response.getRole();
                 final Role role = new Role(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, role);
                 }
                 return role;
@@ -368,11 +414,12 @@ public class CacheService {
     public GrpcRequest<List<Role>> listGuildRoles(final long botId, final long guildId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("list_roles", botId, guildId);
             final List<Role> roleList = context.getContextObject(ctxKey);
-            if(roleList != null)
+            if (roleList != null) {
                 return new FinishedRequestImpl<>(roleList);
+            }
         } else {
             ctxKey = null;
         }
@@ -385,7 +432,7 @@ public class CacheService {
                 final List<Role> roleList = response.getRolesList().stream()
                         .map(role -> new Role(gatewayGrpcClient, botId, role))
                         .collect(Collectors.toList());
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, roleList);
                 }
                 return roleList;
@@ -406,11 +453,12 @@ public class CacheService {
     public GrpcRequest<Emoji> getEmoji(final long botId, final long guildId, final long emojiId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("emoji", botId, guildId, emojiId);
             final Emoji emoji = context.getContextObject(ctxKey);
-            if(emoji != null)
+            if (emoji != null) {
                 return new FinishedRequestImpl<>(emoji);
+            }
         } else {
             ctxKey = null;
         }
@@ -427,7 +475,7 @@ public class CacheService {
                 }
                 final EmojiData data = response.getEmoji();
                 final Emoji emoji = new Emoji(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, emoji);
                 }
                 return emoji;
@@ -447,11 +495,12 @@ public class CacheService {
     public GrpcRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("list_emojis", botId, guildId);
             final List<Emoji> emojiList = context.getContextObject(ctxKey);
-            if(emojiList != null)
+            if (emojiList != null) {
                 return new FinishedRequestImpl<>(emojiList);
+            }
         } else {
             ctxKey = null;
         }
@@ -464,7 +513,7 @@ public class CacheService {
                 final List<Emoji> emojiList = response.getEmojisList().stream()
                         .map(emoji -> new Emoji(gatewayGrpcClient, botId, emoji))
                         .collect(Collectors.toList());
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, emojiList);
                 }
                 return emojiList;
@@ -484,11 +533,12 @@ public class CacheService {
     public GrpcRequest<User> getUser(final long botId, final long userId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("user", botId, userId);
             final User user = context.getContextObject(ctxKey);
-            if(user != null)
+            if (user != null) {
                 return new FinishedRequestImpl<>(user);
+            }
         } else {
             ctxKey = null;
         }
@@ -505,7 +555,7 @@ public class CacheService {
                 }
                 final UserData data = response.getUser();
                 final User user = new User(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, user);
                 }
                 return user;
@@ -526,11 +576,12 @@ public class CacheService {
     public GrpcRequest<MemberVoiceState> getVoiceState(final long botId, final long guildId, final long userId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("voice_state", botId, guildId, userId);
             final MemberVoiceState voiceState = context.getContextObject(ctxKey);
-            if(voiceState != null)
+            if (voiceState != null) {
                 return new FinishedRequestImpl<>(voiceState);
+            }
         } else {
             ctxKey = null;
         }
@@ -547,7 +598,7 @@ public class CacheService {
                 }
                 final VoiceStateData data = response.getVoiceStateData();
                 final MemberVoiceState voiceState = new MemberVoiceState(gatewayGrpcClient, botId, data);
-                if(context != null) {
+                if (context != null) {
                     context.populateContext(ctxKey, voiceState);
                 }
                 return voiceState;
@@ -568,11 +619,12 @@ public class CacheService {
                                                                       final long channelId) throws GrpcRequestException {
         final EventContext context = EventContext.current();
         final String ctxKey;
-        if(context != null) {
+        if (context != null) {
             ctxKey = EventContext.buildContextKey("list_voice_states", botId, guildId);
             final List<MemberVoiceState> voiceStateList = context.getContextObject(ctxKey);
-            if(voiceStateList != null)
+            if (voiceStateList != null) {
                 return new FinishedRequestImpl<>(voiceStateList);
+            }
         } else {
             ctxKey = null;
         }
@@ -588,7 +640,7 @@ public class CacheService {
                         final List<MemberVoiceState> voiceStateList = response.getVoiceStatesDataList().stream()
                                 .map(voiceStateData -> new MemberVoiceState(gatewayGrpcClient, botId, voiceStateData))
                                 .collect(Collectors.toList());
-                        if(context != null) {
+                        if (context != null) {
                             context.populateContext(ctxKey, voiceStateList);
                         }
                         return voiceStateList;

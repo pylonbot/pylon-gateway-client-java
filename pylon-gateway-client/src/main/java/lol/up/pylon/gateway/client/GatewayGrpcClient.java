@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client;
 
 import bot.pylon.proto.gateway.v1.service.GatewayCacheGrpc;
+import bot.pylon.proto.gateway.v1.service.GatewayGrpc;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -11,6 +12,7 @@ import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.CacheService;
+import lol.up.pylon.gateway.client.service.GatewayService;
 import lol.up.pylon.gateway.client.service.RestService;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
@@ -132,6 +134,7 @@ public class GatewayGrpcClient implements Closeable {
     private final ManagedChannel channel;
     private final CacheService cacheService;
     private final RestService restService;
+    private final GatewayService gatewayService;
     private final EventDispatcher eventDispatcher;
 
     private long defaultBotId;
@@ -158,6 +161,7 @@ public class GatewayGrpcClient implements Closeable {
         this.channel = channel;
         this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc);
         this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc);
+        this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), grpc);
         this.defaultBotId = defaultBotId;
         this.eventDispatcher = new EventDispatcher(event);
     }
@@ -176,6 +180,10 @@ public class GatewayGrpcClient implements Closeable {
 
     public RestService getRestService() {
         return restService;
+    }
+
+    public GatewayService getGatewayService() {
+        return gatewayService;
     }
 
     public ExecutorService getGrpcExecutor() {
