@@ -280,7 +280,7 @@ public class PermissionUtil {
             return PermissionSet.all().getValue();
         }
         // MANAGE_CHANNEL allows to delete channels within a category (this is undocumented behavior)
-        if (channel.getParent() != null && checkPermission(channel.getParent().complete(), member, Permission.MANAGE_CHANNELS)) {
+        if (channel.getParentId() > 0 && checkPermission(channel.getParent().complete(), member, Permission.MANAGE_CHANNELS)) {
             permission |= Permission.MANAGE_CHANNELS.getValue();
         }
 
