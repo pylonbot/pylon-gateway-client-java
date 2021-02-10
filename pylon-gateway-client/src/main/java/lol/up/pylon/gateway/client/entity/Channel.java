@@ -10,6 +10,8 @@ import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -18,6 +20,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Channel implements Entity<ChannelData> {
+
+    private static final Logger log = LoggerFactory.getLogger(Channel.class);
 
     private final GatewayGrpcClient grpcClient;
     private final long botId;
@@ -228,6 +232,13 @@ public class Channel implements Entity<ChannelData> {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
+        if(builder.hasEmbed()) {
+            final MessageData.MessageEmbedData.Builder embedBuilder = builder.getEmbedBuilder();
+            if(embedBuilder.getColor() < 0) {
+                log.warn("Received negative color value, applying 0xFFFFFF flag", new RuntimeException("Invalid color"));
+                embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
+            }
+        }
         return getClient().getRestService().createMessage(getBotId(), getGuildId(), builder.build());
     }
 
