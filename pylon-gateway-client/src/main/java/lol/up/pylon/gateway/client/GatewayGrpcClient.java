@@ -14,6 +14,7 @@ import lol.up.pylon.gateway.client.event.EventSupplier;
 import lol.up.pylon.gateway.client.service.CacheService;
 import lol.up.pylon.gateway.client.service.GatewayService;
 import lol.up.pylon.gateway.client.service.RestService;
+import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
@@ -192,7 +193,21 @@ public class GatewayGrpcClient implements Closeable {
 
     @CheckReturnValue
     public GrpcRequest<User> getSelfUser() {
-        return getRestService().getSelfUser(0); // todo
+        final EventContext context = EventContext.current();
+        final long botId;
+        if(context != null) {
+            botId = context.getBotId();
+        } else {
+            botId = getDefaultBotId();
+        }
+        return getCacheService().getUser(botId)
+                .flatTransform(user -> {
+                    if(user == null) {
+                        return getRestService().getSelfUser(0);
+                    } else {
+                        return new FinishedRequestImpl<>(user);
+                    }
+                });
     }
 
     public <E extends Event<E>> void registerReceiver(final Class<E> eventClass,
