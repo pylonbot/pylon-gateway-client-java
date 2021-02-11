@@ -17,6 +17,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Channel implements Entity<ChannelData> {
@@ -232,10 +233,11 @@ public class Channel implements Entity<ChannelData> {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
-        if(builder.hasEmbed()) {
+        if (builder.hasEmbed()) {
             final MessageData.MessageEmbedData.Builder embedBuilder = builder.getEmbedBuilder();
-            if(embedBuilder.getColor() < 0) {
-                log.warn("Received negative color value, applying 0xFFFFFF flag", new RuntimeException("Invalid color"));
+            if (embedBuilder.getColor() < 0) {
+                log.warn("Received negative color value, applying 0xFFFFFF flag", new RuntimeException("Invalid " +
+                        "color"));
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
             }
         }
@@ -310,5 +312,54 @@ public class Channel implements Entity<ChannelData> {
     @CheckReturnValue
     public GrpcRequest<List<MemberVoiceState>> getVoiceStates() {
         return getClient().getCacheService().listChannelVoiceStates(getBotId(), getGuildId(), getData().getId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Channel channel = (Channel) o;
+        if (getType() != channel.getType()) {
+            return false;
+        }
+        if (channel.getType() == ChannelData.ChannelType.DM) {
+            return getBotId() == channel.getBotId() &&
+                    getUserId() == channel.getUserId() &&
+                    getId() == channel.getId();
+        } else {
+            return getBotId() == channel.getBotId() &&
+                    channel.getGuildId() == channel.getGuildId() &&
+                    getId() == channel.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBotId(), getData());
+    }
+
+    @Override
+    public String toString() {
+        if(getType() == ChannelData.ChannelType.DM) {
+            return "Channel{" +
+                    "botId=" + getBotId() +
+                    ", id=" + getId() +
+                    ", channelType=" + getType() +
+                    ", userId=" + getUserId() +
+                    ", name=" + getName() +
+                    '}';
+        } else {
+            return "Channel{" +
+                    "botId=" + getBotId() +
+                    ", id=" + getId() +
+                    ", channelType=" + getType() +
+                    ", guildId=" + getGuildId() +
+                    ", name=" + getName() +
+                    '}';
+        }
     }
 }

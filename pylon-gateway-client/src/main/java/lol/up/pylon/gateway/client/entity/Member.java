@@ -9,10 +9,7 @@ import lol.up.pylon.gateway.client.util.TimeUtil;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Member implements Entity<MemberData> {
@@ -184,5 +181,34 @@ public class Member implements Entity<MemberData> {
     @CheckReturnValue
     public GrpcRequest<Presence> getPresence() {
         return getClient().getCacheService().getPresence(getBotId(), getGuildId(), getUserId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Member member = (Member) o;
+        return getBotId() == member.getBotId() &&
+                getGuildId() == member.getGuildId() &&
+                getId() == member.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBotId(), getData());
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "botId=" + getBotId() +
+                ", guildId=" + getGuildId() +
+                ", id=" + getId() +
+                ", effectiveName=" + getEffectiveName() +
+                '}';
     }
 }

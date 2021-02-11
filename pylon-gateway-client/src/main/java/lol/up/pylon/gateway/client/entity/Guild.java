@@ -238,11 +238,21 @@ public class Guild implements Entity<GuildData> {
             return false;
         }
         Guild guild = (Guild) o;
-        return getId() == guild.getId();
+        return getBotId() == guild.getBotId() &&
+                getId() == guild.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(grpcClient, botId, data);
+        return Objects.hash(getBotId(), getData());
+    }
+
+    @Override
+    public String toString() {
+        return "Guild{" +
+                "botId=" + getBotId() +
+                ", id=" + getId() +
+                ", name=" + getName() +
+                '}';
     }
 }
