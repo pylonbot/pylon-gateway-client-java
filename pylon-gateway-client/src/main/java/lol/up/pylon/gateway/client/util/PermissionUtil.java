@@ -40,7 +40,7 @@ public class PermissionUtil {
      */
     public static boolean canInteract(Member issuer, Member target) {
         Guild guild = issuer.getGuild().complete();
-        if (!guild.equals(target.getGuild().complete())) {
+        if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("Provided members must both be Member objects of the same Guild!");
         }
         if (issuer.isOwner(guild)) {
@@ -66,7 +66,7 @@ public class PermissionUtil {
      */
     public static boolean canInteract(Member issuer, Role target) {
         Guild guild = issuer.getGuild().complete();
-        if (!guild.equals(target.getGuild().complete())) {
+        if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("Provided Member issuer and Role target must be from the same Guild!");
         }
         if (issuer.isOwner(guild)) {
@@ -87,7 +87,7 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Role issuer, Role target) {
-        if (!issuer.getGuild().equals(target.getGuild())) {
+        if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("The 2 Roles are not from same Guild!");
         }
         return target.getPosition() < issuer.getPosition();
@@ -110,7 +110,7 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Member issuer, Emoji emote) {
-        if (!issuer.getGuild().equals(emote.getGuild())) {
+        if (issuer.getGuildId() != emote.getGuildId()) {
             throw new IllegalArgumentException("The issuer and target are not in the same Guild");
         }
 
@@ -152,7 +152,7 @@ public class PermissionUtil {
         switch (channel.getData().getType()) {
             case GUILD_TEXT:
                 member = guild.getMemberById(issuer.getData().getId()).complete();
-                return emote.getGuild().equals(channel.getGuild()) // within the same guild
+                return emote.getGuildId() == channel.getGuildId() // within the same guild
                         || (external && member != null && member.hasPermission(channel,
                         Permission.USE_EXTERNAL_EMOJIS)); // in different guild
             default:
@@ -280,7 +280,8 @@ public class PermissionUtil {
             return PermissionSet.all().getValue();
         }
         // MANAGE_CHANNEL allows to delete channels within a category (this is undocumented behavior)
-        if (channel.getParentId() > 0 && checkPermission(channel.getParent().complete(), member, Permission.MANAGE_CHANNELS)) {
+        if (channel.getParentId() > 0 && checkPermission(channel.getParent().complete(), member,
+                Permission.MANAGE_CHANNELS)) {
             permission |= Permission.MANAGE_CHANNELS.getValue();
         }
 
@@ -315,8 +316,7 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static long getEffectivePermission(Channel channel, Role role) {
-        Guild guild = channel.getGuild().complete();
-        if (!guild.equals(role.getGuild())) {
+        if (channel.getGuildId() != role.getGuildId()) {
             throw new IllegalArgumentException("Provided channel and role are not of the same guild!");
         }
 
