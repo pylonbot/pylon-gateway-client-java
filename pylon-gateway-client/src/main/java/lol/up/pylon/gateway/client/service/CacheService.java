@@ -32,12 +32,14 @@ public class CacheService {
     private final GatewayCacheGrpc.GatewayCacheStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
     private final ExecutorService executorService;
+    private final boolean warnWithoutContext;
 
     public CacheService(final GatewayGrpcClient gatewayGrpcClient,
                         final GatewayCacheGrpc.GatewayCacheStub client,
-                        final ExecutorService executorService) {
+                        final ExecutorService executorService, final boolean warnWithoutContext) {
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.executorService = new EventExecutorService(executorService, EventContext.localContext());
+        this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
             @Override
             public void applyRequestMetadata(RequestInfo requestInfo, Executor appExecutor, MetadataApplier applier) {
@@ -59,8 +61,10 @@ public class CacheService {
         if (current != null) {
             return current.getBotId();
         }
-        log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
-                "AbstractEventReceiver#async instead!", new RuntimeException());
+        if (warnWithoutContext) {
+            log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
+                    "AbstractEventReceiver#async instead!", new RuntimeException());
+        }
         return gatewayGrpcClient.getDefaultBotId();
     }
 

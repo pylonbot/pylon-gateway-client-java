@@ -31,12 +31,14 @@ public class GatewayService {
     private final GatewayGrpc.GatewayStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
     private final ExecutorService executorService;
+    private final boolean warnWithoutContext;
 
     public GatewayService(final GatewayGrpcClient gatewayGrpcClient,
                           final GatewayGrpc.GatewayStub client,
-                          final ExecutorService executorService) {
+                          final ExecutorService executorService, final boolean warnWithoutContext) {
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.executorService = new EventExecutorService(executorService, EventContext.localContext());
+        this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
             @Override
             public void applyRequestMetadata(RequestInfo requestInfo, Executor appExecutor, MetadataApplier applier) {
@@ -57,6 +59,7 @@ public class GatewayService {
         if (current != null) {
             return current.getBotId();
         }
+        if(warnWithoutContext)
         log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
                 "AbstractEventReceiver#async instead!", new RuntimeException());
         return gatewayGrpcClient.getDefaultBotId();

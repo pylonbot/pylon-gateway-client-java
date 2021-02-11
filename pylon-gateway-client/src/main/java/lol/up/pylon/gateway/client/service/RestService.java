@@ -33,12 +33,14 @@ public class RestService {
     private final GatewayRestGrpc.GatewayRestStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
     private final ExecutorService executorService;
+    private final boolean warnWithoutContext;
 
     public RestService(final GatewayGrpcClient gatewayGrpcClient,
                        final GatewayRestGrpc.GatewayRestStub client,
-                       final ExecutorService executorService) {
+                       final ExecutorService executorService, final boolean warnWithoutContext) {
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.executorService = new EventExecutorService(executorService, EventContext.localContext());
+        this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
             @Override
             public void applyRequestMetadata(RequestInfo requestInfo, Executor appExecutor, MetadataApplier applier) {
@@ -60,8 +62,10 @@ public class RestService {
         if (current != null) {
             return current.getBotId();
         }
-        log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
-                "AbstractEventReceiver#async instead!", new RuntimeException());
+        if (warnWithoutContext) {
+            log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
+                    "AbstractEventReceiver#async instead!", new RuntimeException());
+        }
         return gatewayGrpcClient.getDefaultBotId();
     }
 
@@ -840,19 +844,21 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAround(final long guildId, final long channelId,
-                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                        final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesAround(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
-                                                       final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                        final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesAround(botId, guildId, channelId, snowflake, 100);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
-                                                       final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
+                                                        final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
                 .setChannelId(channelId)
                 .setAround(snowflake)
@@ -862,19 +868,21 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAfter(final long guildId, final long channelId,
-                                                       final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                       final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesAfter(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
-                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                       final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesAfter(botId, guildId, channelId, snowflake, 100);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
-                                                        final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
+                                                       final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
                 .setChannelId(channelId)
                 .setAfter(snowflake)
@@ -884,13 +892,15 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesBefore(final long guildId, final long channelId,
-                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                        final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesBefore(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
-                                                        final long snowflake) throws GrpcRequestException, GrpcGatewayApiException {
+                                                        final long snowflake) throws GrpcRequestException,
+            GrpcGatewayApiException {
         return getMessagesBefore(botId, guildId, channelId, snowflake, 100);
     }
 

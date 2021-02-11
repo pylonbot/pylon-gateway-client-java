@@ -39,6 +39,7 @@ public class GatewayGrpcClient implements Closeable {
         private int routerPort;
         private boolean enableRetry;
         private boolean enableContextCache;
+        private boolean warnWithoutContext = false;
         private ExecutorService eventExecutor;
         private ExecutorService grpcExecutor;
 
@@ -91,6 +92,11 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        public GatewayGrpcClientBuilder setWarnWithoutContext(final boolean warnWithoutContext) {
+            this.warnWithoutContext = warnWithoutContext;
+            return this;
+        }
+
         public GatewayGrpcClientBuilder setEventExecutor(ExecutorService eventExecutor) {
             this.eventExecutor = eventExecutor;
             return this;
@@ -116,7 +122,8 @@ public class GatewayGrpcClient implements Closeable {
                     routerPort,
                     enableRetry,
                     eventExecutor,
-                    grpcExecutor
+                    grpcExecutor,
+                    warnWithoutContext
             );
         }
     }
@@ -141,8 +148,9 @@ public class GatewayGrpcClient implements Closeable {
     private long defaultBotId;
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
-                             final ExecutorService event, final ExecutorService grpc) {
-        this(defaultBotId, event, grpc, enableRetry ?
+                             final ExecutorService event, final ExecutorService grpc,
+                             final boolean warnWithoutContext) {
+        this(defaultBotId, event, grpc, warnWithoutContext, enableRetry ?
                 ManagedChannelBuilder.forAddress(host, port)
                         .usePlaintext()
                         .enableRetry()
@@ -153,16 +161,16 @@ public class GatewayGrpcClient implements Closeable {
     }
 
     private GatewayGrpcClient(final long defaultBotId, final ExecutorService event, final ExecutorService grpc,
-                              final ManagedChannel channel) {
+                              final boolean warnWithoutContext, final ManagedChannel channel) {
         if (instance != null) {
             throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
         }
         instance = this;
         this.grpcExecutor = grpc;
         this.channel = channel;
-        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc);
-        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc);
-        this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), grpc);
+        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc, warnWithoutContext);
+        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc, warnWithoutContext);
+        this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), grpc, warnWithoutContext);
         this.defaultBotId = defaultBotId;
         this.eventDispatcher = new EventDispatcher(event);
     }
@@ -195,14 +203,14 @@ public class GatewayGrpcClient implements Closeable {
     public GrpcRequest<User> getSelfUser() {
         final EventContext context = EventContext.current();
         final long botId;
-        if(context != null) {
+        if (context != null) {
             botId = context.getBotId();
         } else {
             botId = getDefaultBotId();
         }
         return getCacheService().getUser(botId)
                 .flatTransform(user -> {
-                    if(user == null) {
+                    if (user == null) {
                         return getRestService().getSelfUser(0);
                     } else {
                         return new FinishedRequestImpl<>(user);
