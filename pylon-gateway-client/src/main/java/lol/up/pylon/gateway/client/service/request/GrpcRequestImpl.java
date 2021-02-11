@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.service.request;
 
+import lol.up.pylon.gateway.client.exception.GrpcException;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +39,25 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
     private final CompletableFuture<T> future;
     private final Executor executor;
+    private final GrpcException source;
 
     public <V> GrpcRequestImpl(final Executor executor, final CompletableFuture<V> future,
                                final Function<V, T> transformer) {
         this.executor = executor;
         this.future = future.thenApply(transformer);
+        this.source = new GrpcException("Source trace");
     }
 
     public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future) {
         this.executor = executor;
         this.future = future;
+        this.source = new GrpcException("Source trace");
+    }
+
+    public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future, final GrpcException source) {
+        this.executor = executor;
+        this.future = future;
+        this.source = source;
     }
 
     @Override
@@ -57,20 +67,20 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
     @Override
     public <V> GrpcRequestImpl<V> transform(Function<T, V> transformer) {
-        return new GrpcRequestImpl<>(executor, future.thenApply(transformer));
+        return new GrpcRequestImpl<>(executor, future.thenApply(transformer), source);
     }
 
     @Override
     public <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer) {
         final CompletableFuture<V> future = getFuture().thenApplyAsync(transformer, executor)
                 .thenComposeAsync(GrpcRequest::getFuture, executor);
-        return new GrpcRequestImpl<>(executor, future);
+        return new GrpcRequestImpl<>(executor, future, source);
     }
 
     @Override
     public <V, P> GrpcRequestImpl<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
         final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
-        return new GrpcRequestImpl<>(executor, future);
+        return new GrpcRequestImpl<>(executor, future, source);
     }
 
     @Override
