@@ -156,7 +156,7 @@ public class Member implements Entity<MemberData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
-        return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), roleId, reason);
+        return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
     // CACHE
