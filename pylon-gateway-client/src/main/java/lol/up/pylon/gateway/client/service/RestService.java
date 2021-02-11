@@ -1945,19 +1945,19 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createDmChannel(final long guildId, final long userId)
+    public GrpcRequest<Channel> createDmChannel(final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
-        return createDmChannel(getBotId(), guildId, userId);
+        return createDmChannel(getBotId(), userId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createDmChannel(final long botId, final long guildId, final long userId)
+    public GrpcRequest<Channel> createDmChannel(final long botId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         try {
             final CompletableFutureStreamObserver<CreateDmResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
                     .run(() -> client.createDm(CreateDmRequest.newBuilder()
                             .setRecipientId(userId)
                             .build(), asyncResponse));

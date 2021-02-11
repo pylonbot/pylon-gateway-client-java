@@ -2,11 +2,9 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.UserData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
-import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Entity<UserData> {
@@ -75,7 +73,7 @@ public class User implements Entity<UserData> {
     }
 
     public String getAvatarId() {
-        if(getData().getAvatar().isInitialized()) {
+        if (getData().getAvatar().isInitialized()) {
             return getData().getAvatar().getValue();
         }
         return null;
@@ -93,7 +91,7 @@ public class User implements Entity<UserData> {
 
     public String getAvatarUrl() {
         final String avatarId = getAvatarId();
-        if(avatarId == null) {
+        if (avatarId == null) {
             final String defaultAvatarId = String.valueOf(getDiscriminator() % 5);
             return String.format(DEFAULT_AVATAR_URL, defaultAvatarId);
         } else {
@@ -105,7 +103,7 @@ public class User implements Entity<UserData> {
 
     @CheckReturnValue
     public GrpcRequest<Channel> openPrivateChannel() {
-        return getClient().getRestService().createDmChannel(getBotId(), getGuildId(), getId());
+        return getClient().getRestService().createDmChannel(getBotId(), getId());
     }
 
     // CACHE
