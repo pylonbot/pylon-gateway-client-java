@@ -343,7 +343,7 @@ public class CacheService {
 
     @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long botId, final long guildId, final long after) throws GrpcRequestException {
-        return listGuildMembersAfter(botId, guildId, after, 0);
+        return listGuildMembersAfter(botId, guildId, after, Integer.MAX_VALUE);
     }
 
     @CheckReturnValue
