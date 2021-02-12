@@ -8,6 +8,7 @@ import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Emoji;
 import lol.up.pylon.gateway.client.entity.Guild;
+import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventExecutorService;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
@@ -153,6 +154,31 @@ public class GatewayService {
                     return null;
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getEmoji());
+            });
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<User> findUser(final long userId) throws GrpcRequestException {
+        return findUser(getBotId(), userId);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<User> findUser(final long botId, final long userId) throws GrpcRequestException {
+        try {
+            final CompletableFutureStreamObserver<FindUserResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValue(Constants.CTX_BOT_ID, botId)
+                    .run(() -> client.findUser(FindUserRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+                if(!response.hasUser()) {
+                    return null;
+                }
+                return new User(gatewayGrpcClient, botId, response.getUser());
             });
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);

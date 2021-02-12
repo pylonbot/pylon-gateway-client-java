@@ -527,48 +527,6 @@ public class CacheService {
         }
     }
 
-    // Users (1x + 1 Overload)
-    @CheckReturnValue
-    public GrpcRequest<User> getUser(final long userId) throws GrpcRequestException {
-        return getUser(getBotId(), userId);
-    }
-
-    @CheckReturnValue
-    public GrpcRequest<User> getUser(final long botId, final long userId) throws GrpcRequestException {
-        final EventContext context = EventContext.current();
-        final String ctxKey;
-        if (context != null) {
-            ctxKey = EventContext.buildContextKey("user", botId, userId);
-            final User user = context.getContextObject(ctxKey);
-            if (user != null) {
-                return new FinishedRequestImpl<>(user);
-            }
-        } else {
-            ctxKey = null;
-        }
-        try {
-            final CompletableFutureStreamObserver<GetUserResponse> asyncResponse =
-                    new CompletableFutureStreamObserver<>();
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
-                    .run(() -> client.getUser(GetUserRequest.newBuilder()
-                            .setUserId(userId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
-                if (!response.hasUser()) {
-                    return null;
-                }
-                final UserData data = response.getUser();
-                final User user = new User(gatewayGrpcClient, botId, data);
-                if (context != null) {
-                    context.populateContext(ctxKey, user);
-                }
-                return user;
-            });
-        } catch (final Throwable throwable) {
-            throw ExceptionUtil.asGrpcException(throwable);
-        }
-    }
-
     // VoiceStates (2x + Overloads)
     // - Get (Overload)
     @CheckReturnValue
