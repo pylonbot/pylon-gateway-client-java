@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 public class EventSuppliers {
 
@@ -30,6 +31,7 @@ public class EventSuppliers {
 
         private GrpcEventSupplierServer(final int port, final EventDispatcher eventDispatcher) {
             this.server = ServerBuilder.forPort(port)
+                    .executor(Executors.newFixedThreadPool(64)) // todo flex
                     .addService(new GatewayDispatchStreamingGrpc.GatewayDispatchStreamingImplBase() {
                         @Override
                         public StreamObserver<EventEnvelope> event(StreamObserver<EventEnvelopeAck> responseObserver) {
