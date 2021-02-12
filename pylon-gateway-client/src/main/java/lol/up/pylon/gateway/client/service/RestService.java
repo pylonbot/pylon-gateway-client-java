@@ -47,6 +47,7 @@ public class RestService {
                 final Metadata metadata = new Metadata();
                 metadata.put(Constants.METADATA_BOT_ID, String.valueOf(Constants.CTX_BOT_ID.get()));
                 metadata.put(Constants.METADATA_GUILD_ID, String.valueOf(Constants.CTX_GUILD_ID.get()));
+                metadata.put(Metadata.Key.of("x-pylon-max-ratelimit-ms", Metadata.ASCII_STRING_MARSHALLER), "15000");
                 applier.apply(metadata);
             }
 
