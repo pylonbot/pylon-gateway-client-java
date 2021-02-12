@@ -199,7 +199,7 @@ public class Member implements Entity<MemberData> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBotId(), getData());
+        return Objects.hash(getBotId(), getGuildId(), getId());
     }
 
     @Override

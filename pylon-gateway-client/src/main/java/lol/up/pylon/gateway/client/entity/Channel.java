@@ -339,7 +339,7 @@ public class Channel implements Entity<ChannelData> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBotId(), getData());
+        return Objects.hash(getBotId(), getId(), getType());
     }
 
     @Override

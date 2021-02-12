@@ -244,7 +244,7 @@ public class Guild implements Entity<GuildData> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBotId(), getData());
+        return Objects.hash(getBotId(), getId(), getName());
     }
 
     @Override
