@@ -9,6 +9,7 @@ import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
+import lol.up.pylon.gateway.client.exception.ValidationException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import org.slf4j.Logger;
@@ -241,6 +242,11 @@ public class Channel implements Entity<ChannelData> {
                         "color"));
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
             }
+        }
+        if(builder.getContent() != null && builder.getContent().length() > 2048 ||
+                (builder.getEmbed() != null && builder.getEmbed().getDescription() != null &&
+                        builder.getEmbed().getDescription().length() > 2048)) {
+            throw new ValidationException("Text length must not be more than 2048!");
         }
         if(getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
