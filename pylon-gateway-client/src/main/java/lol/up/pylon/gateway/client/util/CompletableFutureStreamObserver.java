@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.util;
 
 import io.grpc.stub.StreamObserver;
 import lol.up.pylon.gateway.client.event.EventContext;
+import lol.up.pylon.gateway.client.exception.GrpcException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -11,10 +12,12 @@ public class CompletableFutureStreamObserver<T> extends CompletableFuture<T> imp
 
     private final ThreadLocal<EventContext> threadLocal;
     private final EventContext eventContext;
+    private final GrpcException source;
 
     public CompletableFutureStreamObserver() {
         threadLocal = EventContext.localContext();
         eventContext = threadLocal.get();
+        this.source = new GrpcException("Source trace");
     }
 
     @Override
@@ -24,7 +27,7 @@ public class CompletableFutureStreamObserver<T> extends CompletableFuture<T> imp
 
     @Override
     public void onError(Throwable throwable) {
-        completeWithContext(() -> completeExceptionally(ExceptionUtil.asGrpcException(throwable)));
+        completeWithContext(() -> completeExceptionally(ExceptionUtil.asGrpcException(throwable, source)));
     }
 
     @Override

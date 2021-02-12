@@ -116,7 +116,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         try {
             return future.get();
         } catch (final Throwable throwable) {
-            throw ExceptionUtil.asGrpcException(throwable);
+            throw ExceptionUtil.asGrpcException(throwable, source);
         }
     }
 }
