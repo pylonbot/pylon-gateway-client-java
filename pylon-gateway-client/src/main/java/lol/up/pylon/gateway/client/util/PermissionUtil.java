@@ -39,6 +39,9 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Member issuer, Member target) {
+        if (target == null) {
+            return false;
+        }
         Guild guild = issuer.getGuild().complete();
         if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("Provided members must both be Member objects of the same Guild!");
@@ -65,6 +68,9 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Member issuer, Role target) {
+        if (target == null) {
+            return false;
+        }
         Guild guild = issuer.getGuild().complete();
         if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("Provided Member issuer and Role target must be from the same Guild!");
@@ -87,6 +93,9 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Role issuer, Role target) {
+        if (target == null) {
+            return false;
+        }
         if (issuer.getGuildId() != target.getGuildId()) {
             throw new IllegalArgumentException("The 2 Roles are not from same Guild!");
         }
@@ -110,6 +119,9 @@ public class PermissionUtil {
      * or the provided entities are not from the same guild
      */
     public static boolean canInteract(Member issuer, Emoji emote) {
+        if (emote == null) {
+            return false;
+        }
         if (issuer.getGuildId() != emote.getGuildId()) {
             throw new IllegalArgumentException("The issuer and target are not in the same Guild");
         }
