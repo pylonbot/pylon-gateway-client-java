@@ -208,7 +208,7 @@ public class GatewayGrpcClient implements Closeable {
         } else {
             botId = getDefaultBotId();
         }
-        return getCacheService().getUser(botId)
+        return getGatewayService().findUser(botId)
                 .flatTransform(user -> {
                     if (user == null) {
                         return getRestService().getSelfUser(0);

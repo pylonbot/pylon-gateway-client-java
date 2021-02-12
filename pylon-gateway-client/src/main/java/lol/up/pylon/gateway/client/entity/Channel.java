@@ -154,7 +154,7 @@ public class Channel implements Entity<ChannelData> {
     }
 
     public GrpcRequest<User> getUser() {
-        return getClient().getCacheService().getUser(getBotId(), getUserId());
+        return getClient().getGatewayService().findUser(getBotId(), getUserId());
     }
 
     public boolean canTalk(final Member member) {

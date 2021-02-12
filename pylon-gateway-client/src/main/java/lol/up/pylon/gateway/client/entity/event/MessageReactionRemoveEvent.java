@@ -80,7 +80,7 @@ public interface MessageReactionRemoveEvent extends Event<MessageReactionRemoveE
     @Override
     @CheckReturnValue
     default GrpcRequest<User> getUser() {
-        return GatewayGrpcClient.getSingleton().getCacheService().getUser(getBotId(), getUserId());
+        return GatewayGrpcClient.getSingleton().getGatewayService().findUser(getBotId(), getUserId());
     }
 
     @Override
