@@ -5,6 +5,6 @@ import com.google.protobuf.Timestamp;
 public class TimeUtil {
 
     public static long timestampToLong(final Timestamp timestamp) {
-        return (timestamp.getSeconds() * 1_000) + (timestamp.getNanos() * 1_000_000);
+        return (timestamp.getSeconds() * 1_000) + (timestamp.getNanos() / 1_000_000);
     }
 }
