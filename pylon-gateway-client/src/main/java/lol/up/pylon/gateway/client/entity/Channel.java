@@ -8,6 +8,7 @@ import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import org.slf4j.Logger;
@@ -239,6 +240,23 @@ public class Channel implements Entity<ChannelData> {
                 log.warn("Received negative color value, applying 0xFFFFFF flag", new RuntimeException("Invalid " +
                         "color"));
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
+            }
+        }
+        if(getGuildId() > 0) {
+            final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                    .complete(); // blocking on purpose
+            if (!canTalk(member)) {
+                throw new InsufficientPermissionException(Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
+            }
+            if(builder.hasEmbed()) {
+                if (!member.hasPermission(this, Permission.EMBED_LINKS)) {
+                    throw new InsufficientPermissionException(Permission.EMBED_LINKS);
+                }
+            }
+            if(builder.hasAttachment()) {
+                if (!member.hasPermission(this, Permission.ATTACH_FILES)) {
+                    throw new InsufficientPermissionException(Permission.ATTACH_FILES);
+                }
             }
         }
         return getClient().getRestService().createMessage(getBotId(), getGuildId(), builder.build());

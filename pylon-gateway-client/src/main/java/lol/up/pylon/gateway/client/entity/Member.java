@@ -3,6 +3,8 @@ package lol.up.pylon.gateway.client.entity;
 import bot.pylon.proto.discord.v1.model.MemberData;
 import bot.pylon.proto.discord.v1.rest.ModifyGuildMemberRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.exception.HierarchyException;
+import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
 import lol.up.pylon.gateway.client.util.TimeUtil;
@@ -146,6 +148,14 @@ public class Member implements Entity<MemberData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> addRole(final long roleId, @Nullable final String reason) {
+        final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId()).complete();
+        if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+            throw new InsufficientPermissionException(Permission.MANAGE_ROLES);
+        }
+        final Role role = getClient().getCacheService().getRole(getBotId(), getGuildId(), roleId).complete();
+        if (!member.canInteract(role)) {
+            throw new HierarchyException("I can't interact with " + role.toString() + "!");
+        }
         return getClient().getRestService().addMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
@@ -156,6 +166,14 @@ public class Member implements Entity<MemberData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
+        final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId()).complete();
+        if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+            throw new InsufficientPermissionException(Permission.MANAGE_ROLES);
+        }
+        final Role role = getClient().getCacheService().getRole(getBotId(), getGuildId(), roleId).complete();
+        if (!member.canInteract(role)) {
+            throw new HierarchyException("I can't interact with " + role.toString() + "!");
+        }
         return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
