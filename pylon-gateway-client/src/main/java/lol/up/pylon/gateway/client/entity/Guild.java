@@ -75,6 +75,9 @@ public class Guild implements Entity<GuildData> {
         return getData().getVerificationLevel();
     }
 
+    public int getMemberCount() {
+        return getData().getMemberCount();
+    }
 
     // DATA UTIL
 
