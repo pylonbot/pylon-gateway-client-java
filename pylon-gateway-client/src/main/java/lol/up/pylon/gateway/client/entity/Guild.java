@@ -1,17 +1,17 @@
 package lol.up.pylon.gateway.client.entity;
 
+import bot.pylon.proto.discord.v1.cache.FindGuildMembersRequest;
 import bot.pylon.proto.discord.v1.model.GuildData;
+import bot.pylon.proto.discord.v1.model.PresenceData;
 import bot.pylon.proto.discord.v1.rest.CreateGuildChannelRequest;
 import bot.pylon.proto.discord.v1.rest.RemoveGuildBanRequest;
 import bot.pylon.proto.discord.v1.rest.RemoveGuildMemberRequest;
 import com.google.protobuf.StringValue;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -166,10 +166,11 @@ public class Guild implements Entity<GuildData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> kick(final long userId, @Nullable final String reason) {
-        return getClient().getRestService().removeGuildMember(getBotId(), getGuildId(), RemoveGuildMemberRequest.newBuilder()
-                .setUserId(userId)
-                .setAuditLogReason(reason)
-                .build());
+        return getClient().getRestService().removeGuildMember(getBotId(), getGuildId(),
+                RemoveGuildMemberRequest.newBuilder()
+                        .setUserId(userId)
+                        .setAuditLogReason(reason)
+                        .build());
     }
 
     @CheckReturnValue
@@ -225,9 +226,33 @@ public class Guild implements Entity<GuildData> {
     }
 
     @CheckReturnValue
+    public GrpcRequest<Member> findMemberByName(final String name) {
+        return getClient().getCacheService().findMembers(getBotId(), getGuildId(), FindGuildMembersRequest.newBuilder()
+                .setName(name)
+                .setLimit(1)
+                .build())
+                .transform(members -> members.stream().findFirst().orElse(null));
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> findMembersByPrefix(final String prefix) {
+        return getClient().getCacheService().findMembers(getBotId(), getGuildId(), FindGuildMembersRequest.newBuilder()
+                .setPrefix(prefix)
+                .setLimit(100)
+                .build());
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> findMembersByOnlineStatus(final PresenceData.OnlineStatus status) {
+        return getClient().getCacheService().findMembers(getBotId(), getGuildId(), FindGuildMembersRequest.newBuilder()
+                .setStatus(status)
+                .setLimit(Integer.MAX_VALUE) // todo: bad
+                .build());
+    }
+
+    @CheckReturnValue
     public GrpcRequest<List<Member>> getMembers() {
-        throw new RuntimeException("Avoid this");
-        //return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
+        return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
     }
 
     @CheckReturnValue

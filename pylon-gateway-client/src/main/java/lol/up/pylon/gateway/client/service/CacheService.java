@@ -277,7 +277,7 @@ public class CacheService {
         }
     }
 
-    // Guild Members (2x + Overloads)
+    // Guild Members (3x + Overloads)
     // - Get (1 Overload)
     @CheckReturnValue
     public GrpcRequest<Member> getMember(final long guildId, final long userId) throws GrpcRequestException {
@@ -357,6 +357,28 @@ public class CacheService {
                             .setAfter(after)
                             .setLimit(limit)
                             .build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getMembersList().stream()
+                    .map(member -> new Member(gatewayGrpcClient, botId, member))
+                    .collect(Collectors.toList()));
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    // - Find (1 Overload)
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> findMembers(final long guildId, final FindGuildMembersRequest request) throws GrpcRequestException {
+        return findMembers(getBotId(), guildId, request);
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<List<Member>> findMembers(final long botId, final long guildId,
+                                                 final FindGuildMembersRequest request) throws GrpcRequestException {
+        try {
+            final CompletableFutureStreamObserver<FindGuildMembersResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.findGuildMembers(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response.getMembersList().stream()
                     .map(member -> new Member(gatewayGrpcClient, botId, member))
                     .collect(Collectors.toList()));
