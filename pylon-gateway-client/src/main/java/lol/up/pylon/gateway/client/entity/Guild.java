@@ -6,10 +6,12 @@ import bot.pylon.proto.discord.v1.rest.RemoveGuildBanRequest;
 import bot.pylon.proto.discord.v1.rest.RemoveGuildMemberRequest;
 import com.google.protobuf.StringValue;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -224,7 +226,8 @@ public class Guild implements Entity<GuildData> {
 
     @CheckReturnValue
     public GrpcRequest<List<Member>> getMembers() {
-        return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
+        throw new RuntimeException("Avoid this");
+        //return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
     }
 
     @CheckReturnValue
