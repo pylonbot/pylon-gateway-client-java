@@ -218,6 +218,13 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
+        if(getGuildId() > 0) {
+            final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                    .complete();
+            if(!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+                throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
+            }
+        }
         return getClient().getRestService().bulkDeleteMessages(getBotId(), getGuildId(), getId(), messageIds, reason);
     }
 

@@ -4,6 +4,8 @@ import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
 import com.google.protobuf.Timestamp;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
+import lol.up.pylon.gateway.client.exception.ValidationException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.TimeUtil;
@@ -96,18 +98,20 @@ public class Message implements Entity<MessageData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Void> addReaction(final String emoji) {
-        return getClient().getRestService().createReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
-    }
-
-    @CheckReturnValue
     public GrpcRequest<Void> addReaction(final Emoji emoji) {
         return addReaction(emoji.getName() + ":" + emoji.getId());
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final String emoji) {
-        return getClient().getRestService().deleteOwnReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
+    public GrpcRequest<Void> addReaction(final String emoji) {
+        if(getGuildId() > 0) {
+            final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                    .complete();
+            if(!member.hasPermission(Permission.ADD_REACTIONS)) {
+                throw new InsufficientPermissionException(Permission.ADD_REACTIONS);
+            }
+        }
+        return getClient().getRestService().createReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
     }
 
     @CheckReturnValue
@@ -116,9 +120,8 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final long userId, final String emoji) {
-        return getClient().getRestService().deleteReaction(getBotId(), getGuildId(), getChannelId(), getId(), userId,
-                emoji);
+    public GrpcRequest<Void> removeReaction(final String emoji) {
+        return getClient().getRestService().deleteOwnReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
     }
 
     @CheckReturnValue
@@ -127,7 +130,23 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
+    public GrpcRequest<Void> removeReaction(final long userId, final String emoji) {
+        if(getGuildId() > 0) {
+            final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                    .complete();
+            if(!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+                throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
+            }
+        }
+        return getClient().getRestService().deleteReaction(getBotId(), getGuildId(), getChannelId(), getId(), userId,
+                emoji);
+    }
+
+    @CheckReturnValue
     public GrpcRequest<Void> editMessage(final String message) {
+        if(getAuthor().getId() != getBotId()) {
+            throw new ValidationException("Can't edit messages from other users");
+        }
         return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
                 .setChannelId(getChannelId())
                 .setMessageId(getId())
@@ -140,6 +159,9 @@ public class Message implements Entity<MessageData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> editMessage(final MessageData.MessageEmbedData embed) {
+        if(getAuthor().getId() != getBotId()) {
+            throw new ValidationException("Can't edit messages from other users");
+        }
         return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
                 .setChannelId(getChannelId())
                 .setMessageId(getId())
@@ -157,6 +179,13 @@ public class Message implements Entity<MessageData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> delete(final String reason) {
+        if(getGuildId() > 0 && getAuthor().getId() != getBotId()) {
+            final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
+                    .complete();
+            if (!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+                throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
+            }
+        }
         return getClient().getRestService().deleteMessage(getBotId(), getGuildId(), getChannelId(), getId(), reason);
     }
 
