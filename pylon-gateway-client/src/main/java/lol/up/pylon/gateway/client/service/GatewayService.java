@@ -60,9 +60,10 @@ public class GatewayService {
         if (current != null) {
             return current.getBotId();
         }
-        if(warnWithoutContext)
-        log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
-                "AbstractEventReceiver#async instead!", new RuntimeException());
+        if (warnWithoutContext) {
+            log.warn("Missing event context in current thread. Did you manually create threads? Consider using " +
+                    "AbstractEventReceiver#async instead!", new RuntimeException());
+        }
         return gatewayGrpcClient.getDefaultBotId();
     }
 
@@ -150,7 +151,7 @@ public class GatewayService {
                             .setEmojiId(emojiId)
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
-                if(!response.hasEmoji()) {
+                if (!response.hasEmoji()) {
                     return null;
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getEmoji());
@@ -175,11 +176,24 @@ public class GatewayService {
                             .setUserId(userId)
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
-                if(!response.hasUser()) {
+                if (!response.hasUser()) {
                     return null;
                 }
                 return new User(gatewayGrpcClient, botId, response.getUser());
             });
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
+    public GrpcRequest<GetStatsResponse> getStats(final long botId) throws GrpcRequestException {
+        try {
+            final CompletableFutureStreamObserver<GetStatsResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+            Context.current().withValue(Constants.CTX_BOT_ID, botId)
+                    .run(() -> client.getStats(GetStatsRequest.newBuilder().build(), asyncResponse));
+            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> response);
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
