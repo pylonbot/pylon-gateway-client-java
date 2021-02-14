@@ -246,8 +246,6 @@ public class Channel implements Entity<ChannelData> {
         if (builder.hasEmbed()) {
             final MessageData.MessageEmbedData.Builder embedBuilder = builder.getEmbedBuilder();
             if (embedBuilder.getColor() < 0) {
-                log.warn("Received negative color value, applying 0xFFFFFF flag", new RuntimeException("Invalid " +
-                        "color"));
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
             }
         }
