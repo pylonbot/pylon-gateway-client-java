@@ -16,6 +16,7 @@ import lol.up.pylon.gateway.client.service.GatewayService;
 import lol.up.pylon.gateway.client.service.RestService;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,11 @@ import javax.annotation.CheckReturnValue;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GatewayGrpcClient implements Closeable {
 
@@ -46,7 +49,8 @@ public class GatewayGrpcClient implements Closeable {
         private GatewayGrpcClientBuilder(final long defaultBotId) {
             this.defaultBotId = defaultBotId;
             this.enableContextCache = true;
-            this.eventExecutor = Executors.newFixedThreadPool(Math.max(8, Runtime.getRuntime().availableProcessors() * 2));
+            this.eventExecutor = Executors.newFixedThreadPool(Math.max(8,
+                    Runtime.getRuntime().availableProcessors() * 2));
             this.grpcExecutor = Executors.newFixedThreadPool(
                     Math.max(8, Runtime.getRuntime().availableProcessors()));
         }
@@ -146,6 +150,9 @@ public class GatewayGrpcClient implements Closeable {
     private final EventDispatcher eventDispatcher;
 
     private long defaultBotId;
+    private User selfUser;
+    private long selfUserLastUpdate = 0;
+    private AtomicBoolean updating = new AtomicBoolean(false);
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
                              final ExecutorService event, final ExecutorService grpc,
@@ -208,14 +215,29 @@ public class GatewayGrpcClient implements Closeable {
         } else {
             botId = getDefaultBotId();
         }
-        return getGatewayService().findUser(botId)
-                .flatTransform(user -> {
-                    if (user == null) {
-                        return getRestService().getSelfUser(0);
-                    } else {
-                        return new FinishedRequestImpl<>(user);
-                    }
-                });
+        if (selfUser != null && (System.currentTimeMillis() - selfUserLastUpdate < 60_000 || updating.get())) {
+            return new FinishedRequestImpl<>(selfUser);
+        } else {
+            updating.set(true);
+            return new GrpcRequestImpl<>(getGrpcExecutor(), CompletableFuture.supplyAsync(() -> {
+                try {
+                    this.selfUser = getGatewayService().findUser(botId)
+                            .flatTransform(user -> {
+                                if (user == null) {
+                                    return getRestService().getSelfUser(0);
+                                } else {
+                                    return new FinishedRequestImpl<>(user);
+                                }
+                            }).complete();
+                    this.selfUserLastUpdate = System.currentTimeMillis();
+                } catch (final Throwable ex) {
+                    log.error("An error occurred when trying to get self-user", ex);
+                } finally {
+                    updating.set(false);
+                }
+                return this.selfUser;
+            }, getGrpcExecutor()));
+        }
     }
 
     public <E extends Event<E>> void registerReceiver(final Class<E> eventClass,
