@@ -80,7 +80,7 @@ public interface MessageReactionAddEvent extends Event<MessageReactionAddEvent>,
     @Override
     @CheckReturnValue
     default GrpcRequest<User> getUser() {
-        return GatewayGrpcClient.getSingleton().getGatewayService().findUser(getBotId(), getUserId());
+        return GatewayGrpcClient.getSingleton().getCacheService().getUser(getBotId(), getGuildId(), getUserId());
     }
 
     @Override
