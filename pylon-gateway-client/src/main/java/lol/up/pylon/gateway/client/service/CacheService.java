@@ -262,10 +262,16 @@ public class CacheService {
                             .setUserId(userId)
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
-                if (!response.hasPresence()) {
-                    return null;
+                final PresenceData data;
+                if (response.hasPresence()) {
+                    data = response.getPresence();
+                } else {
+                    data = PresenceData.newBuilder()
+                            .setGuildId(guildId)
+                            .setUserId(userId)
+                            .setStatus(PresenceData.OnlineStatus.OFFLINE)
+                            .build();
                 }
-                final PresenceData data = response.getPresence();
                 final Presence presence = new Presence(gatewayGrpcClient, botId, data);
                 if (context != null) {
                     context.populateContext(ctxKey, presence);
