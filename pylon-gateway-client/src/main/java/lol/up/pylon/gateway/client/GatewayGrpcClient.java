@@ -152,7 +152,7 @@ public class GatewayGrpcClient implements Closeable {
     private long defaultBotId;
     private User selfUser;
     private long selfUserLastUpdate = 0;
-    private AtomicBoolean updating = new AtomicBoolean(false);
+    private final AtomicBoolean updating = new AtomicBoolean(false);
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
                              final ExecutorService event, final ExecutorService grpc,
