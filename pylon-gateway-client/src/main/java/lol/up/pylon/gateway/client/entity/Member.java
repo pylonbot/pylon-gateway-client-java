@@ -173,6 +173,7 @@ public class Member implements Entity<MemberData> {
                     roles.forEach(role -> roleMap.put(role.getData().getId(), role));
                     return getRoleIds().stream()
                             .map(roleMap::get)
+                            .filter(Objects::nonNull) // however it is possible some members have invalid role-ids
                             .sorted(Comparator.comparingInt(Role::getPosition).reversed())
                             .collect(Collectors.toList());
                 });
