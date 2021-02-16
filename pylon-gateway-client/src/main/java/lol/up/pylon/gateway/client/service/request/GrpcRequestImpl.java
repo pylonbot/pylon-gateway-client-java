@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,28 +15,6 @@ import java.util.function.Function;
 public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
     private static final Logger log = LoggerFactory.getLogger(GrpcRequestImpl.class);
-
-    private static final Consumer<Object> SUCCESS = o -> {};
-    private static final Consumer<Throwable> ERROR = error -> log.error("An error occurred during grpc request", error);
-
-    private static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
-    private static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
-
-    public static void setDefaultSuccessHandler(final Consumer<Object> success) {
-        if (success == null) {
-            DEFAULT_SUCCESS_HANDLER = SUCCESS;
-        } else {
-            DEFAULT_SUCCESS_HANDLER = success;
-        }
-    }
-
-    public static void setDefaultErrorHandler(final Consumer<Throwable> error) {
-        if (error == null) {
-            DEFAULT_ERROR_HANDLER = ERROR;
-        } else {
-            DEFAULT_ERROR_HANDLER = error;
-        }
-    }
 
     private final CompletableFuture<T> future;
     private final Executor executor;
@@ -66,7 +45,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public <V> GrpcRequestImpl<V> transform(Function<T, V> transformer) {
+    public <V> GrpcRequest<V> transform(Function<T, V> transformer) {
         return new GrpcRequestImpl<>(executor, future.thenApply(transformer), source);
     }
 
@@ -78,19 +57,9 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public <V, P> GrpcRequestImpl<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
+    public <V, P> GrpcRequest<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
         final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
         return new GrpcRequestImpl<>(executor, future, source);
-    }
-
-    @Override
-    public void queue() {
-        queue(DEFAULT_SUCCESS_HANDLER);
-    }
-
-    @Override
-    public void queue(final Consumer<? super T> success) {
-        queue(success, DEFAULT_ERROR_HANDLER);
     }
 
     @Override
@@ -109,6 +78,11 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
             }
             return null;
         });
+    }
+
+    @Override
+    public void queueAfter(Consumer<? super T> success, Consumer<? super Throwable> error, long time, TimeUnit unit) {
+        queue(success, error); // todo fix
     }
 
     @Override
