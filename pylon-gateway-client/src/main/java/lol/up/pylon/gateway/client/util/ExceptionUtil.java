@@ -26,21 +26,23 @@ public class ExceptionUtil {
 
     public static GrpcException asGrpcException(final Throwable throwable, final GrpcException source) throws RuntimeException {
         if (throwable instanceof GrpcRequestException) {
-            throwable.setStackTrace(source.getStackTrace());
-            return (GrpcRequestException) throwable;
+            source.initCause(throwable);
+            return source;
         }
         if (throwable instanceof GrpcGatewayApiException) {
-            throwable.setStackTrace(source.getStackTrace());
-            return (GrpcGatewayApiException) throwable;
+            source.initCause(throwable);
+            return source;
         }
         if(throwable instanceof ExecutionException) {
             if(throwable.getCause() instanceof GrpcRequestException) {
-                throwable.getCause().setStackTrace(source.getStackTrace());
-                return (GrpcException) throwable.getCause();
+                source.initCause(throwable.getCause());
+                return source;
             }
-            return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(source), throwable.getCause());
+            source.initCause(throwable.getCause());
+            return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(source), source);
         }
-        return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(source), throwable);
+        source.initCause(throwable);
+        return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(source), source);
     }
 
     private static String getLastMethodCaller() {
