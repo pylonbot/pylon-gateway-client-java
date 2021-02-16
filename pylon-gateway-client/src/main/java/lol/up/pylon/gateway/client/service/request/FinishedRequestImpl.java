@@ -4,6 +4,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,18 +40,13 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public void queue() {
-
-    }
-
-    @Override
-    public void queue(Consumer<? super T> success) {
-        success.accept(entity);
-    }
-
-    @Override
     public void queue(Consumer<? super T> success, Consumer<? super Throwable> error) {
         success.accept(entity);
+    }
+
+    @Override
+    public void queueAfter(Consumer<? super T> success, Consumer<? super Throwable> error, long time, TimeUnit unit) {
+        queue(success, error); // todo: eh? this is finished, why should it be queued after???
     }
 
     @Override
