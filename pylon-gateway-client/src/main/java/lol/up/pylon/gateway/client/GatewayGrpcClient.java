@@ -171,6 +171,7 @@ public class GatewayGrpcClient implements Closeable {
                         .build() :
                 ManagedChannelBuilder.forAddress(host, port)
                         .usePlaintext()
+                        .executor(Executors.newWorkStealingPool(128))
                         .build());
     }
 
