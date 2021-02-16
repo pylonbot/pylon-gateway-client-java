@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -37,17 +38,20 @@ public class RestService {
 
     public RestService(final GatewayGrpcClient gatewayGrpcClient,
                        final GatewayRestGrpc.GatewayRestStub client,
-                       final ExecutorService executorService, final boolean warnWithoutContext) {
+                       final ExecutorService executorService, final boolean warnWithoutContext,
+                       final Duration maxRatelimitWaitDuration) {
         this.gatewayGrpcClient = gatewayGrpcClient;
         this.executorService = new EventExecutorService(executorService, EventContext.localContext());
         this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
+            private String timeout = String.valueOf(maxRatelimitWaitDuration.toMillis());
+
             @Override
             public void applyRequestMetadata(RequestInfo requestInfo, Executor appExecutor, MetadataApplier applier) {
                 final Metadata metadata = new Metadata();
                 metadata.put(Constants.METADATA_BOT_ID, String.valueOf(Constants.CTX_BOT_ID.get()));
                 metadata.put(Constants.METADATA_GUILD_ID, String.valueOf(Constants.CTX_GUILD_ID.get()));
-                metadata.put(Metadata.Key.of("x-pylon-max-ratelimit-ms", Metadata.ASCII_STRING_MARSHALLER), "15000");
+                metadata.put(Metadata.Key.of("x-pylon-max-ratelimit-ms", Metadata.ASCII_STRING_MARSHALLER), timeout);
                 applier.apply(metadata);
             }
 

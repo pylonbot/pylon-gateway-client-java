@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.CheckReturnValue;
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +44,7 @@ public class GatewayGrpcClient implements Closeable {
         private boolean enableRetry;
         private boolean enableContextCache;
         private boolean warnWithoutContext = false;
+        private Duration maxRestWaitDuration = Duration.ofSeconds(10);
         private ExecutorService eventExecutor;
         private ExecutorService grpcExecutor;
 
@@ -111,6 +113,10 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
+        public void setMaxRestWaitDuration(Duration maxRestWaitDuration) {
+            this.maxRestWaitDuration = maxRestWaitDuration;
+        }
+
         public GatewayGrpcClient build() {
             if (defaultBotId == 0) {
                 throw new NullPointerException("The default bot id must not be 0");
@@ -127,7 +133,8 @@ public class GatewayGrpcClient implements Closeable {
                     enableRetry,
                     eventExecutor,
                     grpcExecutor,
-                    warnWithoutContext
+                    warnWithoutContext,
+                    maxRestWaitDuration
             );
         }
     }
@@ -156,8 +163,8 @@ public class GatewayGrpcClient implements Closeable {
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
                              final ExecutorService event, final ExecutorService grpc,
-                             final boolean warnWithoutContext) {
-        this(defaultBotId, event, grpc, warnWithoutContext, enableRetry ?
+                             final boolean warnWithoutContext, final Duration maxRestWaitDuration) {
+        this(defaultBotId, event, grpc, warnWithoutContext, maxRestWaitDuration, enableRetry ?
                 ManagedChannelBuilder.forAddress(host, port)
                         .usePlaintext()
                         .enableRetry()
@@ -168,7 +175,8 @@ public class GatewayGrpcClient implements Closeable {
     }
 
     private GatewayGrpcClient(final long defaultBotId, final ExecutorService event, final ExecutorService grpc,
-                              final boolean warnWithoutContext, final ManagedChannel channel) {
+                              final boolean warnWithoutContext, final Duration maxRestWaitDuration,
+                              final ManagedChannel channel) {
         if (instance != null) {
             throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
         }
@@ -176,7 +184,8 @@ public class GatewayGrpcClient implements Closeable {
         this.grpcExecutor = grpc;
         this.channel = channel;
         this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc, warnWithoutContext);
-        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc, warnWithoutContext);
+        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc, warnWithoutContext,
+                maxRestWaitDuration);
         this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), grpc, warnWithoutContext);
         this.defaultBotId = defaultBotId;
         this.eventDispatcher = new EventDispatcher(event);
