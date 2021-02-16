@@ -45,11 +45,6 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public void queueAfter(Consumer<? super T> success, Consumer<? super Throwable> error, long time, TimeUnit unit) {
-        queue(success, error); // todo: eh? this is finished, why should it be queued after???
-    }
-
-    @Override
     public T complete() {
         return entity;
     }

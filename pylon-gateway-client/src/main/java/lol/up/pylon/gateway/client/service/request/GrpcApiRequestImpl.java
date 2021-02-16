@@ -4,7 +4,9 @@ import lol.up.pylon.gateway.client.exception.GrpcException;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class GrpcApiRequestImpl<T> extends GrpcRequestImpl<T> implements GrpcApiRequest<T> {
@@ -45,5 +47,10 @@ public class GrpcApiRequestImpl<T> extends GrpcRequestImpl<T> implements GrpcApi
     @Override
     public <V, P> GrpcApiRequest<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
         return null;
+    }
+
+    @Override
+    public void queueAfter(Consumer<? super T> success, Consumer<? super Throwable> error, long time, TimeUnit unit) {
+        queue(success, error); // todo fix
     }
 }

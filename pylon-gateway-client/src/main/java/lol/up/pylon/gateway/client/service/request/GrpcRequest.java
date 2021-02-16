@@ -20,8 +20,8 @@ public interface GrpcRequest<T> {
         private static final Consumer<Throwable> ERROR = error -> log.error("An error occurred during grpc request",
                 error);
 
-        private static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
-        private static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
+        static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
+        static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
 
         public static void setDefaultSuccessHandler(final Consumer<Object> success) {
             if (success == null) {
@@ -60,16 +60,6 @@ public interface GrpcRequest<T> {
     }
 
     void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error);
-
-    default void queueAfter(long time, TimeUnit unit) {
-        queueAfter(Context.DEFAULT_SUCCESS_HANDLER, time, unit);
-    }
-
-    default void queueAfter(Consumer<? super T> success, long time, TimeUnit unit) {
-        queueAfter(success, Context.DEFAULT_ERROR_HANDLER, time, unit);
-    }
-
-    void queueAfter(Consumer<? super T> success, final Consumer<? super Throwable> error, long time, TimeUnit unit);
 
     T complete();
 

@@ -81,11 +81,6 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
-    public void queueAfter(Consumer<? super T> success, Consumer<? super Throwable> error, long time, TimeUnit unit) {
-        queue(success, error); // todo fix
-    }
-
-    @Override
     public T complete() {
         try {
             return future.get();
