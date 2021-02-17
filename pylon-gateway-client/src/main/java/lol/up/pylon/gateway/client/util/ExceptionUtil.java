@@ -19,9 +19,9 @@ public class ExceptionUtil {
             if(throwable.getCause() instanceof GrpcRequestException) {
                 return (GrpcException) throwable.getCause();
             }
-            return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(), throwable.getCause());
+            return new GrpcRequestException("An error occurred before gRPC: " + getLastMethodCaller(), throwable.getCause());
         }
-        return new GrpcRequestException("An error occurred during gRPC: " + getLastMethodCaller(), throwable);
+        return new GrpcRequestException("An error occurred before gRPC: " + getLastMethodCaller(), throwable);
     }
 
     public static GrpcException asGrpcException(final Throwable throwable, final GrpcException source) throws RuntimeException {

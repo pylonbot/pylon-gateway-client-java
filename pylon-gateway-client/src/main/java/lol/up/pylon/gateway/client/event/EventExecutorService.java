@@ -6,8 +6,8 @@ import java.util.concurrent.*;
 
 public class EventExecutorService implements ExecutorService {
 
-    private final ExecutorService executorService;
-    private final ThreadLocal<EventContext> localContext;
+    protected final ExecutorService executorService;
+    protected final ThreadLocal<EventContext> localContext;
 
     public EventExecutorService(final ExecutorService executorService, final ThreadLocal<EventContext> localContext) {
         this.executorService = executorService;

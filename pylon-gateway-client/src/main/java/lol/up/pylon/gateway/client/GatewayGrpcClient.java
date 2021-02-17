@@ -26,10 +26,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GatewayGrpcClient implements Closeable {
@@ -45,16 +42,16 @@ public class GatewayGrpcClient implements Closeable {
         private boolean enableContextCache;
         private boolean warnWithoutContext = false;
         private Duration maxRestWaitDuration = Duration.ofSeconds(10);
-        private ExecutorService eventExecutor;
-        private ExecutorService grpcExecutor;
+        private ExecutorConfig executorConfig;
 
         private GatewayGrpcClientBuilder(final long defaultBotId) {
             this.defaultBotId = defaultBotId;
             this.enableContextCache = true;
-            this.eventExecutor = Executors.newFixedThreadPool(Math.max(8,
-                    Runtime.getRuntime().availableProcessors() * 2));
-            this.grpcExecutor = Executors.newFixedThreadPool(
-                    Math.max(8, Runtime.getRuntime().availableProcessors()));
+            this.executorConfig = new ExecutorConfig(this);
+        }
+
+        public ExecutorConfig executors() {
+            return executorConfig;
         }
 
         public GatewayGrpcClientBuilder setDefaultBotId(long defaultBotId) {
@@ -103,16 +100,6 @@ public class GatewayGrpcClient implements Closeable {
             return this;
         }
 
-        public GatewayGrpcClientBuilder setEventExecutor(ExecutorService eventExecutor) {
-            this.eventExecutor = eventExecutor;
-            return this;
-        }
-
-        public GatewayGrpcClientBuilder setGrpcExecutor(final ExecutorService grpcExecutor) {
-            this.grpcExecutor = grpcExecutor;
-            return this;
-        }
-
         public void setMaxRestWaitDuration(Duration maxRestWaitDuration) {
             this.maxRestWaitDuration = maxRestWaitDuration;
         }
@@ -131,11 +118,66 @@ public class GatewayGrpcClient implements Closeable {
                     routerHost,
                     routerPort,
                     enableRetry,
-                    eventExecutor,
-                    grpcExecutor,
+                    executorConfig,
                     warnWithoutContext,
                     maxRestWaitDuration
             );
+        }
+
+        public class ExecutorConfig {
+
+            private final GatewayGrpcClientBuilder builder;
+            private ExecutorService eventExecutor;
+            private ExecutorService callbackExecutor;
+            private ExecutorService cacheGrpcExecutor;
+            private ScheduledExecutorService restGrpcExecutor;
+
+            private ExecutorConfig(final GatewayGrpcClientBuilder builder) {
+                this.builder = builder;
+                this.eventExecutor = Executors.newFixedThreadPool(Math.max(8,
+                        Runtime.getRuntime().availableProcessors() * 2));
+                this.cacheGrpcExecutor = Executors.newFixedThreadPool(
+                        Math.max(8, Runtime.getRuntime().availableProcessors()));
+            }
+
+            public GatewayGrpcClientBuilder client() {
+                return builder;
+            }
+
+            public ExecutorService getEventExecutor() {
+                return eventExecutor;
+            }
+
+            public ExecutorConfig setEventExecutor(ExecutorService eventExecutor) {
+                this.eventExecutor = eventExecutor;
+                return this;
+            }
+
+            public ExecutorService getCallbackExecutor() {
+                return callbackExecutor;
+            }
+
+            public void setCallbackExecutor(final ExecutorService callbackExecutor) {
+                this.callbackExecutor = callbackExecutor;
+            }
+
+            public ExecutorService getCacheGrpcExecutor() {
+                return cacheGrpcExecutor;
+            }
+
+            public ExecutorConfig setCacheGrpcExecutor(final ExecutorService cacheGrpcExecutor) {
+                this.cacheGrpcExecutor = cacheGrpcExecutor;
+                return this;
+            }
+
+            public ScheduledExecutorService getRestGrpcExecutor() {
+                return restGrpcExecutor;
+            }
+
+            public ExecutorConfig setRestGrpcExecutor(final ScheduledExecutorService restGrpcExecutor) {
+                this.restGrpcExecutor = restGrpcExecutor;
+                return this;
+            }
         }
     }
 
@@ -149,7 +191,7 @@ public class GatewayGrpcClient implements Closeable {
         return instance;
     }
 
-    private final ExecutorService grpcExecutor;
+    private final GatewayGrpcClientBuilder.ExecutorConfig executorConfig;
     private final ManagedChannel channel;
     private final CacheService cacheService;
     private final RestService restService;
@@ -162,9 +204,9 @@ public class GatewayGrpcClient implements Closeable {
     private final AtomicBoolean updating = new AtomicBoolean(false);
 
     public GatewayGrpcClient(final long defaultBotId, final String host, final int port, final boolean enableRetry,
-                             final ExecutorService event, final ExecutorService grpc,
+                             final GatewayGrpcClientBuilder.ExecutorConfig executorConfig,
                              final boolean warnWithoutContext, final Duration maxRestWaitDuration) {
-        this(defaultBotId, event, grpc, warnWithoutContext, maxRestWaitDuration, enableRetry ?
+        this(defaultBotId, executorConfig, warnWithoutContext, maxRestWaitDuration, enableRetry ?
                 ManagedChannelBuilder.forAddress(host, port)
                         .usePlaintext()
                         .enableRetry()
@@ -175,21 +217,23 @@ public class GatewayGrpcClient implements Closeable {
                         .build());
     }
 
-    private GatewayGrpcClient(final long defaultBotId, final ExecutorService event, final ExecutorService grpc,
+    private GatewayGrpcClient(final long defaultBotId, final GatewayGrpcClientBuilder.ExecutorConfig executorConfig,
                               final boolean warnWithoutContext, final Duration maxRestWaitDuration,
                               final ManagedChannel channel) {
         if (instance != null) {
             throw new RuntimeException("There must be at most one instance of GatewayGrpcClient");
         }
         instance = this;
-        this.grpcExecutor = grpc;
+        this.executorConfig = executorConfig;
         this.channel = channel;
-        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel), grpc, warnWithoutContext);
-        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), grpc, warnWithoutContext,
-                maxRestWaitDuration);
-        this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), grpc, warnWithoutContext);
+        this.cacheService = new CacheService(this, GatewayCacheGrpc.newStub(channel),
+                executorConfig.cacheGrpcExecutor, warnWithoutContext);
+        this.restService = new RestService(this, GatewayRestGrpc.newStub(channel), executorConfig.restGrpcExecutor,
+                warnWithoutContext, maxRestWaitDuration);
+        this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), executorConfig.cacheGrpcExecutor,
+                warnWithoutContext);
         this.defaultBotId = defaultBotId;
-        this.eventDispatcher = new EventDispatcher(event);
+        this.eventDispatcher = new EventDispatcher(executorConfig.eventExecutor);
     }
 
     public void setDefaultBotId(final long defaultBotId) {
@@ -212,8 +256,8 @@ public class GatewayGrpcClient implements Closeable {
         return gatewayService;
     }
 
-    public ExecutorService getGrpcExecutor() {
-        return grpcExecutor;
+    public GatewayGrpcClientBuilder.ExecutorConfig getExecutorConfig() {
+        return executorConfig;
     }
 
     @CheckReturnValue
@@ -229,7 +273,8 @@ public class GatewayGrpcClient implements Closeable {
             return new FinishedRequestImpl<>(selfUser);
         } else {
             updating.set(true);
-            return new GrpcRequestImpl<>(getGrpcExecutor(), CompletableFuture.supplyAsync(() -> {
+            final ExecutorService cacheGrpcExecutor = getExecutorConfig().getCacheGrpcExecutor();
+            return new GrpcRequestImpl<>(cacheGrpcExecutor, CompletableFuture.supplyAsync(() -> {
                 try {
                     this.selfUser = getGatewayService().findUser(botId)
                             .flatTransform(user -> {
@@ -246,7 +291,7 @@ public class GatewayGrpcClient implements Closeable {
                     updating.set(false);
                 }
                 return this.selfUser;
-            }, getGrpcExecutor()));
+            }, cacheGrpcExecutor));
         }
     }
 

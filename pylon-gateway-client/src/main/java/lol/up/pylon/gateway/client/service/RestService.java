@@ -10,7 +10,7 @@ import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
-import lol.up.pylon.gateway.client.event.EventExecutorService;
+import lol.up.pylon.gateway.client.event.ScheduledEventExecutorService;
 import lol.up.pylon.gateway.client.exception.*;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class RestService {
@@ -33,15 +33,15 @@ public class RestService {
 
     private final GatewayRestGrpc.GatewayRestStub client;
     private final GatewayGrpcClient gatewayGrpcClient;
-    private final ExecutorService executorService;
+    private final ScheduledExecutorService executorService;
     private final boolean warnWithoutContext;
 
     public RestService(final GatewayGrpcClient gatewayGrpcClient,
                        final GatewayRestGrpc.GatewayRestStub client,
-                       final ExecutorService executorService, final boolean warnWithoutContext,
+                       final ScheduledExecutorService executorService, final boolean warnWithoutContext,
                        final Duration maxRatelimitWaitDuration) {
         this.gatewayGrpcClient = gatewayGrpcClient;
-        this.executorService = new EventExecutorService(executorService, EventContext.localContext());
+        this.executorService = new ScheduledEventExecutorService(executorService, EventContext.localContext());
         this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
             private String timeout = String.valueOf(maxRatelimitWaitDuration.toMillis());

@@ -29,7 +29,7 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
 
     @Override
     public <V, P> GrpcRequest<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
-        final ExecutorService executor = GatewayGrpcClient.getSingleton().getGrpcExecutor();
+        final ExecutorService executor = GatewayGrpcClient.getSingleton().getExecutorConfig().getCallbackExecutor();
         final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
         return new GrpcRequestImpl<>(executor, future);
     }
