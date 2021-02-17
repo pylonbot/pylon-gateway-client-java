@@ -44,7 +44,7 @@ public class RestService {
         this.executorService = new ScheduledEventExecutorService(executorService, EventContext.localContext());
         this.warnWithoutContext = warnWithoutContext;
         this.client = client.withCallCredentials(new CallCredentials() {
-            private String timeout = String.valueOf(maxRatelimitWaitDuration.toMillis());
+            private final String timeout = String.valueOf(maxRatelimitWaitDuration.toMillis());
 
             @Override
             public void applyRequestMetadata(RequestInfo requestInfo, Executor appExecutor, MetadataApplier applier) {
@@ -74,7 +74,7 @@ public class RestService {
         return gatewayGrpcClient.getDefaultBotId();
     }
 
-    private GrpcGatewayApiException createApiException(final RestError apiError) {
+    private GrpcGatewayApiException createApiException(final RestError apiError, final GrpcException source) {
         switch (apiError.getErrorTypeCase()) {
             case UNKNOWN_ERROR:
                 return new GrpcGatewayApiUnknownErrorException(apiError,
@@ -84,13 +84,11 @@ public class RestService {
                                 "Message: " + apiError.getUnknownError().getMessage());
             case VALIDATION_ERROR:
                 final StringBuilder fieldsError = new StringBuilder("Fields:");
-                apiError.getValidationError().getFieldsList().forEach(field -> {
-                    fieldsError.append(" Field(")
-                            .append("path=").append(field.getPath()).append(",")
-                            .append("code=").append(field.getCode()).append(",")
-                            .append("message=").append(field.getMessage())
-                            .append(")");
-                });
+                apiError.getValidationError().getFieldsList().forEach(field -> fieldsError.append(" Field(")
+                        .append("path=").append(field.getPath()).append(",")
+                        .append("code=").append(field.getCode()).append(",")
+                        .append("message=").append(field.getMessage())
+                        .append(")"));
                 return new GrpcGatewayApiValidationErrorException(apiError,
                         "A validation error occurred during REST request: " +
                                 "Message: " + apiError.getValidationError().getMessage() + " | " +
@@ -112,7 +110,7 @@ public class RestService {
                                 "Retry-At: " + apiError.getRateLimited().getRetryAt());
             case ERRORTYPE_NOT_SET:
             default:
-                return new GrpcGatewayApiException(apiError, "An unknown error type occurred!");
+                return new GrpcGatewayApiException(apiError, "An unknown error type occurred!", source);
         }
     }
 
@@ -126,16 +124,16 @@ public class RestService {
     public GrpcRequest<Guild> modifyGuild(final long botId, final long guildId,
                                           final ModifyGuildRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
-
             Context.current().withValues(Constants.CTX_BOT_ID, botId,
                     Constants.CTX_GUILD_ID, guildId)
                     .run(() -> client.modifyGuild(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Guild(gatewayGrpcClient, botId, response.getData().getGuild());
             });
@@ -154,6 +152,7 @@ public class RestService {
     public GrpcRequest<Channel> createChannel(final long botId, final long guildId,
                                               final CreateGuildChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateGuildChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -163,7 +162,7 @@ public class RestService {
                     .run(() -> client.createGuildChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
             });
@@ -183,6 +182,7 @@ public class RestService {
     public GrpcRequest<Void> modifyChannelPositions(final long botId, final long guildId,
                                                     final ModifyGuildChannelPositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildChannelPositionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -192,7 +192,7 @@ public class RestService {
                     .run(() -> client.modifyGuildChannelPositions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -211,6 +211,7 @@ public class RestService {
     public GrpcRequest<Boolean> addGuildMember(final long botId, final long guildId,
                                                final AddGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<AddGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -219,7 +220,7 @@ public class RestService {
                     .run(() -> client.addGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getAdded();
             });
@@ -238,6 +239,7 @@ public class RestService {
     public GrpcRequest<Void> modifyGuildMember(final long botId, final long guildId,
                                                final ModifyGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -246,7 +248,7 @@ public class RestService {
                     .run(() -> client.modifyGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -273,6 +275,7 @@ public class RestService {
     public GrpcRequest<Void> changeSelfNickname(final long botId, final long guildId,
                                                 final ModifyCurrentUserNickRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyCurrentUserNickResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -281,7 +284,7 @@ public class RestService {
                     .run(() -> client.modifyCurrentUserNick(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -318,6 +321,7 @@ public class RestService {
     public GrpcRequest<Void> addMemberRole(final long botId, final long guildId,
                                            final AddGuildMemberRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<AddGuildMemberRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -326,7 +330,7 @@ public class RestService {
                     .run(() -> client.addGuildMemberRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -364,6 +368,7 @@ public class RestService {
     public GrpcRequest<Void> removeMemberRole(final long botId, final long guildId,
                                               final RemoveGuildMemberRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<RemoveGuildMemberRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -372,7 +377,7 @@ public class RestService {
                     .run(() -> client.removeGuildMemberRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -385,6 +390,7 @@ public class RestService {
     public GrpcRequest<Void> removeGuildMember(final long botId, final long guildId,
                                                final RemoveGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<RemoveGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -393,7 +399,7 @@ public class RestService {
                     .run(() -> client.removeGuildMember(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -411,6 +417,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<Ban>> getGuildBans(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildBansResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -419,7 +426,7 @@ public class RestService {
                     .run(() -> client.getGuildBans(GetGuildBansRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getBansList()
                         .stream()
@@ -448,6 +455,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Ban> getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -456,7 +464,7 @@ public class RestService {
                     .run(() -> client.getGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 if (!response.hasData() || !response.getData().hasBan()) {
                     return null;
@@ -496,6 +504,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> createGuildBan(final long botId, final long guildId, final CreateGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -504,7 +513,7 @@ public class RestService {
                     .run(() -> client.createGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -516,6 +525,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> removeGuildBan(final long botId, final long guildId, final RemoveGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<RemoveGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -524,7 +534,7 @@ public class RestService {
                     .run(() -> client.removeGuildBan(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -542,6 +552,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Role> createGuildRole(final long botId, final long guildId, final CreateGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -550,7 +561,7 @@ public class RestService {
                     .run(() -> client.createGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
             });
@@ -570,6 +581,7 @@ public class RestService {
     public GrpcRequest<List<Role>> modifyGuildRolePositions(final long botId, final long guildId,
                                                             final ModifyGuildRolePositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildRolePositionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -578,7 +590,7 @@ public class RestService {
                     .run(() -> client.modifyGuildRolePositions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getRolesList().stream()
                         .map(roleData -> new Role(gatewayGrpcClient, botId, roleData))
@@ -598,6 +610,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Role> modifyGuildRole(final long botId, final long guildId, final ModifyGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -606,7 +619,7 @@ public class RestService {
                     .run(() -> client.modifyGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
             });
@@ -640,6 +653,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> deleteGuildRole(final long botId, final long guildId, final DeleteGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -648,7 +662,7 @@ public class RestService {
                     .run(() -> client.deleteGuildRole(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -679,6 +693,7 @@ public class RestService {
     public GrpcRequest<Integer> getGuildPruneCount(final long botId, final long guildId,
                                                    final GetGuildPruneCountRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildPruneCountResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -687,7 +702,7 @@ public class RestService {
                     .run(() -> client.getGuildPruneCount(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getSerializedSize(); // todo ehhhhh?
             });
@@ -705,6 +720,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> beginGuildPrune(final long botId, final long guildId, final BeginGuildPruneRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<BeginGuildPruneResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -713,7 +729,7 @@ public class RestService {
                     .run(() -> client.beginGuildPrune(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -731,6 +747,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<String>> getGuildVoiceRegions(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildVoiceRegionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -740,7 +757,7 @@ public class RestService {
                             asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getRegionsList().asByteStringList().stream()
                         .map(ByteString::toStringUtf8)
@@ -760,6 +777,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<GuildInvite>> getGuildInvites(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildInvitesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -768,7 +786,7 @@ public class RestService {
                     .run(() -> client.getGuildInvites(GetGuildInvitesRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
@@ -788,6 +806,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Channel> modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -796,7 +815,7 @@ public class RestService {
                     .run(() -> client.modifyChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
             });
@@ -830,6 +849,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -838,7 +858,7 @@ public class RestService {
                     .run(() -> client.deleteChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -944,6 +964,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId,
                                                   final GetChannelMessagesRequest request) throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetChannelMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -952,7 +973,7 @@ public class RestService {
                     .run(() -> client.getChannelMessages(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getMessagesList().stream()
                         .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
@@ -971,6 +992,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Message> getMessage(final long botId, final long guildId, final long channelId,
                                            final long messageId) throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -982,7 +1004,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 if (!response.getData().hasMessage()) {
                     return null;
@@ -1003,6 +1025,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Message> createMessage(final long botId, final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1011,7 +1034,7 @@ public class RestService {
                     .run(() -> client.createMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -1040,6 +1063,7 @@ public class RestService {
     public GrpcRequest<Message> crosspostMessage(final long botId, final long guildId,
                                                  final CrosspostMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CrosspostMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1048,7 +1072,7 @@ public class RestService {
                     .run(() -> client.crosspostMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -1079,6 +1103,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> createReaction(final long botId, final long guildId, final CreateReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1087,7 +1112,7 @@ public class RestService {
                     .run(() -> client.createReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1119,6 +1144,7 @@ public class RestService {
     public GrpcRequest<Void> deleteOwnReaction(final long botId, final long guildId,
                                                final DeleteOwnReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteOwnReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1127,7 +1153,7 @@ public class RestService {
                     .run(() -> client.deleteOwnReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1161,6 +1187,7 @@ public class RestService {
     public GrpcRequest<Void> deleteReaction(final long botId, final long guildId,
                                             final DeleteUserReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteUserReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1169,7 +1196,7 @@ public class RestService {
                     .run(() -> client.deleteUserReaction(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1198,6 +1225,7 @@ public class RestService {
     public GrpcRequest<Void> deleteAllReactions(final long botId, final long guildId,
                                                 final DeleteAllReactionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteAllReactionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1206,7 +1234,7 @@ public class RestService {
                     .run(() -> client.deleteAllReactions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1238,6 +1266,7 @@ public class RestService {
     public GrpcRequest<Void> deleteEmoteReactions(final long botId, final long guildId,
                                                   final DeleteAllReactionsForEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteAllReactionsForEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1246,7 +1275,7 @@ public class RestService {
                     .run(() -> client.deleteAllReactionsForEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1264,6 +1293,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Message> editMessage(final long botId, final long guildId, final EditMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<EditMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1272,7 +1302,7 @@ public class RestService {
                     .run(() -> client.editMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
             });
@@ -1309,6 +1339,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1317,7 +1348,7 @@ public class RestService {
                     .run(() -> client.deleteMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1354,6 +1385,7 @@ public class RestService {
     public GrpcRequest<Void> bulkDeleteMessages(final long botId, final long guildId,
                                                 final BulkDeleteMessagesRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<BulkDeleteMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1362,7 +1394,7 @@ public class RestService {
                     .run(() -> client.bulkDeleteMessages(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1381,6 +1413,7 @@ public class RestService {
     public GrpcRequest<Void> editChannelPermissions(final long botId, final long guildId,
                                                     final EditChannelPermissionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<EditChannelPermissionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1389,7 +1422,7 @@ public class RestService {
                     .run(() -> client.editChannelPermissions(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1407,6 +1440,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<GuildInvite>> getChannelInvites(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetChannelInvitesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1417,7 +1451,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
@@ -1438,6 +1472,7 @@ public class RestService {
     public GrpcRequest<GuildInvite> createChannelInvite(final long botId, final long guildId,
                                                         final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateChannelInviteResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1446,7 +1481,7 @@ public class RestService {
                     .run(() -> client.createChannelInvite(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new GuildInvite(gatewayGrpcClient, botId, response.getData().getInvite());
             });
@@ -1465,6 +1500,7 @@ public class RestService {
     public GrpcRequest<Void> deleteChannelPermission(final long botId, final long guildId,
                                                      final DeleteChannelPermissionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteChannelPermissionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1473,7 +1509,7 @@ public class RestService {
                     .run(() -> client.deleteChannelPermission(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1502,6 +1538,7 @@ public class RestService {
     public GrpcRequest<Long> followNewsChannel(final long botId, final long guildId,
                                                final FollowNewsChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<FollowNewsChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1510,7 +1547,7 @@ public class RestService {
                     .run(() -> client.followNewsChannel(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getChannelId();
             });
@@ -1528,6 +1565,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> startTyping(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<TriggerTypingIndicatorResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1538,7 +1576,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1556,6 +1594,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<Message>> getPinnedMessages(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetPinnedMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1566,7 +1605,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getMessagesList()
                         .stream()
@@ -1607,6 +1646,7 @@ public class RestService {
     public GrpcRequest<Void> pinMessage(final long botId, final long guildId,
                                         final AddPinnedChannelMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<AddPinnedChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1615,7 +1655,7 @@ public class RestService {
                     .run(() -> client.addPinnedChannelMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1653,6 +1693,7 @@ public class RestService {
     public GrpcRequest<Void> unpinMessage(final long botId, final long guildId,
                                           final DeletePinnedChannelMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeletePinnedChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1661,7 +1702,7 @@ public class RestService {
                     .run(() -> client.deletePinnedChannelMessage(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1679,6 +1720,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ListGuildEmojisResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1687,7 +1729,7 @@ public class RestService {
                     .run(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return response.getData().getEmojisList().stream()
                         .map(emojiData -> new Emoji(gatewayGrpcClient, botId, emojiData))
@@ -1707,6 +1749,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Emoji> getGuildEmoji(final long botId, final long guildId, final long emoteId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1717,7 +1760,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1736,6 +1779,7 @@ public class RestService {
     public GrpcRequest<Emoji> createGuildEmoji(final long botId, final long guildId,
                                                final CreateGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1744,7 +1788,7 @@ public class RestService {
                     .run(() -> client.createGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1782,6 +1826,7 @@ public class RestService {
     public GrpcRequest<Emoji> modifyGuildEmoji(final long botId, final long guildId,
                                                final ModifyGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1790,7 +1835,7 @@ public class RestService {
                     .run(() -> client.modifyGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
             });
@@ -1825,6 +1870,7 @@ public class RestService {
     public GrpcRequest<Void> deleteGuildEmoji(final long botId, final long guildId,
                                               final DeleteGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<DeleteGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1833,7 +1879,7 @@ public class RestService {
                     .run(() -> client.deleteGuildEmoji(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1851,6 +1897,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<User> getSelfUser(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetCurrentUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1859,7 +1906,7 @@ public class RestService {
                     .run(() -> client.getCurrentUser(GetCurrentUserRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1877,6 +1924,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<User> getUser(final long botId, final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1887,7 +1935,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1906,6 +1954,7 @@ public class RestService {
     public GrpcRequest<User> modifySelfUser(final long botId, final long guildId,
                                             final ModifyCurrentUserRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<ModifyCurrentUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1914,7 +1963,7 @@ public class RestService {
                     .run(() -> client.modifyCurrentUser(request, asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
             });
@@ -1932,6 +1981,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Void> leaveGuild(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<LeaveGuildResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1940,7 +1990,7 @@ public class RestService {
                     .run(() -> client.leaveGuild(LeaveGuildRequest.newBuilder().build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return null;
             });
@@ -1958,6 +2008,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcRequest<Channel> createDmChannel(final long botId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
+        final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<CreateDmResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
@@ -1968,7 +2019,7 @@ public class RestService {
                             .build(), asyncResponse));
             return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
                 if (response.hasError()) {
-                    throw createApiException(response.getError());
+                    throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel(), userId);
             });

@@ -11,6 +11,11 @@ public class GrpcGatewayApiException extends GrpcException {
         this.apiError = apiError;
     }
 
+    public GrpcGatewayApiException(final RestError apiError, final String message, final GrpcException source) {
+        super(message, source);
+        this.apiError = apiError;
+    }
+
     public RestError getApiError() {
         return apiError;
     }
