@@ -157,8 +157,9 @@ public class GatewayGrpcClient implements Closeable {
                 return callbackExecutor;
             }
 
-            public void setCallbackExecutor(final ExecutorService callbackExecutor) {
+            public ExecutorConfig setCallbackExecutor(final ExecutorService callbackExecutor) {
                 this.callbackExecutor = callbackExecutor;
+                return this;
             }
 
             public ExecutorService getCacheGrpcExecutor() {
