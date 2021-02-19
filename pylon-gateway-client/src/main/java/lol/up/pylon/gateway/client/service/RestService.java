@@ -12,8 +12,8 @@ import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.ScheduledEventExecutorService;
 import lol.up.pylon.gateway.client.exception.*;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
-import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
 import lol.up.pylon.gateway.client.util.CompletableFutureStreamObserver;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
@@ -128,15 +128,14 @@ public class RestService {
         try {
             final CompletableFutureStreamObserver<ModifyGuildResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
-            Context.current().withValues(Constants.CTX_BOT_ID, botId,
-                    Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuild(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Guild(gatewayGrpcClient, botId, response.getData().getGuild());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId,
+                    Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuild(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -157,15 +156,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateGuildChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId,
-                    Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createGuildChannel(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createGuildChannel(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -187,15 +184,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyGuildChannelPositionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID,
-                    botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuildChannelPositions(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuildChannelPositions(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -216,14 +211,13 @@ public class RestService {
             final CompletableFutureStreamObserver<AddGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.addGuildMember(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getAdded();
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.addGuildMember(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -244,14 +238,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuildMember(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuildMember(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -280,14 +273,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyCurrentUserNickResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyCurrentUserNick(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyCurrentUserNick(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -326,14 +318,13 @@ public class RestService {
             final CompletableFutureStreamObserver<AddGuildMemberRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.addGuildMemberRole(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.addGuildMemberRole(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -373,14 +364,13 @@ public class RestService {
             final CompletableFutureStreamObserver<RemoveGuildMemberRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.removeGuildMemberRole(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.removeGuildMemberRole(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -395,14 +385,13 @@ public class RestService {
             final CompletableFutureStreamObserver<RemoveGuildMemberResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.removeGuildMember(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.removeGuildMember(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -422,9 +411,7 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildBansResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildBans(GetGuildBansRequest.newBuilder().build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
@@ -432,7 +419,8 @@ public class RestService {
                         .stream()
                         .map(guildBanData -> new Ban(gatewayGrpcClient, botId, guildId, guildBanData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildBans(GetGuildBansRequest.newBuilder().build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -460,9 +448,7 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildBan(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
@@ -470,7 +456,8 @@ public class RestService {
                     return null;
                 }
                 return new Ban(gatewayGrpcClient, botId, guildId, response.getData().getBan());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildBan(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -509,14 +496,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createGuildBan(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createGuildBan(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -530,14 +516,13 @@ public class RestService {
             final CompletableFutureStreamObserver<RemoveGuildBanResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.removeGuildBan(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.removeGuildBan(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -557,14 +542,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createGuildRole(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createGuildRole(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -586,16 +570,15 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyGuildRolePositionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuildRolePositions(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getRolesList().stream()
                         .map(roleData -> new Role(gatewayGrpcClient, botId, roleData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuildRolePositions(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -615,14 +598,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuildRole(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Role(gatewayGrpcClient, botId, response.getData().getRole());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuildRole(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -658,14 +640,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteGuildRoleResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteGuildRole(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteGuildRole(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -698,14 +679,13 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildPruneCountResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildPruneCount(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getSerializedSize(); // todo ehhhhh?
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildPruneCount(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -725,14 +705,13 @@ public class RestService {
             final CompletableFutureStreamObserver<BeginGuildPruneResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.beginGuildPrune(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.beginGuildPrune(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -752,17 +731,16 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildVoiceRegionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildVoiceRegions(GetGuildVoiceRegionsRequest.newBuilder().build(),
-                            asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getRegionsList().asByteStringList().stream()
                         .map(ByteString::toStringUtf8)
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildVoiceRegions(GetGuildVoiceRegionsRequest.newBuilder().build(),
+                            asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -782,16 +760,15 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildInvitesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildInvites(GetGuildInvitesRequest.newBuilder().build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildInvites(GetGuildInvitesRequest.newBuilder().build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -811,14 +788,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyChannel(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyChannel(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -854,14 +830,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteChannel(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteChannel(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -969,16 +944,15 @@ public class RestService {
             final CompletableFutureStreamObserver<GetChannelMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getChannelMessages(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getMessagesList().stream()
                         .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getChannelMessages(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -997,12 +971,7 @@ public class RestService {
             final CompletableFutureStreamObserver<GetChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getChannelMessage(GetChannelMessageRequest.newBuilder()
-                            .setChannelId(channelId)
-                            .setMessageId(messageId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
@@ -1010,7 +979,11 @@ public class RestService {
                     return null;
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getChannelMessage(GetChannelMessageRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .setMessageId(messageId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1030,14 +1003,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1068,14 +1040,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CrosspostMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.crosspostMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.crosspostMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1108,14 +1079,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createReaction(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createReaction(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1149,14 +1119,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteOwnReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteOwnReaction(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteOwnReaction(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1192,14 +1161,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteUserReactionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteUserReaction(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteUserReaction(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1230,14 +1198,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteAllReactionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteAllReactions(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteAllReactions(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1271,14 +1238,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteAllReactionsForEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteAllReactionsForEmoji(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteAllReactionsForEmoji(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1298,14 +1264,13 @@ public class RestService {
             final CompletableFutureStreamObserver<EditMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.editMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.editMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1344,14 +1309,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1390,14 +1354,13 @@ public class RestService {
             final CompletableFutureStreamObserver<BulkDeleteMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.bulkDeleteMessages(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.bulkDeleteMessages(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1418,14 +1381,13 @@ public class RestService {
             final CompletableFutureStreamObserver<EditChannelPermissionsResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.editChannelPermissions(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.editChannelPermissions(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1445,18 +1407,17 @@ public class RestService {
             final CompletableFutureStreamObserver<GetChannelInvitesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getChannelInvites(GetChannelInvitesRequest.newBuilder()
-                            .setChannelId(channelId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getInvitesList().stream()
                         .map(inviteData -> new GuildInvite(gatewayGrpcClient, botId, inviteData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getChannelInvites(GetChannelInvitesRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1477,14 +1438,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateChannelInviteResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createChannelInvite(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new GuildInvite(gatewayGrpcClient, botId, response.getData().getInvite());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createChannelInvite(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1505,14 +1465,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteChannelPermissionResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteChannelPermission(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteChannelPermission(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1543,14 +1502,13 @@ public class RestService {
             final CompletableFutureStreamObserver<FollowNewsChannelResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.followNewsChannel(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getChannelId();
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.followNewsChannel(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1570,16 +1528,15 @@ public class RestService {
             final CompletableFutureStreamObserver<TriggerTypingIndicatorResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.triggerTypingIndicator(TriggerTypingIndicatorRequest.newBuilder()
-                            .setChannelId(channelId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.triggerTypingIndicator(TriggerTypingIndicatorRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1599,11 +1556,7 @@ public class RestService {
             final CompletableFutureStreamObserver<GetPinnedMessagesResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getPinnedMessages(GetPinnedMessagesRequest.newBuilder()
-                            .setChannelId(channelId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
@@ -1611,7 +1564,10 @@ public class RestService {
                         .stream()
                         .map(messageData -> new Message(gatewayGrpcClient, botId, messageData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getPinnedMessages(GetPinnedMessagesRequest.newBuilder()
+                            .setChannelId(channelId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1651,14 +1607,13 @@ public class RestService {
             final CompletableFutureStreamObserver<AddPinnedChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.addPinnedChannelMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.addPinnedChannelMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1698,14 +1653,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeletePinnedChannelMessageResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deletePinnedChannelMessage(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deletePinnedChannelMessage(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1725,16 +1679,15 @@ public class RestService {
             final CompletableFutureStreamObserver<ListGuildEmojisResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return response.getData().getEmojisList().stream()
                         .map(emojiData -> new Emoji(gatewayGrpcClient, botId, emojiData))
                         .collect(Collectors.toList());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.listGuildEmojis(ListGuildEmojisRequest.newBuilder().build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1754,16 +1707,15 @@ public class RestService {
             final CompletableFutureStreamObserver<GetGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
-                            .setEmojiId(emoteId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getGuildEmoji(GetGuildEmojiRequest.newBuilder()
+                            .setEmojiId(emoteId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1784,14 +1736,13 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.createGuildEmoji(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.createGuildEmoji(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1831,14 +1782,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyGuildEmoji(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Emoji(gatewayGrpcClient, botId, response.getData().getEmoji());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyGuildEmoji(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1875,14 +1825,13 @@ public class RestService {
             final CompletableFutureStreamObserver<DeleteGuildEmojiResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.deleteGuildEmoji(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, request, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.deleteGuildEmoji(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1901,15 +1850,14 @@ public class RestService {
         try {
             final CompletableFutureStreamObserver<GetCurrentUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
-
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getCurrentUser(GetCurrentUserRequest.newBuilder().build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            ;
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getCurrentUser(GetCurrentUserRequest.newBuilder().build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1929,16 +1877,15 @@ public class RestService {
             final CompletableFutureStreamObserver<GetUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.getUser(GetUserRequest.newBuilder()
-                            .setUserId(userId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.getUser(GetUserRequest.newBuilder()
+                            .setUserId(userId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1959,14 +1906,13 @@ public class RestService {
             final CompletableFutureStreamObserver<ModifyCurrentUserResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.modifyCurrentUser(request, asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new User(gatewayGrpcClient, botId, response.getData().getUser());
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.modifyCurrentUser(request, asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -1986,14 +1932,13 @@ public class RestService {
             final CompletableFutureStreamObserver<LeaveGuildResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
-                    .run(() -> client.leaveGuild(LeaveGuildRequest.newBuilder().build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return null;
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, guildId)
+                    .run(() -> client.leaveGuild(LeaveGuildRequest.newBuilder().build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
@@ -2013,16 +1958,15 @@ public class RestService {
             final CompletableFutureStreamObserver<CreateDmResponse> asyncResponse =
                     new CompletableFutureStreamObserver<>();
 
-            Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
-                    .run(() -> client.createDm(CreateDmRequest.newBuilder()
-                            .setRecipientId(userId)
-                            .build(), asyncResponse));
-            return new GrpcRequestImpl<>(executorService, asyncResponse, response -> {
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
                 if (response.hasError()) {
                     throw createApiException(response.getError(), source);
                 }
                 return new Channel(gatewayGrpcClient, botId, response.getData().getChannel(), userId);
-            });
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.createDm(CreateDmRequest.newBuilder()
+                            .setRecipientId(userId)
+                            .build(), asyncResponse)));
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }

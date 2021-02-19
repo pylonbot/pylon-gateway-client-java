@@ -22,10 +22,11 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     protected final Runnable request;
 
     public <V> GrpcRequestImpl(final Executor executor, final CompletableFuture<V> future,
-                               final Function<V, T> transformer) {
+                               final Function<V, T> transformer, final Runnable request) {
         this.executor = executor;
         this.future = future.thenApply(transformer);
         this.source = new GrpcException("Source trace");
+        this.request = request;
     }
 
     public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future) {

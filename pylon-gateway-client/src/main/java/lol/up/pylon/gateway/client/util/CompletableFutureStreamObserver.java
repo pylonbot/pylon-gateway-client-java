@@ -19,7 +19,7 @@ public class CompletableFutureStreamObserver<T> extends CompletableFuture<T> imp
     private final GrpcException source;
     private final ScheduledExecutorService scheduler;
     private final Supplier<CompletableFutureStreamObserver<T>> retry;
-    private final int retryLimit;
+    private int retryLimit;
     private int retryIndex = 0;
 
     public CompletableFutureStreamObserver() {
@@ -37,14 +37,7 @@ public class CompletableFutureStreamObserver<T> extends CompletableFuture<T> imp
         this.retryLimit = 0;
     }
 
-    public CompletableFutureStreamObserver(final ScheduledExecutorService scheduler,
-                                           final Supplier<CompletableFutureStreamObserver<T>> retry,
-                                           final int retryLimit) {
-        this.threadLocal = EventContext.localContext();
-        this.eventContext = threadLocal.get();
-        this.source = new GrpcException("Source trace");
-        this.scheduler = scheduler;
-        this.retry = retry;
+    public void setRetryLimit(int retryLimit) {
         this.retryLimit = retryLimit;
     }
 

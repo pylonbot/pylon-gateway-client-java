@@ -8,6 +8,23 @@ import java.util.function.Function;
 
 public interface GrpcApiRequest<T> extends GrpcRequest<T> {
 
+    /**
+     * Returns true if this representation of a {@link java.util.concurrent.CompletableFuture CompletableFuture}
+     * can be altered with {@link GrpcApiRequest#reason(String) GrpcApiRequest#reason(String)} or
+     * {@link GrpcApiRequest#retry(int) GrpcApiRequest#retry(int)}.
+     * <p>
+     * If it returns false, this request has already been transformed and is no longer mutable.
+     *
+     * @return true if mutable
+     */
+    boolean isMutable();
+
+    /**
+     * Sets the AuditLogReason for this request, if applicable
+     *
+     * @param reason the reason to show in audit-log
+     * @return this request
+     */
     @CheckReturnValue
     GrpcApiRequest<T> reason(String reason);
 
