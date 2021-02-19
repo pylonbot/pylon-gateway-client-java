@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,32 +38,39 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         this.source = source;
     }
 
-    @Override
     public CompletableFuture<T> getFuture() {
         return future;
     }
 
     @Override
+    public CompletableFuture<T> submit() {
+        return future;
+    }
+
+    @Override
     public <V> GrpcRequest<V> transform(Function<T, V> transformer) {
-        return new GrpcRequestImpl<>(executor, future.thenApply(transformer), source);
+        return new GrpcRequestImpl<>(executor, getFuture()
+                .thenApply(transformer), request, source);
     }
 
     @Override
     public <V> GrpcRequest<V> flatTransform(Function<T, GrpcRequest<V>> transformer) {
-        final CompletableFuture<V> future = getFuture().thenApplyAsync(transformer, executor)
+        final CompletableFuture<V> transformed = getFuture()
+                .thenApplyAsync(transformer, executor)
                 .thenComposeAsync(GrpcRequest::getFuture, executor);
-        return new GrpcRequestImpl<>(executor, future, source);
+        return new GrpcRequestImpl<>(executor, transformed, request, source);
     }
 
     @Override
     public <V, P> GrpcRequest<V> transformWith(GrpcRequest<P> other, BiFunction<T, P, V> transformer) {
-        final CompletableFuture<V> future = getFuture().thenCombineAsync(other.getFuture(), transformer, executor);
-        return new GrpcRequestImpl<>(executor, future, source);
+        final CompletableFuture<V> transformed = getFuture()
+                .thenCombineAsync(other.getFuture(), transformer, executor);
+        return new GrpcRequestImpl<>(executor, transformed, request, source);
     }
 
     @Override
     public void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error) {
-        future.thenAcceptAsync(result -> {
+        submit().thenAcceptAsync(result -> {
             try {
                 success.accept(result);
             } catch (final Exception ex) {
@@ -83,7 +89,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     @Override
     public T complete() {
         try {
-            return future.get();
+            return submit().get();
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable, source);
         }

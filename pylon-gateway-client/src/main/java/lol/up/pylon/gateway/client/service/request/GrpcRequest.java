@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,6 +22,11 @@ public interface GrpcRequest<T> {
         static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
         static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
 
+        /**
+         * Sets the default success handler for all {@link GrpcRequest GrpcRequests}
+         *
+         * @param success the success handler
+         */
         public static void setDefaultSuccessHandler(final Consumer<Object> success) {
             if (success == null) {
                 DEFAULT_SUCCESS_HANDLER = SUCCESS;
@@ -31,6 +35,11 @@ public interface GrpcRequest<T> {
             }
         }
 
+        /**
+         * Sets the default error handler for all {@link GrpcRequest GrpcRequests}
+         *
+         * @param error the error handler
+         */
         public static void setDefaultErrorHandler(final Consumer<Throwable> error) {
             if (error == null) {
                 DEFAULT_ERROR_HANDLER = ERROR;
@@ -51,16 +60,54 @@ public interface GrpcRequest<T> {
 
     CompletableFuture<T> getFuture();
 
+    /**
+     * Subscribes to the request for the future and returns the future
+     *
+     * @return the Future for this request
+     */
+    @CheckReturnValue
+    CompletableFuture<T> submit();
+
+    /**
+     * Subscribes & queues this request with the default success handler
+     * Calls {@link GrpcRequest#queue(Consumer) GrpcRequest#queue(Consumer)}
+     *
+     * @see GrpcRequest#submit()
+     * @see GrpcRequest#queue(Consumer)
+     * @see GrpcRequest.Context#setDefaultSuccessHandler(Consumer)
+     */
     default void queue() {
         queue(Context.DEFAULT_SUCCESS_HANDLER);
     }
 
+    /**
+     * Subscribes & queues this request with the specified success handler and the default error handler
+     * Calls {@link GrpcRequest#queue(Consumer, Consumer) GrpcRequest#queue(Consumer, Consumer)}
+     *
+     * @param success the success handler for the result of the future
+     * @see GrpcRequest#submit()
+     * @see GrpcRequest#queue(Consumer, Consumer)
+     * @see GrpcRequest.Context#setDefaultErrorHandler(Consumer)
+     */
     default void queue(final Consumer<? super T> success) {
         queue(success, Context.DEFAULT_ERROR_HANDLER);
     }
 
+    /**
+     * Subscribes & queues this request with the specified success and error handler
+     *
+     * @param success the success handler for the result of the future
+     * @param error the error handler for error events
+     * @see GrpcRequest#submit()
+     */
     void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error);
 
+    /**
+     * Subscribes and blocks until the future returns
+     *
+     * @return the result of the future
+     * @see GrpcRequest#submit()
+     */
     T complete();
 
 }

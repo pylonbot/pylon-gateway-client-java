@@ -4,7 +4,6 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,6 +36,11 @@ public class FinishedRequestImpl<T> implements GrpcRequest<T> {
     @Override
     public CompletableFuture<T> getFuture() {
         return CompletableFuture.completedFuture(entity);
+    }
+
+    @Override
+    public CompletableFuture<T> submit() {
+        return getFuture();
     }
 
     @Override
