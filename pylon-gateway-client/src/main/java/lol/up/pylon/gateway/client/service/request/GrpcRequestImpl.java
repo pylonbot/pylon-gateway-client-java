@@ -13,11 +13,13 @@ import java.util.function.Function;
 
 public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
-    private static final Logger log = LoggerFactory.getLogger(GrpcRequestImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(GrpcRequest.class);
+    protected static final Runnable COMPLETED = () -> {};
 
-    private final CompletableFuture<T> future;
-    private final Executor executor;
-    private final GrpcException source;
+    protected final CompletableFuture<T> future;
+    protected final Executor executor;
+    protected final GrpcException source;
+    protected final Runnable request;
 
     public <V> GrpcRequestImpl(final Executor executor, final CompletableFuture<V> future,
                                final Function<V, T> transformer) {
@@ -30,12 +32,15 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
         this.executor = executor;
         this.future = future;
         this.source = new GrpcException("Source trace");
+        this.request = COMPLETED;
     }
 
-    public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future, final GrpcException source) {
+    public GrpcRequestImpl(final Executor executor, final CompletableFuture<T> future, final Runnable request,
+                           final GrpcException source) {
         this.executor = executor;
         this.future = future;
         this.source = source;
+        this.request = request;
     }
 
     public CompletableFuture<T> getFuture() {
@@ -44,6 +49,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
     @Override
     public CompletableFuture<T> submit() {
+        request.run();
         return future;
     }
 
