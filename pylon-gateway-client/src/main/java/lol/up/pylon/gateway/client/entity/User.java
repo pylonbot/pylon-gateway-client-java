@@ -2,6 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.UserData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 import javax.annotation.CheckReturnValue;
@@ -103,7 +104,7 @@ public class User implements Entity<UserData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Channel> openPrivateChannel() {
+    public GrpcApiRequest<Channel> openPrivateChannel() {
         return getClient().getRestService().createDmChannel(getBotId(), getId());
     }
 

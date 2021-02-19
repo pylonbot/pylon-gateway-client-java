@@ -12,6 +12,7 @@ import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.ScheduledEventExecutorService;
 import lol.up.pylon.gateway.client.exception.*;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcApiRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.CompletableFutureStreamObserver;
@@ -115,13 +116,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Guild> modifyGuild(final long guildId, final ModifyGuildRequest request)
+    public GrpcApiRequest<Guild> modifyGuild(final long guildId, final ModifyGuildRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuild(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Guild> modifyGuild(final long botId, final long guildId,
+    public GrpcApiRequest<Guild> modifyGuild(final long botId, final long guildId,
                                           final ModifyGuildRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -142,13 +143,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createChannel(final long guildId, final CreateGuildChannelRequest request)
+    public GrpcApiRequest<Channel> createChannel(final long guildId, final CreateGuildChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createChannel(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createChannel(final long botId, final long guildId,
+    public GrpcApiRequest<Channel> createChannel(final long botId, final long guildId,
                                               final CreateGuildChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -169,14 +170,14 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> modifyChannelPositions(final long guildId,
+    public GrpcApiRequest<Void> modifyChannelPositions(final long guildId,
                                                     final ModifyGuildChannelPositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyChannelPositions(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> modifyChannelPositions(final long botId, final long guildId,
+    public GrpcApiRequest<Void> modifyChannelPositions(final long botId, final long guildId,
                                                     final ModifyGuildChannelPositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -197,13 +198,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Boolean> addGuildMember(final long guildId, final AddGuildMemberRequest request)
+    public GrpcApiRequest<Boolean> addGuildMember(final long guildId, final AddGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return addGuildMember(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Boolean> addGuildMember(final long botId, final long guildId,
+    public GrpcApiRequest<Boolean> addGuildMember(final long botId, final long guildId,
                                                final AddGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -224,13 +225,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> modifyGuildMember(final long guildId, final ModifyGuildMemberRequest request)
+    public GrpcApiRequest<Void> modifyGuildMember(final long guildId, final ModifyGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuildMember(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> modifyGuildMember(final long botId, final long guildId,
+    public GrpcApiRequest<Void> modifyGuildMember(final long botId, final long guildId,
                                                final ModifyGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -251,13 +252,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeSelfNickname(final long guildId, final String nickName)
+    public GrpcApiRequest<Void> changeSelfNickname(final long guildId, final String nickName)
             throws GrpcRequestException, GrpcGatewayApiException {
         return changeSelfNickname(getBotId(), guildId, nickName);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeSelfNickname(final long botId, final long guildId, final String nickName)
+    public GrpcApiRequest<Void> changeSelfNickname(final long botId, final long guildId, final String nickName)
             throws GrpcRequestException, GrpcGatewayApiException {
         return changeSelfNickname(botId, guildId, ModifyCurrentUserNickRequest.newBuilder()
                 .setNick(nickName)
@@ -265,7 +266,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeSelfNickname(final long botId, final long guildId,
+    public GrpcApiRequest<Void> changeSelfNickname(final long botId, final long guildId,
                                                 final ModifyCurrentUserNickRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -286,20 +287,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addMemberRole(final long guildId, final long memberId, final long roleId)
+    public GrpcApiRequest<Void> addMemberRole(final long guildId, final long memberId, final long roleId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return addMemberRole(guildId, memberId, roleId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addMemberRole(final long guildId, final long memberId, final long roleId,
+    public GrpcApiRequest<Void> addMemberRole(final long guildId, final long memberId, final long roleId,
                                            @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return addMemberRole(getBotId(), guildId, memberId, roleId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addMemberRole(final long botId, final long guildId, final long memberId, final long roleId,
+    public GrpcApiRequest<Void> addMemberRole(final long botId, final long guildId, final long memberId, final long roleId,
                                            @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return addMemberRole(botId, guildId, AddGuildMemberRoleRequest.newBuilder()
@@ -310,7 +311,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addMemberRole(final long botId, final long guildId,
+    public GrpcApiRequest<Void> addMemberRole(final long botId, final long guildId,
                                            final AddGuildMemberRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -331,20 +332,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeMemberRole(final long guildId, final long memberId, final long roleId)
+    public GrpcApiRequest<Void> removeMemberRole(final long guildId, final long memberId, final long roleId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return removeMemberRole(guildId, memberId, roleId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeMemberRole(final long guildId, final long memberId, final long roleId,
+    public GrpcApiRequest<Void> removeMemberRole(final long guildId, final long memberId, final long roleId,
                                               @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return removeMemberRole(getBotId(), guildId, memberId, roleId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeMemberRole(final long botId, final long guildId, final long memberId,
+    public GrpcApiRequest<Void> removeMemberRole(final long botId, final long guildId, final long memberId,
                                               final long roleId,
                                               @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -356,7 +357,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeMemberRole(final long botId, final long guildId,
+    public GrpcApiRequest<Void> removeMemberRole(final long botId, final long guildId,
                                               final RemoveGuildMemberRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -377,7 +378,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeGuildMember(final long botId, final long guildId,
+    public GrpcApiRequest<Void> removeGuildMember(final long botId, final long guildId,
                                                final RemoveGuildMemberRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -398,13 +399,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Ban>> getGuildBans(final long guildId)
+    public GrpcApiRequest<List<Ban>> getGuildBans(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBans(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Ban>> getGuildBans(final long botId, final long guildId)
+    public GrpcApiRequest<List<Ban>> getGuildBans(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -427,13 +428,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Ban> getGuildBan(final long guildId, final long userId)
+    public GrpcApiRequest<Ban> getGuildBan(final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBan(getBotId(), guildId, userId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Ban> getGuildBan(final long botId, final long guildId, final long userId)
+    public GrpcApiRequest<Ban> getGuildBan(final long botId, final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildBan(botId, guildId, GetGuildBanRequest.newBuilder()
                 .setUserId(userId)
@@ -441,7 +442,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Ban> getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
+    public GrpcApiRequest<Ban> getGuildBan(final long botId, final long guildId, final GetGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -464,20 +465,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createGuildBan(final long guildId, final long userId, final int deleteDays)
+    public GrpcApiRequest<Void> createGuildBan(final long guildId, final long userId, final int deleteDays)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createGuildBan(guildId, userId, deleteDays, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createGuildBan(final long guildId, final long userId, final int deleteDays,
+    public GrpcApiRequest<Void> createGuildBan(final long guildId, final long userId, final int deleteDays,
                                             @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createGuildBan(getBotId(), guildId, userId, deleteDays, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createGuildBan(final long botId, final long guildId, final long userId,
+    public GrpcApiRequest<Void> createGuildBan(final long botId, final long guildId, final long userId,
                                             final int deleteDays,
                                             @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -489,7 +490,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createGuildBan(final long botId, final long guildId, final CreateGuildBanRequest request)
+    public GrpcApiRequest<Void> createGuildBan(final long botId, final long guildId, final CreateGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -509,7 +510,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeGuildBan(final long botId, final long guildId, final RemoveGuildBanRequest request)
+    public GrpcApiRequest<Void> removeGuildBan(final long botId, final long guildId, final RemoveGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -529,13 +530,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Role> createGuildRole(final long guildId, final CreateGuildRoleRequest request)
+    public GrpcApiRequest<Role> createGuildRole(final long guildId, final CreateGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createGuildRole(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Role> createGuildRole(final long botId, final long guildId, final CreateGuildRoleRequest request)
+    public GrpcApiRequest<Role> createGuildRole(final long botId, final long guildId, final CreateGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -555,14 +556,14 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Role>> modifyGuildRolePositions(final long guildId,
+    public GrpcApiRequest<List<Role>> modifyGuildRolePositions(final long guildId,
                                                             final ModifyGuildRolePositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuildRolePositions(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Role>> modifyGuildRolePositions(final long botId, final long guildId,
+    public GrpcApiRequest<List<Role>> modifyGuildRolePositions(final long botId, final long guildId,
                                                             final ModifyGuildRolePositionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -585,13 +586,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Role> modifyGuildRole(final long guildId, final ModifyGuildRoleRequest request)
+    public GrpcApiRequest<Role> modifyGuildRole(final long guildId, final ModifyGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuildRole(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Role> modifyGuildRole(final long botId, final long guildId, final ModifyGuildRoleRequest request)
+    public GrpcApiRequest<Role> modifyGuildRole(final long botId, final long guildId, final ModifyGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -611,19 +612,19 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildRole(final long guildId, final long roleId)
+    public GrpcApiRequest<Void> deleteGuildRole(final long guildId, final long roleId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildRole(guildId, roleId, (String) null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildRole(final long guildId, final long roleId, @Nullable final String reason)
+    public GrpcApiRequest<Void> deleteGuildRole(final long guildId, final long roleId, @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildRole(getBotId(), guildId, roleId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildRole(final long botId, final long guildId, final long roleId,
+    public GrpcApiRequest<Void> deleteGuildRole(final long botId, final long guildId, final long roleId,
                                              @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildRole(botId, guildId, DeleteGuildRoleRequest.newBuilder()
@@ -633,7 +634,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildRole(final long botId, final long guildId, final DeleteGuildRoleRequest request)
+    public GrpcApiRequest<Void> deleteGuildRole(final long botId, final long guildId, final DeleteGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -653,13 +654,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Integer> getGuildPruneCount(final long guildId, final int days, final List<Long> roles)
+    public GrpcApiRequest<Integer> getGuildPruneCount(final long guildId, final int days, final List<Long> roles)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildPruneCount(getBotId(), guildId, days, roles);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Integer> getGuildPruneCount(final long botId, final long guildId, final int days,
+    public GrpcApiRequest<Integer> getGuildPruneCount(final long botId, final long guildId, final int days,
                                                    final List<Long> roles)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildPruneCount(botId, guildId, GetGuildPruneCountRequest.newBuilder()
@@ -671,7 +672,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Integer> getGuildPruneCount(final long botId, final long guildId,
+    public GrpcApiRequest<Integer> getGuildPruneCount(final long botId, final long guildId,
                                                    final GetGuildPruneCountRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -692,13 +693,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> beginGuildPrune(final long guildId, final BeginGuildPruneRequest request)
+    public GrpcApiRequest<Void> beginGuildPrune(final long guildId, final BeginGuildPruneRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return beginGuildPrune(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> beginGuildPrune(final long botId, final long guildId, final BeginGuildPruneRequest request)
+    public GrpcApiRequest<Void> beginGuildPrune(final long botId, final long guildId, final BeginGuildPruneRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -718,13 +719,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<String>> getGuildVoiceRegions(final long guildId)
+    public GrpcApiRequest<List<String>> getGuildVoiceRegions(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildVoiceRegions(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<String>> getGuildVoiceRegions(final long botId, final long guildId)
+    public GrpcApiRequest<List<String>> getGuildVoiceRegions(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -747,13 +748,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildInvite>> getGuildInvites(final long guildId)
+    public GrpcApiRequest<List<GuildInvite>> getGuildInvites(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildInvites(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildInvite>> getGuildInvites(final long botId, final long guildId)
+    public GrpcApiRequest<List<GuildInvite>> getGuildInvites(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -775,13 +776,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> modifyChannel(final long guildId, final ModifyChannelRequest request)
+    public GrpcApiRequest<Channel> modifyChannel(final long guildId, final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyChannel(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
+    public GrpcApiRequest<Channel> modifyChannel(final long botId, final long guildId, final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -801,19 +802,19 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannel(final long guildId, final long channelId)
+    public GrpcApiRequest<Void> deleteChannel(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteChannel(guildId, channelId, (String) null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannel(final long guildId, final long channelId, @Nullable final String reason)
+    public GrpcApiRequest<Void> deleteChannel(final long guildId, final long channelId, @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteChannel(getBotId(), guildId, channelId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannel(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteChannel(final long botId, final long guildId, final long channelId,
                                            @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteChannel(botId, guildId, DeleteChannelRequest.newBuilder()
@@ -823,7 +824,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request)
+    public GrpcApiRequest<Void> deleteChannel(final long botId, final long guildId, final DeleteChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -843,21 +844,21 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAround(final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAround(final long guildId, final long channelId,
                                                         final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesAround(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
                                                         final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesAround(botId, guildId, channelId, snowflake, 100);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAround(final long botId, final long guildId, final long channelId,
                                                         final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
                 .setChannelId(channelId)
@@ -867,21 +868,21 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAfter(final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAfter(final long guildId, final long channelId,
                                                        final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesAfter(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
                                                        final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesAfter(botId, guildId, channelId, snowflake, 100);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesAfter(final long botId, final long guildId, final long channelId,
                                                        final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
                 .setChannelId(channelId)
@@ -891,21 +892,21 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesBefore(final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesBefore(final long guildId, final long channelId,
                                                         final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesBefore(getBotId(), guildId, channelId, snowflake);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
                                                         final long snowflake) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessagesBefore(botId, guildId, channelId, snowflake, 100);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessagesBefore(final long botId, final long guildId, final long channelId,
                                                         final long snowflake, final int limit) throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
                 .setChannelId(channelId)
@@ -915,19 +916,19 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessages(final long guildId, final long channelId)
+    public GrpcApiRequest<List<Message>> getMessages(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(getBotId(), guildId, channelId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId)
+    public GrpcApiRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getMessages(botId, guildId, channelId, 100);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<List<Message>> getMessages(final long botId, final long guildId, final long channelId,
                                                   final int limit) throws GrpcRequestException,
             GrpcGatewayApiException {
         return getMessages(botId, guildId, GetChannelMessagesRequest.newBuilder()
@@ -937,7 +938,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessages(final long botId, final long guildId,
+    public GrpcApiRequest<List<Message>> getMessages(final long botId, final long guildId,
                                                   final GetChannelMessagesRequest request) throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -959,12 +960,12 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> getMessage(final long guildId, final long channelId, final long messageId) {
+    public GrpcApiRequest<Message> getMessage(final long guildId, final long channelId, final long messageId) {
         return getMessage(getBotId(), guildId, channelId, messageId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> getMessage(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Message> getMessage(final long botId, final long guildId, final long channelId,
                                            final long messageId) throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -990,13 +991,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> createMessage(final long guildId, final CreateMessageRequest request)
+    public GrpcApiRequest<Message> createMessage(final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createMessage(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> createMessage(final long botId, final long guildId, final CreateMessageRequest request)
+    public GrpcApiRequest<Message> createMessage(final long botId, final long guildId, final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1016,13 +1017,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> crosspostMessage(final long guildId, final long channelId, final long messageId)
+    public GrpcApiRequest<Message> crosspostMessage(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return crosspostMessage(getBotId(), guildId, channelId, messageId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> crosspostMessage(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Message> crosspostMessage(final long botId, final long guildId, final long channelId,
                                                  final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return crosspostMessage(botId, guildId, CrosspostMessageRequest.newBuilder()
@@ -1032,7 +1033,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> crosspostMessage(final long botId, final long guildId,
+    public GrpcApiRequest<Message> crosspostMessage(final long botId, final long guildId,
                                                  final CrosspostMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1053,14 +1054,14 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createReaction(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> createReaction(final long guildId, final long channelId, final long messageId,
                                             final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createReaction(getBotId(), guildId, channelId, messageId, emoji);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createReaction(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> createReaction(final long botId, final long guildId, final long channelId,
                                             final long messageId,
                                             final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1072,7 +1073,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> createReaction(final long botId, final long guildId, final CreateReactionRequest request)
+    public GrpcApiRequest<Void> createReaction(final long botId, final long guildId, final CreateReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1092,14 +1093,14 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteOwnReaction(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> deleteOwnReaction(final long guildId, final long channelId, final long messageId,
                                                final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteOwnReaction(getBotId(), guildId, channelId, messageId, emoji);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteOwnReaction(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteOwnReaction(final long botId, final long guildId, final long channelId,
                                                final long messageId,
                                                final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1111,7 +1112,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteOwnReaction(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteOwnReaction(final long botId, final long guildId,
                                                final DeleteOwnReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1132,7 +1133,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteReaction(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> deleteReaction(final long guildId, final long channelId, final long messageId,
                                             final long userId,
                                             final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1140,7 +1141,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteReaction(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteReaction(final long botId, final long guildId, final long channelId,
                                             final long messageId,
                                             final long userId, final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1153,7 +1154,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteReaction(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteReaction(final long botId, final long guildId,
                                             final DeleteUserReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1174,13 +1175,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteAllReactions(final long guildId, final long channelId, final long messageId)
+    public GrpcApiRequest<Void> deleteAllReactions(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteAllReactions(getBotId(), guildId, channelId, messageId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteAllReactions(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteAllReactions(final long botId, final long guildId, final long channelId,
                                                 final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteAllReactions(botId, guildId, DeleteAllReactionsRequest.newBuilder()
@@ -1190,7 +1191,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteAllReactions(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteAllReactions(final long botId, final long guildId,
                                                 final DeleteAllReactionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1211,14 +1212,14 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteEmoteReactions(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> deleteEmoteReactions(final long guildId, final long channelId, final long messageId,
                                                   final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteEmoteReactions(getBotId(), guildId, channelId, messageId, emoji);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteEmoteReactions(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteEmoteReactions(final long botId, final long guildId, final long channelId,
                                                   final long messageId,
                                                   final String emoji)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1230,7 +1231,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteEmoteReactions(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteEmoteReactions(final long botId, final long guildId,
                                                   final DeleteAllReactionsForEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1251,13 +1252,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> editMessage(final long guildId, final EditMessageRequest request)
+    public GrpcApiRequest<Message> editMessage(final long guildId, final EditMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return editMessage(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> editMessage(final long botId, final long guildId, final EditMessageRequest request)
+    public GrpcApiRequest<Message> editMessage(final long botId, final long guildId, final EditMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1277,20 +1278,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessage(final long guildId, final long channelId, final long messageId)
+    public GrpcApiRequest<Void> deleteMessage(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteMessage(guildId, channelId, messageId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessage(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> deleteMessage(final long guildId, final long channelId, final long messageId,
                                            @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteMessage(getBotId(), guildId, channelId, messageId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessage(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> deleteMessage(final long botId, final long guildId, final long channelId,
                                            final long messageId,
                                            @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1302,7 +1303,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request)
+    public GrpcApiRequest<Void> deleteMessage(final long botId, final long guildId, final DeleteMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1322,20 +1323,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds)
+    public GrpcApiRequest<Void> bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds)
             throws GrpcRequestException, GrpcGatewayApiException {
         return bulkDeleteMessages(guildId, channelId, messageIds, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds,
+    public GrpcApiRequest<Void> bulkDeleteMessages(final long guildId, final long channelId, final List<Long> messageIds,
                                                 @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return bulkDeleteMessages(getBotId(), guildId, channelId, messageIds, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> bulkDeleteMessages(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> bulkDeleteMessages(final long botId, final long guildId, final long channelId,
                                                 final List<Long> messageIds, @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return bulkDeleteMessages(botId, guildId, BulkDeleteMessagesRequest.newBuilder()
@@ -1346,7 +1347,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> bulkDeleteMessages(final long botId, final long guildId,
+    public GrpcApiRequest<Void> bulkDeleteMessages(final long botId, final long guildId,
                                                 final BulkDeleteMessagesRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1367,13 +1368,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> editChannelPermissions(final long guildId, final EditChannelPermissionsRequest request)
+    public GrpcApiRequest<Void> editChannelPermissions(final long guildId, final EditChannelPermissionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return editChannelPermissions(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> editChannelPermissions(final long botId, final long guildId,
+    public GrpcApiRequest<Void> editChannelPermissions(final long botId, final long guildId,
                                                     final EditChannelPermissionsRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1394,13 +1395,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildInvite>> getChannelInvites(final long guildId, final long channelId)
+    public GrpcApiRequest<List<GuildInvite>> getChannelInvites(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getChannelInvites(getBotId(), guildId, channelId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<GuildInvite>> getChannelInvites(final long botId, final long guildId, final long channelId)
+    public GrpcApiRequest<List<GuildInvite>> getChannelInvites(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1424,13 +1425,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<GuildInvite> createChannelInvite(final long guildId, final CreateChannelInviteRequest request)
+    public GrpcApiRequest<GuildInvite> createChannelInvite(final long guildId, final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createChannelInvite(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<GuildInvite> createChannelInvite(final long botId, final long guildId,
+    public GrpcApiRequest<GuildInvite> createChannelInvite(final long botId, final long guildId,
                                                         final CreateChannelInviteRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1451,13 +1452,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannelPermission(final long guildId, final DeleteChannelPermissionRequest request)
+    public GrpcApiRequest<Void> deleteChannelPermission(final long guildId, final DeleteChannelPermissionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteChannelPermission(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteChannelPermission(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteChannelPermission(final long botId, final long guildId,
                                                      final DeleteChannelPermissionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1478,13 +1479,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Long> followNewsChannel(final long guildId, final long channelId, final long webhookId)
+    public GrpcApiRequest<Long> followNewsChannel(final long guildId, final long channelId, final long webhookId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return followNewsChannel(getBotId(), guildId, channelId, webhookId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Long> followNewsChannel(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Long> followNewsChannel(final long botId, final long guildId, final long channelId,
                                                final long webhookId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return followNewsChannel(botId, guildId, FollowNewsChannelRequest.newBuilder()
@@ -1494,7 +1495,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Long> followNewsChannel(final long botId, final long guildId,
+    public GrpcApiRequest<Long> followNewsChannel(final long botId, final long guildId,
                                                final FollowNewsChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1515,13 +1516,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> startTyping(final long guildId, final long channelId)
+    public GrpcApiRequest<Void> startTyping(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return startTyping(getBotId(), guildId, channelId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> startTyping(final long botId, final long guildId, final long channelId)
+    public GrpcApiRequest<Void> startTyping(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1543,13 +1544,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getPinnedMessages(final long guildId, final long channelId)
+    public GrpcApiRequest<List<Message>> getPinnedMessages(final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getPinnedMessages(getBotId(), guildId, channelId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getPinnedMessages(final long botId, final long guildId, final long channelId)
+    public GrpcApiRequest<List<Message>> getPinnedMessages(final long botId, final long guildId, final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1574,20 +1575,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> pinMessage(final long guildId, final long channelId, final long messageId)
+    public GrpcApiRequest<Void> pinMessage(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return pinMessage(getBotId(), channelId, messageId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> pinMessage(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> pinMessage(final long guildId, final long channelId, final long messageId,
                                         @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return pinMessage(getBotId(), channelId, messageId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> pinMessage(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> pinMessage(final long botId, final long guildId, final long channelId,
                                         final long messageId,
                                         @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1599,7 +1600,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> pinMessage(final long botId, final long guildId,
+    public GrpcApiRequest<Void> pinMessage(final long botId, final long guildId,
                                         final AddPinnedChannelMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1620,20 +1621,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> unpinMessage(final long guildId, final long channelId, final long messageId)
+    public GrpcApiRequest<Void> unpinMessage(final long guildId, final long channelId, final long messageId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return unpinMessage(guildId, channelId, messageId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> unpinMessage(final long guildId, final long channelId, final long messageId,
+    public GrpcApiRequest<Void> unpinMessage(final long guildId, final long channelId, final long messageId,
                                           @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return unpinMessage(getBotId(), guildId, channelId, messageId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> unpinMessage(final long botId, final long guildId, final long channelId,
+    public GrpcApiRequest<Void> unpinMessage(final long botId, final long guildId, final long channelId,
                                           final long messageId,
                                           @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1645,7 +1646,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> unpinMessage(final long botId, final long guildId,
+    public GrpcApiRequest<Void> unpinMessage(final long botId, final long guildId,
                                           final DeletePinnedChannelMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1666,13 +1667,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Emoji>> listGuildEmojis(final long guildId)
+    public GrpcApiRequest<List<Emoji>> listGuildEmojis(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return listGuildEmojis(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId)
+    public GrpcApiRequest<List<Emoji>> listGuildEmojis(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1694,13 +1695,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> getGuildEmoji(final long guildId, final long emoteId)
+    public GrpcApiRequest<Emoji> getGuildEmoji(final long guildId, final long emoteId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getGuildEmoji(getBotId(), guildId, emoteId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> getGuildEmoji(final long botId, final long guildId, final long emoteId)
+    public GrpcApiRequest<Emoji> getGuildEmoji(final long botId, final long guildId, final long emoteId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1722,13 +1723,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> createGuildEmoji(final long guildId, final CreateGuildEmojiRequest request)
+    public GrpcApiRequest<Emoji> createGuildEmoji(final long guildId, final CreateGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createGuildEmoji(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> createGuildEmoji(final long botId, final long guildId,
+    public GrpcApiRequest<Emoji> createGuildEmoji(final long botId, final long guildId,
                                                final CreateGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1749,20 +1750,20 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> modifyGuildEmoji(final long guildId, final long emoteId, final String name)
+    public GrpcApiRequest<Emoji> modifyGuildEmoji(final long guildId, final long emoteId, final String name)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuildEmoji(guildId, emoteId, name, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> modifyGuildEmoji(final long guildId, final long emoteId, final String name,
+    public GrpcApiRequest<Emoji> modifyGuildEmoji(final long guildId, final long emoteId, final String name,
                                                @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifyGuildEmoji(getBotId(), guildId, emoteId, name, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> modifyGuildEmoji(final long botId, final long guildId, final long emoteId,
+    public GrpcApiRequest<Emoji> modifyGuildEmoji(final long botId, final long guildId, final long emoteId,
                                                final String name,
                                                @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
@@ -1774,7 +1775,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Emoji> modifyGuildEmoji(final long botId, final long guildId,
+    public GrpcApiRequest<Emoji> modifyGuildEmoji(final long botId, final long guildId,
                                                final ModifyGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1795,19 +1796,19 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildEmoji(final long guildId, final long emoteId)
+    public GrpcApiRequest<Void> deleteGuildEmoji(final long guildId, final long emoteId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildEmoji(guildId, emoteId, (String) null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildEmoji(final long guildId, final long emoteId, @Nullable final String reason)
+    public GrpcApiRequest<Void> deleteGuildEmoji(final long guildId, final long emoteId, @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildEmoji(getBotId(), guildId, emoteId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildEmoji(final long botId, final long guildId, final long emoteId,
+    public GrpcApiRequest<Void> deleteGuildEmoji(final long botId, final long guildId, final long emoteId,
                                               @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteGuildEmoji(botId, guildId, DeleteGuildEmojiRequest.newBuilder()
@@ -1817,7 +1818,7 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteGuildEmoji(final long botId, final long guildId,
+    public GrpcApiRequest<Void> deleteGuildEmoji(final long botId, final long guildId,
                                               final DeleteGuildEmojiRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1838,13 +1839,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> getSelfUser(final long guildId)
+    public GrpcApiRequest<User> getSelfUser(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getSelfUser(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> getSelfUser(final long botId, final long guildId)
+    public GrpcApiRequest<User> getSelfUser(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1864,13 +1865,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> getUser(final long guildId, final long userId)
+    public GrpcApiRequest<User> getUser(final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return getUser(getBotId(), guildId, userId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> getUser(final long botId, final long guildId, final long userId)
+    public GrpcApiRequest<User> getUser(final long botId, final long guildId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1892,13 +1893,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> modifySelfUser(final long guildId, final ModifyCurrentUserRequest request)
+    public GrpcApiRequest<User> modifySelfUser(final long guildId, final ModifyCurrentUserRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return modifySelfUser(getBotId(), guildId, request);
     }
 
     @CheckReturnValue
-    public GrpcRequest<User> modifySelfUser(final long botId, final long guildId,
+    public GrpcApiRequest<User> modifySelfUser(final long botId, final long guildId,
                                             final ModifyCurrentUserRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
@@ -1919,13 +1920,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> leaveGuild(final long guildId)
+    public GrpcApiRequest<Void> leaveGuild(final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return leaveGuild(getBotId(), guildId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> leaveGuild(final long botId, final long guildId)
+    public GrpcApiRequest<Void> leaveGuild(final long botId, final long guildId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1945,13 +1946,13 @@ public class RestService {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createDmChannel(final long userId)
+    public GrpcApiRequest<Channel> createDmChannel(final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         return createDmChannel(getBotId(), userId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Channel> createDmChannel(final long botId, final long userId)
+    public GrpcApiRequest<Channel> createDmChannel(final long botId, final long userId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {

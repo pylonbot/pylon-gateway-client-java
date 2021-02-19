@@ -2,7 +2,7 @@ package lol.up.pylon.gateway.client.entity;
 
 import bot.pylon.proto.discord.v1.model.EmojiData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
-import lol.up.pylon.gateway.client.service.request.GrpcRequest;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
@@ -75,12 +75,12 @@ public class Emoji implements Entity<EmojiData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeName(final String name) {
+    public GrpcApiRequest<Void> changeName(final String name) {
         return changeName(name, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeName(final String name, @Nullable final String reason) {
+    public GrpcApiRequest<Void> changeName(final String name, @Nullable final String reason) {
         return getClient().getRestService().modifyGuildEmoji(getBotId(), getGuildId(), getData().getId(), name, reason)
                 .transform(emoji -> {
                     this.data = emoji.getData();
@@ -89,12 +89,12 @@ public class Emoji implements Entity<EmojiData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete() {
+    public GrpcApiRequest<Void> delete() {
         return delete(null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete(@Nullable final String reason) {
+    public GrpcApiRequest<Void> delete(@Nullable final String reason) {
         return getClient().getRestService().deleteGuildEmoji(getBotId(), getGuildId(), getData().getId(), reason);
     }
 

@@ -7,6 +7,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
 import lol.up.pylon.gateway.client.exception.ValidationException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.TimeUtil;
 
@@ -98,16 +99,16 @@ public class Message implements Entity<MessageData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Void> addReaction(final Emoji emoji) {
+    public GrpcApiRequest<Void> addReaction(final Emoji emoji) {
         return addReaction(emoji.getName() + ":" + emoji.getId());
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addReaction(final String emoji) {
-        if(getGuildId() > 0) {
+    public GrpcApiRequest<Void> addReaction(final String emoji) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete();
-            if(!member.hasPermission(Permission.ADD_REACTIONS)) {
+            if (!member.hasPermission(Permission.ADD_REACTIONS)) {
                 throw new InsufficientPermissionException(Permission.ADD_REACTIONS);
             }
         }
@@ -115,26 +116,26 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final Emoji emoji) {
+    public GrpcApiRequest<Void> removeReaction(final Emoji emoji) {
         return removeReaction(emoji.getName() + ":" + emoji.getId());
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final String emoji) {
+    public GrpcApiRequest<Void> removeReaction(final String emoji) {
         return getClient().getRestService().deleteOwnReaction(getBotId(), getGuildId(), getChannelId(), getId(), emoji);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final long userId, final Emoji emoji) {
+    public GrpcApiRequest<Void> removeReaction(final long userId, final Emoji emoji) {
         return removeReaction(userId, emoji.getName() + ":" + emoji.getId());
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeReaction(final long userId, final String emoji) {
-        if(getGuildId() > 0) {
+    public GrpcApiRequest<Void> removeReaction(final long userId, final String emoji) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete();
-            if(!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+            if (!member.hasPermission(Permission.MANAGE_MESSAGES)) {
                 throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
             }
         }
@@ -143,8 +144,8 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> editMessage(final String message) {
-        if(getAuthor().getId() != getBotId()) {
+    public GrpcApiRequest<Void> editMessage(final String message) {
+        if (getAuthor().getId() != getBotId()) {
             throw new ValidationException("Can't edit messages from other users");
         }
         return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
@@ -158,8 +159,8 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> editMessage(final MessageData.MessageEmbedData embed) {
-        if(getAuthor().getId() != getBotId()) {
+    public GrpcApiRequest<Void> editMessage(final MessageData.MessageEmbedData embed) {
+        if (getAuthor().getId() != getBotId()) {
             throw new ValidationException("Can't edit messages from other users");
         }
         return getClient().getRestService().editMessage(getBotId(), getGuildId(), EditMessageRequest.newBuilder()
@@ -173,13 +174,13 @@ public class Message implements Entity<MessageData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete() {
+    public GrpcApiRequest<Void> delete() {
         return delete(null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete(final String reason) {
-        if(getGuildId() > 0 && getAuthor().getId() != getBotId()) {
+    public GrpcApiRequest<Void> delete(final String reason) {
+        if (getGuildId() > 0 && getAuthor().getId() != getBotId()) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete();
             if (!member.hasPermission(Permission.MANAGE_MESSAGES)) {

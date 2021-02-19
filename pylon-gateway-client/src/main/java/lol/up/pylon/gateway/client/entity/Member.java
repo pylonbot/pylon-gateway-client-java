@@ -5,6 +5,7 @@ import bot.pylon.proto.discord.v1.rest.ModifyGuildMemberRequest;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.exception.HierarchyException;
 import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.PermissionUtil;
 import lol.up.pylon.gateway.client.util.TimeUtil;
@@ -127,12 +128,12 @@ public class Member implements Entity<MemberData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeNickname(final String nickname) {
+    public GrpcApiRequest<Void> changeNickname(final String nickname) {
         return changeNickname(nickname, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
+    public GrpcApiRequest<Void> changeNickname(final String nickname, @Nullable final String reason) {
         return getClient().getRestService().modifyGuildMember(getBotId(), getGuildId(),
                 ModifyGuildMemberRequest.newBuilder()
                         .setUserId(getUserId())
@@ -142,23 +143,23 @@ public class Member implements Entity<MemberData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addRole(final long roleId) {
+    public GrpcApiRequest<Void> addRole(final long roleId) {
         return addRole(roleId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> addRole(final long roleId, @Nullable final String reason) {
+    public GrpcApiRequest<Void> addRole(final long roleId, @Nullable final String reason) {
         checkRolePerms(roleId);
         return getClient().getRestService().addMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeRole(final long roleId) {
+    public GrpcApiRequest<Void> removeRole(final long roleId) {
         return removeRole(roleId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
+    public GrpcApiRequest<Void> removeRole(final long roleId, @Nullable final String reason) {
         checkRolePerms(roleId);
         return getClient().getRestService().removeMemberRole(getBotId(), getGuildId(), getUserId(), roleId, reason);
     }

@@ -11,6 +11,7 @@ import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
 import lol.up.pylon.gateway.client.exception.ValidationException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
+import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,7 +180,7 @@ public class Channel implements Entity<ChannelData> {
     // REST
 
     @CheckReturnValue
-    public GrpcRequest<Void> edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
+    public GrpcApiRequest<Void> edit(final Consumer<ModifyChannelRequest.Builder> consumer) {
         final ModifyChannelRequest.Builder builder = ModifyChannelRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
@@ -191,7 +192,7 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
+    public GrpcApiRequest<Void> editPermissions(final Consumer<EditChannelPermissionsRequest.Builder> consumer) {
         final EditChannelPermissionsRequest.Builder builder = EditChannelPermissionsRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
@@ -199,12 +200,12 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete() {
+    public GrpcApiRequest<Void> delete() {
         return delete(null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> delete(@Nullable final String reason) {
+    public GrpcApiRequest<Void> delete(@Nullable final String reason) {
         if (getType() == ChannelData.ChannelType.DM) {
             throw new IllegalArgumentException("Cannot delete a DM channel");
         }
@@ -212,16 +213,16 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessages(final List<Long> messageIds) {
+    public GrpcApiRequest<Void> deleteMessages(final List<Long> messageIds) {
         return deleteMessages(messageIds, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
-        if(getGuildId() > 0) {
+    public GrpcApiRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete();
-            if(!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+            if (!member.hasPermission(Permission.MANAGE_MESSAGES)) {
                 throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
             }
         }
@@ -229,17 +230,17 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessageById(final long messageId) {
+    public GrpcApiRequest<Void> deleteMessageById(final long messageId) {
         return deleteMessageById(messageId, null);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Void> deleteMessageById(final long messageId, @Nullable final String reason) {
+    public GrpcApiRequest<Void> deleteMessageById(final long messageId, @Nullable final String reason) {
         return getClient().getRestService().deleteMessage(getBotId(), getGuildId(), getId(), messageId, reason);
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
+    public GrpcApiRequest<Message> createMessage(final Consumer<CreateMessageRequest.Builder> consumer) {
         final CreateMessageRequest.Builder builder = CreateMessageRequest.newBuilder();
         consumer.accept(builder);
         builder.setChannelId(getData().getId());
@@ -249,23 +250,23 @@ public class Channel implements Entity<ChannelData> {
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
             }
         }
-        if(builder.getContent() != null && builder.getContent().length() > 2048 ||
+        if (builder.getContent() != null && builder.getContent().length() > 2048 ||
                 (builder.getEmbed() != null && builder.getEmbed().getDescription() != null &&
                         builder.getEmbed().getDescription().length() > 2048)) {
             throw new ValidationException("Text length must not be more than 2048!");
         }
-        if(getGuildId() > 0) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete(); // blocking on purpose
             if (!canTalk(member)) {
                 throw new InsufficientPermissionException(Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
             }
-            if(builder.hasEmbed()) {
+            if (builder.hasEmbed()) {
                 if (!member.hasPermission(this, Permission.EMBED_LINKS)) {
                     throw new InsufficientPermissionException(Permission.EMBED_LINKS);
                 }
             }
-            if(builder.hasAttachment()) {
+            if (builder.hasAttachment()) {
                 if (!member.hasPermission(this, Permission.ATTACH_FILES)) {
                     throw new InsufficientPermissionException(Permission.ATTACH_FILES);
                 }
@@ -275,17 +276,17 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> createMessage(final String text) {
+    public GrpcApiRequest<Message> createMessage(final String text) {
         return createMessage(builder -> builder.setContent(text));
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> createMessage(final MessageData.MessageEmbedData embedData) {
+    public GrpcApiRequest<Message> createMessage(final MessageData.MessageEmbedData embedData) {
         return createMessage(builder -> builder.setEmbed(embedData));
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> sendFile(final byte[] data, final String fileName) {
+    public GrpcApiRequest<Message> sendFile(final byte[] data, final String fileName) {
         return createMessage(builder -> builder.setAttachment(CreateMessageRequest.Attachment.newBuilder()
                 .setContent(ByteString.copyFrom(data))
                 .setName(fileName)
@@ -293,7 +294,8 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> editMessageById(final long messageId, Consumer<EditMessageRequest.Builder> consumer) {
+    public GrpcApiRequest<Message> editMessageById(final long messageId,
+                                                   Consumer<EditMessageRequest.Builder> consumer) {
         final EditMessageRequest.Builder builder = EditMessageRequest.newBuilder()
                 .setMessageId(messageId)
                 .setChannelId(getId());
@@ -302,22 +304,22 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> editMessageById(final long messageId, final String content) {
+    public GrpcApiRequest<Message> editMessageById(final long messageId, final String content) {
         return editMessageById(messageId, builder -> builder.setContent(content));
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> editMessageById(final long messageId, final MessageData.MessageEmbedData embedData) {
+    public GrpcApiRequest<Message> editMessageById(final long messageId, final MessageData.MessageEmbedData embedData) {
         return editMessageById(messageId, builder -> builder.setEmbed(embedData));
     }
 
     @CheckReturnValue
-    public GrpcRequest<Message> getMessageById(long messageId) {
+    public GrpcApiRequest<Message> getMessageById(long messageId) {
         return getClient().getRestService().getMessage(getBotId(), getGuildId(), getId(), messageId);
     }
 
     @CheckReturnValue
-    public GrpcRequest<List<Message>> getMessages(final long before, final int limit) {
+    public GrpcApiRequest<List<Message>> getMessages(final long before, final int limit) {
         if (before <= 0) {
             return getClient().getRestService().getMessages(getBotId(), getGuildId(), getId(), limit);
         }
@@ -374,7 +376,7 @@ public class Channel implements Entity<ChannelData> {
 
     @Override
     public String toString() {
-        if(getType() == ChannelData.ChannelType.DM) {
+        if (getType() == ChannelData.ChannelType.DM) {
             return "Channel{" +
                     "botId=" + getBotId() +
                     ", id=" + getId() +
