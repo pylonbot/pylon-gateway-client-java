@@ -11,5 +11,6 @@
     <modules>
         <module>event-proto-gen</module>
         <module>pylon-gateway-client</module>
+        <module>pylon-kotlin-extensions</module>
     </modules>
 </project>
