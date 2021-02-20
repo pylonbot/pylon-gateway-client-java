@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.event;
 
+import bot.pylon.proto.discord.v1.event.EventEnvelope;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.event.Event;
 import lol.up.pylon.gateway.client.service.CacheService;
@@ -38,5 +39,11 @@ public abstract class AbstractEventReceiver<E extends Event> {
     }
 
 
-    protected abstract void receive(E event);
+    protected void receive(EventEnvelope.HeaderData headerData, E event) {
+        receive(event);
+    }
+
+    protected void receive(E event) {
+
+    }
 }
