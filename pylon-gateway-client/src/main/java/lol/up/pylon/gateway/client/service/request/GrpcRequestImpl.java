@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.service.request;
 
 import lol.up.pylon.gateway.client.exception.GrpcException;
+import lol.up.pylon.gateway.client.exception.GrpcRequestException;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
     protected final Executor executor;
     protected final GrpcException source;
     protected final Runnable request;
+    private boolean submitted = false;
 
     public <V> GrpcRequestImpl(final Executor executor, final CompletableFuture<V> future,
                                final Function<V, T> transformer, final Runnable request) {
@@ -50,6 +52,10 @@ public class GrpcRequestImpl<T> implements GrpcRequest<T> {
 
     @Override
     public CompletableFuture<T> submit() {
+        if (submitted) {
+            throw new GrpcRequestException("This request already has been submitted and cannot submit twice!");
+        }
+        submitted = true;
         request.run();
         return future;
     }
