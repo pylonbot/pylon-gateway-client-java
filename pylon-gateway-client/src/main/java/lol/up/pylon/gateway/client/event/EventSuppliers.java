@@ -7,6 +7,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
+import lol.up.pylon.gateway.client.event.worker.WorkerGroupSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +20,9 @@ public class EventSuppliers {
         return dispatcher -> new GrpcEventSupplierServer(serverPort, dispatcher);
     }
 
-    public static EventSupplier grpcPollingEventSupplier(final String destinationHost, final int destinationPort) {
-        throw new RuntimeException("This method is missing implementation");
+    public static EventSupplier grpcWorkerGroupSupplier(final String authToken, final String consumerGroup,
+                                                        final String consumerId) {
+        return dispatcher -> new WorkerGroupSupplier(dispatcher, authToken, consumerGroup, consumerId);
     }
 
     private static class GrpcEventSupplierServer implements ClosingRunnable {
@@ -56,7 +58,7 @@ public class EventSuppliers {
         }
 
         @Override
-        public void stop() throws Exception {
+        public void stop() {
             if (server != null) {
                 server.shutdown().shutdown();
             }

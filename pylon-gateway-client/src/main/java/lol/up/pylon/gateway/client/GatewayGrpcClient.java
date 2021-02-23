@@ -77,8 +77,9 @@ public class GatewayGrpcClient implements Closeable {
         /**
          * Cache repeated calls on the same cache entity during one {@link EventContext EventContext} if set to true
          * One {@link EventContext EventContext} is valid for all listeners and is cleared as the listeners completed.
-         * See {@link EventDispatcher#dispatchEvent(Event) EventDispatcher#dispatchEvent(Event)} for implementation
-         * details regarding the {@link EventContext EventContext} lifetime.
+         * See {@link EventDispatcher#dispatchEvent(bot.pylon.proto.discord.v1.event.EventEnvelope.HeaderData, Event)
+         * EventDispatcher#dispatchEvent(Event)} for implementation details regarding the {@link EventContext
+         * EventContext} lifetime.
          * <p>
          * To manually clear an {@link EventContext EventContext} you can use {@link EventContext#clearCache()}.
          * To manually clear one specific entity from the {@link EventContext EventContext} cache, you can use
@@ -311,6 +312,10 @@ public class GatewayGrpcClient implements Closeable {
                 log.error("Couldn't stop EventSupplier {}", eventSupplier.getClass().getCanonicalName(), exception);
             }
         };
+    }
+
+    public ManagedChannel getGrpcChannel() {
+        return channel;
     }
 
     @Override
