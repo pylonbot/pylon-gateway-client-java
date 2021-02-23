@@ -136,8 +136,11 @@ public class GatewayGrpcClient implements Closeable {
                 this.builder = builder;
                 this.eventExecutor = Executors.newFixedThreadPool(Math.max(8,
                         Runtime.getRuntime().availableProcessors() * 2));
-                this.cacheGrpcExecutor = Executors.newFixedThreadPool(
-                        Math.max(8, Runtime.getRuntime().availableProcessors()));
+                this.callbackExecutor = Executors.newFixedThreadPool(Math.max(8,
+                        Runtime.getRuntime().availableProcessors() * 2));
+                this.cacheGrpcExecutor = Executors.newWorkStealingPool(Math.max(8,
+                        Runtime.getRuntime().availableProcessors() * 2));
+                this.restGrpcExecutor = Executors.newScheduledThreadPool(512);
             }
 
             public GatewayGrpcClientBuilder client() {
