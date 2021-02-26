@@ -17,6 +17,7 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
     private final WorkerGroupSupplier workerGroupSupplier;
     private final EventDispatcher eventDispatcher;
     private final AtomicBoolean drained;
+    private final AtomicBoolean draining;
 
     private StreamObserver<WorkerStreamClientMessage> responseStream;
     private long seq;
@@ -28,6 +29,7 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
         this.workerGroupSupplier = workerGroupSupplier;
         this.eventDispatcher = eventDispatcher;
         this.drained = new AtomicBoolean(false);
+        this.draining = new AtomicBoolean(false);
         this.seq = 0;
     }
 
@@ -44,6 +46,10 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
     }
 
     public CompletableFuture<Void> drainWorker() {
+        if(draining.get()) {
+            return drainFuture == null ? CompletableFuture.completedFuture((Void)null) : drainFuture;
+        }
+        draining.set(true);
         responseStream.onNext(WorkerStreamClientMessage.newBuilder()
                 .setDrainRequest(WorkerDrainRequest.newBuilder().build())
                 .build());
@@ -82,19 +88,23 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
             return;
         }
         log.warn("Connection completed but the worker wasn't drained!");
+        if(!draining.get()) {
+            workerGroupSupplier.connectWorker(); // reconnect if the worker isn't draining
+        }
     }
 
     private void handleEventEnvelope(final EventEnvelope eventEnvelope) {
+        if(draining.get() || drained.get()) {
+            log.debug("Dropped event during/after draining");
+            return;
+        }
         seq = eventEnvelope.getHeader().getSeq();
         eventDispatcher.dispatchEvent(eventEnvelope.getHeader(), eventEnvelope.getEvent());
-        // todo: no response?
     }
 
     private void handleHeartbeatRequest(final WorkerHeartbeatRequest heartbeatRequest) {
-        if (heartbeatRequest.getLastSequence() != seq) {
-            log.warn("[Heartbeat] Got heartbeat request with seq {}, last received sequence was {}",
-                    heartbeatRequest.getLastSequence(), seq);
-        }
+        log.debug("[Heartbeat] Received heartbeat request from gateway. Seq: {}, Nonce: {}",
+                heartbeatRequest.getLastSequence(), heartbeatRequest.getNonce());
         responseStream.onNext(WorkerStreamClientMessage.newBuilder()
                 .setHeartbeatResponse(WorkerHeartbeatResponse.newBuilder()
                         .setNonce(heartbeatRequest.getNonce())
@@ -103,7 +113,7 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
     }
 
     private void handleHeartbeatResponse(final WorkerHeartbeatResponse heartbeatResponse) {
-        // todo: no response??
+        // Nothing here... For now?
     }
 
     private void handleIdentifyResponse(final WorkerIdentifyResponse identifyResponse) {

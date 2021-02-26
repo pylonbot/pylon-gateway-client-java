@@ -13,19 +13,17 @@ import java.util.concurrent.Executor;
 public class WorkerGroupSupplier implements ClosingRunnable {
 
     private final EventDispatcher eventDispatcher;
+    private final WorkerGroupStreamObserver streamObserver;
     private final GatewayWorkerGroupGrpc.GatewayWorkerGroupStub client;
 
     private final String authToken;
     private final String consumerGroup;
     private final String consumerId;
 
-
-    private WorkerGroupStreamObserver streamObserver;
-    private boolean reconnect = true;
-
     public WorkerGroupSupplier(final EventDispatcher eventDispatcher, final String authToken,
                                final String consumerGroup, final String consumerId) {
         this.eventDispatcher = eventDispatcher;
+        this.streamObserver = new WorkerGroupStreamObserver(this, eventDispatcher);
         this.authToken = authToken;
         this.consumerGroup = consumerGroup;
         this.consumerId = consumerId;
@@ -45,22 +43,20 @@ public class WorkerGroupSupplier implements ClosingRunnable {
                 });
     }
 
-    private void registerWorkerGroupStream() {
-        streamObserver = new WorkerGroupStreamObserver(this, eventDispatcher);
+    void connectWorker() {
         final StreamObserver<WorkerStreamClientMessage> clientObserver = this.client.workerStream(streamObserver);
         streamObserver.registerWorker(clientObserver);
     }
 
     @Override
     public void stop() throws Exception {
-        reconnect = false;
         streamObserver.drainWorker().get();
 
     }
 
     @Override
     public void run() {
-        registerWorkerGroupStream();
+        connectWorker();
     }
 
     public String getAuthToken() {
