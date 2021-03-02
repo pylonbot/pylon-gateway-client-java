@@ -8,6 +8,8 @@ import bot.pylon.proto.discord.v1.rest.EditMessageRequest;
 import bot.pylon.proto.discord.v1.rest.ModifyChannelRequest;
 import com.google.protobuf.ByteString;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.builder.EmbedBuilder;
+import lol.up.pylon.gateway.client.entity.builder.MessageBuilder;
 import lol.up.pylon.gateway.client.exception.InsufficientPermissionException;
 import lol.up.pylon.gateway.client.exception.ValidationException;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
@@ -276,13 +278,24 @@ public class Channel implements Entity<ChannelData> {
     }
 
     @CheckReturnValue
-    public GrpcApiRequest<Message> createMessage(final String text) {
-        return createMessage(builder -> builder.setContent(text));
+    public GrpcApiRequest<Message> createMessage(final MessageBuilder messageBuilder) {
+        return createMessage(messageBuilder::apply);
     }
 
     @CheckReturnValue
+    public GrpcApiRequest<Message> createMessage(final String text) {
+        return createMessage(MessageBuilder.text(text));
+    }
+
+    @Deprecated
+    @CheckReturnValue
     public GrpcApiRequest<Message> createMessage(final MessageData.MessageEmbedData embedData) {
         return createMessage(builder -> builder.setEmbed(embedData));
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> createMessage(final EmbedBuilder embedBuilder) {
+        return createMessage(MessageBuilder.embed(embedBuilder));
     }
 
     @CheckReturnValue
