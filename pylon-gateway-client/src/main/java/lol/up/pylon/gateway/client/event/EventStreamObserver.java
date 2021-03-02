@@ -25,7 +25,7 @@ public class EventStreamObserver implements StreamObserver<EventEnvelope> {
                 .setSeq(eventEnvelope.getHeader().getSeq())
                 .build());
         try {
-            eventDispatcher.dispatchEvent(eventEnvelope.getEvent());
+            eventDispatcher.dispatchEvent(eventEnvelope.getHeader(), eventEnvelope.getEvent());
         } catch (final Exception ex) {
             log.error("An unexpected error occurred when processing incoming event", ex);
         }

@@ -1,5 +1,6 @@
 package lol.up.pylon.gateway.client.event;
 
+import bot.pylon.proto.discord.v1.event.EventEnvelope;
 import lol.up.pylon.gateway.client.entity.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class EventDispatcher {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void dispatchEvent(Event<? extends Event> event) {
+    public void dispatchEvent(final EventEnvelope.HeaderData headerData, Event<? extends Event> event) {
         log.trace("Dispatching event {}", event);
         final Class<? extends Event> interfaceType = event.getInterfaceType();
         final List<AbstractEventReceiver<? extends Event<?>>> receivers = receiverHolder.get(interfaceType);
@@ -43,7 +44,7 @@ public class EventDispatcher {
                 EventContext.localContext().set(context);
                 receivers.forEach(receiver -> {
                     try {
-                        ((AbstractEventReceiver) receiver).receive(event);
+                        ((AbstractEventReceiver) receiver).receive(headerData, event);
                     } catch (final Throwable throwable) {
                         log.error("An error occurred in event-receiver {}",
                                 receiver.getClass().getCanonicalName(), throwable);
