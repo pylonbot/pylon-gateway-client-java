@@ -30,6 +30,7 @@ public class MessageBuilder {
         this.content = Optional.empty();
         this.embedData = Optional.empty();
         this.attachment = Optional.empty();
+        this.allowedMentions = Optional.empty();
     }
 
     public void apply(final CreateMessageRequest.Builder request) {
