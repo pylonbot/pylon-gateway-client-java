@@ -32,7 +32,8 @@ public class EventDispatcher {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void dispatchEvent(final EventEnvelope.HeaderData headerData, Event<? extends Event> event) {
-        log.trace("Dispatching event {}", event);
+        log.trace("Dispatching event {} from guild {} on bot {}",
+                event.getClass().getSimpleName(), event.getGuildId(), event.getBotId());
         final Class<? extends Event> interfaceType = event.getInterfaceType();
         final List<AbstractEventReceiver<? extends Event<?>>> receivers = receiverHolder.get(interfaceType);
         if (receivers == null) {
