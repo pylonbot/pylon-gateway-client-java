@@ -75,6 +75,11 @@ public class ContinuationGrpcRequestImpl<T> implements GrpcRequest<T> {
     }
 
     @Override
+    public CompletableFuture<T> submit() {
+        return getRequest().submit();
+    }
+
+    @Override
     public void queue(Consumer<? super T> success, Consumer<? super Throwable> error) {
         getRequest().queue(success, error);
     }
