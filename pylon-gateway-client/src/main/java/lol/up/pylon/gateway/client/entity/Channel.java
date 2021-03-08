@@ -167,13 +167,12 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<List<Member>> getMembers() {
-        return new FinishedRequestImpl<>(new ArrayList<>(0));
-/*        return getGuild().flatTransform(Guild::getMembers)
+        return getGuild().flatTransform(Guild::getMembers)
                 .transform(members -> {
                     final List<Member> filtered = new ArrayList<>(members);
                     filtered.removeIf(member -> member.hasPermission(this, Permission.VIEW_CHANNEL));
                     return filtered;
-                });*/
+                });
     }
 
     // REST
@@ -218,10 +217,10 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
-        if(getGuildId() > 0) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete();
-            if(!member.hasPermission(Permission.MANAGE_MESSAGES)) {
+            if (!member.hasPermission(Permission.MANAGE_MESSAGES)) {
                 throw new InsufficientPermissionException(Permission.MANAGE_MESSAGES);
             }
         }
@@ -249,23 +248,23 @@ public class Channel implements Entity<ChannelData> {
                 embedBuilder.setColor(embedBuilder.getColor() & 0xFFFFFF);
             }
         }
-        if(builder.getContent() != null && builder.getContent().length() > 2048 ||
+        if (builder.getContent() != null && builder.getContent().length() > 2048 ||
                 (builder.getEmbed() != null && builder.getEmbed().getDescription() != null &&
                         builder.getEmbed().getDescription().length() > 2048)) {
             throw new ValidationException("Text length must not be more than 2048!");
         }
-        if(getGuildId() > 0) {
+        if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
                     .complete(); // blocking on purpose
             if (!canTalk(member)) {
                 throw new InsufficientPermissionException(Permission.VIEW_CHANNEL, Permission.SEND_MESSAGES);
             }
-            if(builder.hasEmbed()) {
+            if (builder.hasEmbed()) {
                 if (!member.hasPermission(this, Permission.EMBED_LINKS)) {
                     throw new InsufficientPermissionException(Permission.EMBED_LINKS);
                 }
             }
-            if(builder.hasAttachment()) {
+            if (builder.hasAttachment()) {
                 if (!member.hasPermission(this, Permission.ATTACH_FILES)) {
                     throw new InsufficientPermissionException(Permission.ATTACH_FILES);
                 }
@@ -374,7 +373,7 @@ public class Channel implements Entity<ChannelData> {
 
     @Override
     public String toString() {
-        if(getType() == ChannelData.ChannelType.DM) {
+        if (getType() == ChannelData.ChannelType.DM) {
             return "Channel{" +
                     "botId=" + getBotId() +
                     ", id=" + getId() +
