@@ -7,6 +7,10 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * This is a dirty implementation, meant to be replaced by grpc streaming requests
+ * @param <T> type of the GrpcRequest
+ */
 public class ContinuationGrpcRequestImpl<T> implements GrpcRequest<T> {
 
     private final AtomicBoolean shouldContinue;
