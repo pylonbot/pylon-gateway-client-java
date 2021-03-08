@@ -13,18 +13,18 @@ public class ContinuationGrpcRequestImpl<T> implements GrpcRequest<T> {
     private final AtomicReference<T> oldValue;
     private final AtomicReference<GrpcRequest<T>> request;
     private final Function<T, GrpcRequest<T>> continuationSupplier;
-    private final BiFunction<T, T, Boolean> successfullyUpdatedPredicate;
+    private final BiFunction<T, T, Boolean> continuePredicate;
     private final BiFunction<GrpcRequest<T>, T, GrpcRequest<T>> accumulator;
 
     public ContinuationGrpcRequestImpl(final GrpcRequest<T> init,
                                        final Function<T, GrpcRequest<T>> continuationSupplier,
-                                       final BiFunction<T, T, Boolean> successfullyUpdatedPredicate,
+                                       final BiFunction<T, T, Boolean> continuePredicate,
                                        final BiFunction<GrpcRequest<T>, T, GrpcRequest<T>> accumulator) {
         this.shouldContinue = new AtomicBoolean(true);
         this.oldValue = new AtomicReference<>();
         this.request = new AtomicReference<>(init);
         this.continuationSupplier = continuationSupplier;
-        this.successfullyUpdatedPredicate = successfullyUpdatedPredicate;
+        this.continuePredicate = continuePredicate;
         this.accumulator = accumulator;
     }
 
@@ -32,7 +32,7 @@ public class ContinuationGrpcRequestImpl<T> implements GrpcRequest<T> {
         while (shouldContinue.get()) {
             request.getAndUpdate(request -> request.flatTransform(value -> {
                 final T oldValue = this.oldValue.getAndSet(value);
-                if (successfullyUpdatedPredicate.apply(oldValue, value)) {
+                if (continuePredicate.apply(oldValue, value)) {
                     final GrpcRequest<T> continuationRequest = continuationSupplier.apply(value);
                     return accumulator.apply(continuationRequest, value);
                 } else {
