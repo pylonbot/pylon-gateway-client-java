@@ -170,13 +170,12 @@ public class Channel implements Entity<ChannelData> {
 
     @CheckReturnValue
     public GrpcRequest<List<Member>> getMembers() {
-        return new FinishedRequestImpl<>(new ArrayList<>(0));
-/*        return getGuild().flatTransform(Guild::getMembers)
+        return getGuild().flatTransform(Guild::getMembers)
                 .transform(members -> {
                     final List<Member> filtered = new ArrayList<>(members);
                     filtered.removeIf(member -> member.hasPermission(this, Permission.VIEW_CHANNEL));
                     return filtered;
-                });*/
+                });
     }
 
     // REST

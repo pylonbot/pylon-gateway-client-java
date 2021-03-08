@@ -11,6 +11,7 @@ import lol.up.pylon.gateway.client.entity.*;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.EventExecutorService;
 import lol.up.pylon.gateway.client.exception.GrpcRequestException;
+import lol.up.pylon.gateway.client.service.request.ContinuationGrpcRequestImpl;
 import lol.up.pylon.gateway.client.service.request.FinishedRequestImpl;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcRequestImpl;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -349,7 +351,20 @@ public class CacheService {
 
     @CheckReturnValue
     public GrpcRequest<List<Member>> listGuildMembersAfter(final long botId, final long guildId, final long after) throws GrpcRequestException {
-        return listGuildMembersAfter(botId, guildId, after, Integer.MAX_VALUE);
+        final int requestLimit = 500;
+        return new ContinuationGrpcRequestImpl<>(
+                listGuildMembersAfter(botId, guildId, after, requestLimit),
+                members -> listGuildMembersAfter(botId, guildId, members == null ? 0 : members.stream()
+                        .mapToLong(Member::getId)
+                        .max()
+                        .orElse(0), requestLimit),
+                (oldValue, newValue) -> oldValue == null || newValue.size() - requestLimit >= oldValue.size(),
+                (listGrpcRequest, members) -> listGrpcRequest.transform(newMembers -> {
+                    final List<Member> copy = new ArrayList<>(members);
+                    copy.addAll(newMembers);
+                    return copy;
+                })
+        );
     }
 
     @CheckReturnValue

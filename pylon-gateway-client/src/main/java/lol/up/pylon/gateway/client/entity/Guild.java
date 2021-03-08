@@ -252,6 +252,14 @@ public class Guild implements Entity<GuildData> {
     }
 
     @CheckReturnValue
+    public GrpcRequest<List<Member>> findMembersByRole(final long roleId) {
+        return getClient().getCacheService().findMembers(getBotId(), getGuildId(), FindGuildMembersRequest.newBuilder()
+                .setRoleId(roleId)
+                .setLimit(Integer.MAX_VALUE) // todo: bad
+                .build());
+    }
+
+    @CheckReturnValue
     public GrpcRequest<List<Member>> getMembers() {
         return getClient().getCacheService().listGuildMembers(getBotId(), getGuildId());
     }
