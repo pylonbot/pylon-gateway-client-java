@@ -7,6 +7,8 @@ import lol.up.pylon.gateway.client.service.CacheService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractEventReceiver<E extends Event> {
 
@@ -36,6 +38,14 @@ public abstract class AbstractEventReceiver<E extends Event> {
      */
     public final <V> Future<V> async(final Callable<V> callable) {
         return EventContext.current().getExecutorService().submit(callable);
+    }
+
+    public final ScheduledFuture<?> asyncAfter(Runnable command, long delay, TimeUnit unit) {
+        return EventContext.current().getExecutorService().schedule(command, delay, unit);
+    }
+
+    public final <V> ScheduledFuture<V> asyncAfter(Callable<V> command, long delay, TimeUnit unit) {
+        return EventContext.current().getExecutorService().schedule(command, delay, unit);
     }
 
 

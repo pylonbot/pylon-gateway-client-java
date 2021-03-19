@@ -77,7 +77,8 @@ public class GatewayGrpcClient implements Closeable {
         /**
          * Cache repeated calls on the same cache entity during one {@link EventContext EventContext} if set to true
          * One {@link EventContext EventContext} is valid for all listeners and is cleared as the listeners completed.
-         * See {@link EventDispatcher#dispatchEvent(Event) EventDispatcher#dispatchEvent(Event)} for implementation
+         * See {@link EventDispatcher#dispatchEvent(bot.pylon.proto.discord.v1.event.EventEnvelope.HeaderData, Event)
+         * EventDispatcher#dispatchEvent(HeaderData, Event)} for implementation
          * details regarding the {@link EventContext EventContext} lifetime.
          * <p>
          * To manually clear an {@link EventContext EventContext} you can use {@link EventContext#clearCache()}.
@@ -128,6 +129,7 @@ public class GatewayGrpcClient implements Closeable {
 
             private final GatewayGrpcClientBuilder builder;
             private ExecutorService eventExecutor;
+            private ScheduledExecutorService asyncEventExecutor;
             private ExecutorService callbackExecutor;
             private ExecutorService cacheGrpcExecutor;
             private ScheduledExecutorService restGrpcExecutor;
@@ -136,8 +138,12 @@ public class GatewayGrpcClient implements Closeable {
                 this.builder = builder;
                 this.eventExecutor = Executors.newFixedThreadPool(Math.max(8,
                         Runtime.getRuntime().availableProcessors() * 2));
+                this.asyncEventExecutor = Executors.newScheduledThreadPool(Math.max(8,
+                        Runtime.getRuntime().availableProcessors()) * 2);
+                this.callbackExecutor = Executors.newWorkStealingPool(8);
                 this.cacheGrpcExecutor = Executors.newFixedThreadPool(
                         Math.max(8, Runtime.getRuntime().availableProcessors()));
+                this.restGrpcExecutor = Executors.newScheduledThreadPool(1024);
             }
 
             public GatewayGrpcClientBuilder client() {
@@ -150,6 +156,15 @@ public class GatewayGrpcClient implements Closeable {
 
             public ExecutorConfig setEventExecutor(ExecutorService eventExecutor) {
                 this.eventExecutor = eventExecutor;
+                return this;
+            }
+
+            public ScheduledExecutorService getAsyncEventExecutor() {
+                return asyncEventExecutor;
+            }
+
+            public ExecutorConfig setAsyncEventExecutor(ScheduledExecutorService eventExecutor) {
+                this.asyncEventExecutor = eventExecutor;
                 return this;
             }
 
@@ -234,7 +249,7 @@ public class GatewayGrpcClient implements Closeable {
         this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), executorConfig.cacheGrpcExecutor,
                 warnWithoutContext);
         this.defaultBotId = defaultBotId;
-        this.eventDispatcher = new EventDispatcher(executorConfig.eventExecutor);
+        this.eventDispatcher = new EventDispatcher(executorConfig.eventExecutor, executorConfig.asyncEventExecutor);
     }
 
     public void setDefaultBotId(final long defaultBotId) {

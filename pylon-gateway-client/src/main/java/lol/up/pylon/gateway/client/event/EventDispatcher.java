@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class EventDispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
     private final ExecutorService executor;
+    private final ScheduledExecutorService asyncExecutor;
     private final Map<Class<? extends Event<?>>, List<AbstractEventReceiver<? extends Event<?>>>> receiverHolder;
 
-    public EventDispatcher(final ExecutorService executor) {
+    public EventDispatcher(final ExecutorService executor, final ScheduledExecutorService asyncExecutor) {
         this.executor = new EventExecutorService(executor, EventContext.localContext());
+        this.asyncExecutor = new ScheduledEventExecutorService(asyncExecutor, EventContext.localContext());
         this.receiverHolder = new ConcurrentHashMap<>();
     }
 
@@ -40,7 +43,7 @@ public class EventDispatcher {
         }
         executor.submit(() -> {
             try {
-                final EventContext context = new EventContext(executor, event.getBotId(), event.getGuildId());
+                final EventContext context = new EventContext(asyncExecutor, event.getBotId(), event.getGuildId());
                 EventContext.localContext().set(context);
                 receivers.forEach(receiver -> {
                     try {
