@@ -50,7 +50,6 @@ public class EventDispatcher {
                                 receiver.getClass().getCanonicalName(), throwable);
                     }
                 });
-                context.clearCache(); // make 100% sure the caches are freed
                 EventContext.localContext().set(null);
             } catch (final Throwable throwable) {
                 log.error("An error occurred when dispatching event {}", event, throwable);
