@@ -4,7 +4,7 @@ import bot.pylon.proto.discord.v1.rest.RestError;
 
 public class GrpcGatewayApiResourceNotFoundException extends GrpcGatewayApiException {
 
-    public GrpcGatewayApiResourceNotFoundException(RestError apiError, String message) {
-        super(apiError, message);
+    public GrpcGatewayApiResourceNotFoundException(RestError apiError, String message, GrpcException source) {
+        super(apiError, message, source);
     }
 }
