@@ -14,6 +14,10 @@ public class EventExecutorService implements ExecutorService {
         this.localContext = localContext;
     }
 
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
     @Override
     public void shutdown() {
         executorService.shutdown();
