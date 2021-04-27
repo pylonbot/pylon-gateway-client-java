@@ -3,7 +3,6 @@ package lol.up.pylon.gateway.client.event.worker;
 import bot.pylon.proto.discord.v1.event.EventEnvelope;
 import bot.pylon.proto.gateway.v1.workergroup.*;
 import io.grpc.stub.StreamObserver;
-import lol.up.pylon.gateway.client.event.DefaultEventDispatcher;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

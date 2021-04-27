@@ -6,8 +6,8 @@ import bot.pylon.proto.gateway.v1.service.GatewayDispatchStreamingGrpc;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
-import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import lol.up.pylon.gateway.client.event.worker.WorkerGroupSupplier;
+import lol.up.pylon.gateway.client.util.ClosingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

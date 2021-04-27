@@ -2,7 +2,7 @@ package lol.up.pylon.gateway.client.entity.builder;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class EmbedBuilder {
 

@@ -2,7 +2,6 @@ package lol.up.pylon.gateway.client.entity.event;
 
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Channel;
-import lol.up.pylon.gateway.client.service.CacheService;
 import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 
 public interface ChannelPinsUpdateEvent extends Event<ChannelPinsUpdateEvent> {

@@ -14,7 +14,6 @@ import lol.up.pylon.gateway.client.event.ScheduledEventExecutorService;
 import lol.up.pylon.gateway.client.exception.*;
 import lol.up.pylon.gateway.client.service.request.GrpcApiRequest;
 import lol.up.pylon.gateway.client.service.request.GrpcApiRequestImpl;
-import lol.up.pylon.gateway.client.service.request.GrpcRequest;
 import lol.up.pylon.gateway.client.util.CompletableFutureStreamObserver;
 import lol.up.pylon.gateway.client.util.ExceptionUtil;
 import org.slf4j.Logger;

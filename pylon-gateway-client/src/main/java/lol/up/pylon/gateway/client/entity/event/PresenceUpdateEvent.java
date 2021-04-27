@@ -1,6 +1,5 @@
 package lol.up.pylon.gateway.client.entity.event;
 
-import bot.pylon.proto.discord.v1.model.PresenceData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Presence;
 
