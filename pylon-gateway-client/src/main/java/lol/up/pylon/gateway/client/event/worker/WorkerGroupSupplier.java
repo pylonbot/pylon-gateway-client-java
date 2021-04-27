@@ -5,6 +5,7 @@ import bot.pylon.proto.gateway.v1.workergroup.WorkerStreamClientMessage;
 import io.grpc.CallCredentials;
 import io.grpc.stub.StreamObserver;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.event.DefaultEventDispatcher;
 import lol.up.pylon.gateway.client.event.EventDispatcher;
 import lol.up.pylon.gateway.client.util.ClosingRunnable;
 
