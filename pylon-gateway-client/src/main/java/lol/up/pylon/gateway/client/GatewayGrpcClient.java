@@ -7,10 +7,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lol.up.pylon.gateway.client.entity.User;
 import lol.up.pylon.gateway.client.entity.event.Event;
-import lol.up.pylon.gateway.client.event.AbstractEventReceiver;
-import lol.up.pylon.gateway.client.event.EventContext;
-import lol.up.pylon.gateway.client.event.EventDispatcher;
-import lol.up.pylon.gateway.client.event.EventSupplier;
+import lol.up.pylon.gateway.client.event.*;
 import lol.up.pylon.gateway.client.service.CacheService;
 import lol.up.pylon.gateway.client.service.GatewayService;
 import lol.up.pylon.gateway.client.service.RestService;
@@ -22,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
@@ -77,7 +75,7 @@ public class GatewayGrpcClient implements Closeable {
         /**
          * Cache repeated calls on the same cache entity during one {@link EventContext EventContext} if set to true
          * One {@link EventContext EventContext} is valid for all listeners and is cleared as the listeners completed.
-         * See {@link EventDispatcher#dispatchEvent(bot.pylon.proto.discord.v1.event.EventEnvelope.HeaderData, Event)
+         * See {@link DefaultEventDispatcher#dispatchEvent(bot.pylon.proto.discord.v1.event.EventEnvelope.HeaderData, Event)
          * EventDispatcher#dispatchEvent(Event)} for implementation details regarding the {@link EventContext
          * EventContext} lifetime.
          * <p>
@@ -201,7 +199,7 @@ public class GatewayGrpcClient implements Closeable {
     private final CacheService cacheService;
     private final RestService restService;
     private final GatewayService gatewayService;
-    private final EventDispatcher eventDispatcher;
+    private EventDispatcher eventDispatcher;
 
     private long defaultBotId;
     private User selfUser;
@@ -238,7 +236,16 @@ public class GatewayGrpcClient implements Closeable {
         this.gatewayService = new GatewayService(this, GatewayGrpc.newStub(channel), executorConfig.cacheGrpcExecutor,
                 warnWithoutContext);
         this.defaultBotId = defaultBotId;
-        this.eventDispatcher = new EventDispatcher(executorConfig.eventExecutor);
+        this.eventDispatcher = new DefaultEventDispatcher(executorConfig.eventExecutor);
+    }
+
+    public void setEventDispatcher(@Nonnull final EventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
+    }
+
+    @Nonnull
+    public EventDispatcher getEventDispatcher() {
+        return eventDispatcher;
     }
 
     public void setDefaultBotId(final long defaultBotId) {
