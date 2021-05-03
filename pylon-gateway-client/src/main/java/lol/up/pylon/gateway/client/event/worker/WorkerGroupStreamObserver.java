@@ -40,14 +40,14 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
                         .setAuthToken(workerGroupSupplier.getAuthToken())
                         .setConsumerGroup(workerGroupSupplier.getConsumerGroup())
                         .setConsumerId(workerGroupSupplier.getConsumerId())
-                        .setResumeSequence(seq)
+                        .setLastSequence(seq)
                         .build())
                 .build());
     }
 
     public CompletableFuture<Void> drainWorker() {
-        if(draining.get()) {
-            return drainFuture == null ? CompletableFuture.completedFuture((Void)null) : drainFuture;
+        if (draining.get()) {
+            return drainFuture == null ? CompletableFuture.completedFuture((Void) null) : drainFuture;
         }
         draining.set(true);
         responseStream.onNext(WorkerStreamClientMessage.newBuilder()
@@ -63,12 +63,10 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
             handleEventEnvelope(message.getEventEnvelope());
         } else if (message.hasHeartbeatRequest()) {
             handleHeartbeatRequest(message.getHeartbeatRequest());
-        } else if (message.hasHeartbeatResponse()) {
-            handleHeartbeatResponse(message.getHeartbeatResponse());
         } else if (message.hasIdentifyResponse()) {
             handleIdentifyResponse(message.getIdentifyResponse());
-        } else if (message.hasDrainResponse()) {
-            handleDrainResponse(message.getDrainResponse());
+        } else if (message.hasStreamClosed()) {
+            handleStreamClosed(message.getStreamClosed());
         } else {
             handleUnknown();
         }
@@ -88,13 +86,13 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
             return;
         }
         log.warn("Connection completed but the worker wasn't drained!");
-        if(!draining.get()) {
+        if (!draining.get()) {
             workerGroupSupplier.connectWorker(); // reconnect if the worker isn't draining
         }
     }
 
     private void handleEventEnvelope(final EventEnvelope eventEnvelope) {
-        if(draining.get() || drained.get()) {
+        if (draining.get() || drained.get()) {
             log.debug("Dropped event during/after draining");
             return;
         }
@@ -103,46 +101,22 @@ public class WorkerGroupStreamObserver implements StreamObserver<WorkerStreamSer
     }
 
     private void handleHeartbeatRequest(final WorkerHeartbeatRequest heartbeatRequest) {
-        log.debug("[Heartbeat] Received heartbeat request from gateway. Seq: {}, Nonce: {}",
-                heartbeatRequest.getLastSequence(), heartbeatRequest.getNonce());
+        log.debug("[Heartbeat] Received heartbeat request from gateway. Nonce: {}",
+                heartbeatRequest.getNonce());
         responseStream.onNext(WorkerStreamClientMessage.newBuilder()
-                .setHeartbeatResponse(WorkerHeartbeatResponse.newBuilder()
+                .setHeartbeatAck(WorkerHeartbeatAck.newBuilder()
+                        .setSequence(seq)
                         .setNonce(heartbeatRequest.getNonce())
                         .build())
                 .build());
     }
 
-    private void handleHeartbeatResponse(final WorkerHeartbeatResponse heartbeatResponse) {
-        // Nothing here... For now?
-    }
-
     private void handleIdentifyResponse(final WorkerIdentifyResponse identifyResponse) {
-        if (identifyResponse.getMissedEvents()) {
-            log.warn("[Identify] This worker group has missed events!");
-        }
-        final WorkerIdentifyResponse.IdentifyStatus status = identifyResponse.getStatus();
-        switch (status) {
-            case OK:
-                log.info("[Identify] Successfully subscribed to event stream for group {} with consumer {}",
-                        workerGroupSupplier.getConsumerGroup(), workerGroupSupplier.getConsumerId());
-                break;
-            case ERROR:
-                // todo: detailed error message
-                log.error("[Identify] Unable to subscribe to event stream for group {} with consumer {}",
-                        workerGroupSupplier.getConsumerGroup(), workerGroupSupplier.getConsumerId());
-                break;
-            case UNRECOGNIZED:
-                log.error("[Identify] Unrecognized consumer group {}", workerGroupSupplier.getConsumerGroup());
-                break;
-            case UNKNOWN:
-            default:
-                log.error("[Identify] Unknown response received from server... Update client?");
-                break;
-        }
+        log.info("Received WorkerIdentifyResponse with router ticket {}", identifyResponse.getRouterTicket());
     }
 
-    private void handleDrainResponse(final WorkerDrainResponse drainResponse) {
-        log.info("Worker stopped received events. Completing...");
+    private void handleStreamClosed(final WorkerStreamClosed workerStreamClosed) {
+        log.info("Worker stopped received events with reason {}. Completing...", workerStreamClosed.getReason().name());
         drained.set(true);
     }
 
