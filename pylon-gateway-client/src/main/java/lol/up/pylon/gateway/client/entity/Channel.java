@@ -221,7 +221,7 @@ public class Channel implements Entity<ChannelData> {
     @CheckReturnValue
     public GrpcApiRequest<Void> deleteMessages(final List<Long> messageIds, @Nullable final String reason) {
         if (messageIds.isEmpty()) {
-            return new FinishedRequestImpl<>(null);
+            throw new IllegalArgumentException("Can't delete no messages");
         }
         if (getGuildId() > 0) {
             final Member member = getClient().getCacheService().getMember(getBotId(), getGuildId(), getBotId())
