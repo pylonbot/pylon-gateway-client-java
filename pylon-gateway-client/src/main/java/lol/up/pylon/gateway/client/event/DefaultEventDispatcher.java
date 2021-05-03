@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class DefaultEventDispatcher implements EventDispatcher {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultEventDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
     private final ExecutorService executor;
+    private final ScheduledExecutorService asyncExecutor;
     private final Map<Class<? extends Event<?>>, List<AbstractEventReceiver<? extends Event<?>>>> receiverHolder;
 
-    public DefaultEventDispatcher(final ExecutorService executor) {
+    public DefaultEventDispatcher(final ExecutorService executor, final ScheduledExecutorService asyncExecutor) {
         this.executor = new EventExecutorService(executor, EventContext.localContext());
+        this.asyncExecutor = new ScheduledEventExecutorService(asyncExecutor, EventContext.localContext());
         this.receiverHolder = new ConcurrentHashMap<>();
     }
 
@@ -41,7 +44,7 @@ public class DefaultEventDispatcher implements EventDispatcher {
         }
         executor.submit(() -> {
             try {
-                final EventContext context = new EventContext(executor, event.getBotId(), event.getGuildId());
+                final EventContext context = new EventContext(asyncExecutor, event.getBotId(), event.getGuildId());
                 EventContext.localContext().set(context);
                 receivers.forEach(receiver -> {
                     try {
@@ -51,7 +54,6 @@ public class DefaultEventDispatcher implements EventDispatcher {
                                 receiver.getClass().getCanonicalName(), throwable);
                     }
                 });
-                context.clearCache(); // make 100% sure the caches are freed
                 EventContext.localContext().set(null);
             } catch (final Throwable throwable) {
                 log.error("An error occurred when dispatching event {}", event, throwable);
