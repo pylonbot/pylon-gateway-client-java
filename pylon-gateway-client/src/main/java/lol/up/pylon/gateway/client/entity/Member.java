@@ -85,6 +85,10 @@ public class Member implements Entity<MemberData> {
         return TimeUtil.timestampToLong(getData().getJoinedAt());
     }
 
+    public boolean isPending() {
+        return getData().hasPending() && getData().getPending().getValue();
+    }
+
     // DATA UTILITY
 
     public String getEffectiveName() {

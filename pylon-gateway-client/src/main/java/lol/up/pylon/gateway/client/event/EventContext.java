@@ -3,7 +3,7 @@ package lol.up.pylon.gateway.client.event;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class EventContext {
 
@@ -31,12 +31,12 @@ public class EventContext {
         cacheEnabled = enabled;
     }
 
-    private final ExecutorService executorService;
+    private final ScheduledExecutorService executorService;
     private final long botId;
     private final long guildId;
     private final Map<String, Object> contextCache;
 
-    EventContext(final ExecutorService asyncExecutor, final long botId, final long guildId) {
+    EventContext(final ScheduledExecutorService asyncExecutor, final long botId, final long guildId) {
         this.executorService = asyncExecutor;
         this.botId = botId;
         this.guildId = guildId;
@@ -66,7 +66,7 @@ public class EventContext {
         return guildId;
     }
 
-    public ExecutorService getExecutorService() {
+    public ScheduledExecutorService getExecutorService() {
         return executorService;
     }
 

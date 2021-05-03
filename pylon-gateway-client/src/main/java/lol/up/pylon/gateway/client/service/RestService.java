@@ -82,7 +82,8 @@ public class RestService {
                         "An unknown error occurred during REST request: " +
                                 "HTTPStatus: " + apiError.getUnknownError().getHttpStatus() + " | " +
                                 "ErrorCode: " + apiError.getUnknownError().getCode() + " | " +
-                                "Message: " + apiError.getUnknownError().getMessage());
+                                "Message: " + apiError.getUnknownError().getMessage(),
+                        source);
             case VALIDATION_ERROR:
                 final StringBuilder fieldsError = new StringBuilder("Fields:");
                 apiError.getValidationError().getFieldsList().forEach(field -> fieldsError.append(" Field(")
@@ -93,22 +94,26 @@ public class RestService {
                 return new GrpcGatewayApiValidationErrorException(apiError,
                         "A validation error occurred during REST request: " +
                                 "Message: " + apiError.getValidationError().getMessage() + " | " +
-                                "Fields: " + fieldsError.toString());
+                                "Fields: " + fieldsError.toString(),
+                        source);
             case RESOURCE_NOT_FOUND:
                 return new GrpcGatewayApiResourceNotFoundException(apiError,
                         "A resource was not found during REST request: " +
                                 "ErrorCode: " + apiError.getResourceNotFound().getCode() + " | " +
-                                "Message: " + apiError.getResourceNotFound().getMessage());
+                                "Message: " + apiError.getResourceNotFound().getMessage(),
+                        source);
             case ACCESS_DENIED:
                 return new GrpcGatewayApiAccessDeniedException(apiError,
                         "Access to a resource was denied during REST request: " +
                                 "ErrorCode: " + apiError.getAccessDenied().getCode() + " | " +
-                                "Message: " + apiError.getAccessDenied().getMessage());
+                                "Message: " + apiError.getAccessDenied().getMessage(),
+                        source);
             case RATE_LIMITED:
                 return new GrpcGatewayApiRateLimitedException(apiError,
                         "A request was rate-limited during REST request: " +
                                 "Global: " + apiError.getRateLimited().getGlobal() + " | " +
-                                "Retry-At: " + apiError.getRateLimited().getRetryAt());
+                                "Retry-At: " + apiError.getRateLimited().getRetryAt(),
+                        source);
             case ERRORTYPE_NOT_SET:
             default:
                 return new GrpcGatewayApiException(apiError, "An unknown error type occurred!", source);
