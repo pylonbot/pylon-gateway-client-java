@@ -97,7 +97,7 @@ public class MessageBuilder {
     }
 
     public MessageBuilder setMessageReference(final long guildId, final long channelId, final long messageId,
-                                    final boolean failIfNotExists) {
+                                              final boolean failIfNotExists) {
         this.messageReference = Optional.of(CreateMessageRequest.MessageReference.newBuilder()
                 .setGuildId(guildId)
                 .setChannelId(channelId)
@@ -112,6 +112,9 @@ public class MessageBuilder {
     }
 
     public MessageBuilder addButton(final int line, final MessageData.MessageComponentData button) {
+        if (line >= 5) {
+            throw new IllegalArgumentException("You may not exceed 5 action rows!");
+        }
         final int size = this.components.size();
         if (size >= line) {
             for (int i = size; i <= line; i++) {
@@ -119,6 +122,9 @@ public class MessageBuilder {
                         .setType(MessageData.MessageComponentData.MessageComponentType.ACTION_ROW)
                         .build());
             }
+        }
+        if (this.components.get(line).getComponentsCount() >= 5) {
+            throw new IllegalArgumentException("You may only add up to 5 buttons per action row!");
         }
         final MessageData.MessageComponentData.Builder replaceBuilder = this.components.remove(line).toBuilder();
         replaceBuilder.addComponents(button);
