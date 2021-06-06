@@ -3,8 +3,11 @@ package lol.up.pylon.gateway.client.entity.builder;
 import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.rest.CreateMessageRequest;
 import com.google.protobuf.ByteString;
+import lol.up.pylon.gateway.client.entity.Message;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -15,6 +18,8 @@ public class MessageBuilder {
     private Optional<MessageData.MessageEmbedData> embedData;
     private Optional<CreateMessageRequest.Attachment> attachment;
     private Optional<CreateMessageRequest.AllowedMentions> allowedMentions;
+    private Optional<CreateMessageRequest.MessageReference> messageReference;
+    private List<MessageData.MessageComponentData> components;
 
     public static MessageBuilder embed(final EmbedBuilder embedBuilder) {
         return new MessageBuilder()
@@ -31,6 +36,8 @@ public class MessageBuilder {
         this.embedData = Optional.empty();
         this.attachment = Optional.empty();
         this.allowedMentions = Optional.empty();
+        this.messageReference = Optional.empty();
+        this.components = new ArrayList<>();
     }
 
     public void apply(final CreateMessageRequest.Builder request) {
@@ -38,6 +45,8 @@ public class MessageBuilder {
         embedData.ifPresent(request::setEmbed);
         attachment.ifPresent(request::setAttachment);
         allowedMentions.ifPresent(request::setAllowedMentions);
+        messageReference.ifPresent(request::setMessageReference);
+        request.addAllComponents(components);
     }
 
     public MessageBuilder setContent(@Nullable final String content) {
@@ -71,5 +80,43 @@ public class MessageBuilder {
 
     public void setAllowedMentions(@Nullable final CreateMessageRequest.AllowedMentions allowedMentions) {
         this.allowedMentions = Optional.ofNullable(allowedMentions);
+    }
+
+    public void setMessageReference(final Message message) {
+        setMessageReference(message, false);
+    }
+
+    public void setMessageReference(final Message message, final boolean failIfNotExists) {
+        setMessageReference(message.getGuildId(), message.getChannelId(), message.getId(), failIfNotExists);
+    }
+
+    public void setMessageReference(final long guildId, final long channelId, final long messageId) {
+        setMessageReference(guildId, channelId, messageId, false);
+    }
+
+    public void setMessageReference(final long guildId, final long channelId, final long messageId,
+                                    final boolean failIfNotExists) {
+        this.messageReference = Optional.of(CreateMessageRequest.MessageReference.newBuilder()
+                .setGuildId(guildId)
+                .setChannelId(channelId)
+                .setMessageId(messageId)
+                .setFailIfNotExists(failIfNotExists)
+                .build());
+    }
+
+    public void addButton(final MessageData.MessageComponentData button) {
+        addButton(0, button);
+    }
+
+    public void addButton(final int line, final MessageData.MessageComponentData button) {
+        final int size = this.components.size();
+        if (size >= line) {
+            for (int i = size; i <= line; i++) {
+                this.components.add(MessageData.MessageComponentData.newBuilder()
+                        .setType(MessageData.MessageComponentData.MessageComponentType.ACTION_ROW)
+                        .build());
+            }
+        }
+        this.components.get(line).getComponentsList().add(button);
     }
 }
