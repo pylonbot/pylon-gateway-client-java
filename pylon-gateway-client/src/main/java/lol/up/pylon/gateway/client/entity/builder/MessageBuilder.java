@@ -71,30 +71,32 @@ public class MessageBuilder {
         return this.setEmbed(embedBuilder);
     }
 
-    public void setAttachment(final String name, final byte[] data) {
+    public MessageBuilder setAttachment(final String name, final byte[] data) {
         this.attachment = Optional.of(CreateMessageRequest.Attachment.newBuilder()
                 .setName(name)
                 .setContent(ByteString.copyFrom(data))
                 .build());
+        return this;
     }
 
-    public void setAllowedMentions(@Nullable final CreateMessageRequest.AllowedMentions allowedMentions) {
+    public MessageBuilder setAllowedMentions(@Nullable final CreateMessageRequest.AllowedMentions allowedMentions) {
         this.allowedMentions = Optional.ofNullable(allowedMentions);
+        return this;
     }
 
-    public void setMessageReference(final Message message) {
-        setMessageReference(message, false);
+    public MessageBuilder setMessageReference(final Message message) {
+        return setMessageReference(message, false);
     }
 
-    public void setMessageReference(final Message message, final boolean failIfNotExists) {
-        setMessageReference(message.getGuildId(), message.getChannelId(), message.getId(), failIfNotExists);
+    public MessageBuilder setMessageReference(final Message message, final boolean failIfNotExists) {
+        return setMessageReference(message.getGuildId(), message.getChannelId(), message.getId(), failIfNotExists);
     }
 
-    public void setMessageReference(final long guildId, final long channelId, final long messageId) {
-        setMessageReference(guildId, channelId, messageId, false);
+    public MessageBuilder setMessageReference(final long guildId, final long channelId, final long messageId) {
+        return setMessageReference(guildId, channelId, messageId, false);
     }
 
-    public void setMessageReference(final long guildId, final long channelId, final long messageId,
+    public MessageBuilder setMessageReference(final long guildId, final long channelId, final long messageId,
                                     final boolean failIfNotExists) {
         this.messageReference = Optional.of(CreateMessageRequest.MessageReference.newBuilder()
                 .setGuildId(guildId)
@@ -102,13 +104,14 @@ public class MessageBuilder {
                 .setMessageId(messageId)
                 .setFailIfNotExists(failIfNotExists)
                 .build());
+        return this;
     }
 
-    public void addButton(final MessageData.MessageComponentData button) {
-        addButton(0, button);
+    public MessageBuilder addButton(final MessageData.MessageComponentData button) {
+        return addButton(0, button);
     }
 
-    public void addButton(final int line, final MessageData.MessageComponentData button) {
+    public MessageBuilder addButton(final int line, final MessageData.MessageComponentData button) {
         final int size = this.components.size();
         if (size >= line) {
             for (int i = size; i <= line; i++) {
@@ -117,6 +120,9 @@ public class MessageBuilder {
                         .build());
             }
         }
-        this.components.get(line).getComponentsList().add(button);
+        final MessageData.MessageComponentData.Builder replaceBuilder = this.components.remove(line).toBuilder();
+        replaceBuilder.addComponents(button);
+        this.components.add(line, replaceBuilder.build());
+        return this;
     }
 }
