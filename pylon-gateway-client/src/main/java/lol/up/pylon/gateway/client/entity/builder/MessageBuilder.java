@@ -17,7 +17,7 @@ public class MessageBuilder {
     private Optional<String> content;
     private Optional<MessageData.MessageEmbedData> embedData;
     private Optional<CreateMessageRequest.Attachment> attachment;
-    private Optional<CreateMessageRequest.AllowedMentions> allowedMentions;
+    private Optional<MessageData.MessageAllowedMentionsData> allowedMentions;
     private Optional<CreateMessageRequest.MessageReference> messageReference;
     private List<MessageData.MessageComponentData> components;
 
@@ -79,7 +79,7 @@ public class MessageBuilder {
         return this;
     }
 
-    public MessageBuilder setAllowedMentions(@Nullable final CreateMessageRequest.AllowedMentions allowedMentions) {
+    public MessageBuilder setAllowedMentions(@Nullable final MessageData.MessageAllowedMentionsData allowedMentions) {
         this.allowedMentions = Optional.ofNullable(allowedMentions);
         return this;
     }
