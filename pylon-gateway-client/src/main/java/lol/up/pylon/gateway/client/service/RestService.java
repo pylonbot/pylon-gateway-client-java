@@ -1993,6 +1993,7 @@ public class RestService {
         }
     }
 
+    @CheckReturnValue
     public GrpcApiRequest<Void> createInteractionResponse(final long botId,
                                                           final long interactionId,
                                                           final String token,
@@ -2009,7 +2010,7 @@ public class RestService {
                 return null;
             }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
                     .run(() -> client.createInteractionResponse(InteractionResponseCreateRequest.newBuilder()
-                            .setApplicationId(interactionId)
+                            .setInteractionId(interactionId)
                             .setToken(token)
                             .setInteractionResponse(interactionResponse)
                             .build(), asyncResponse)));
