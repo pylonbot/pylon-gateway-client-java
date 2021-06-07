@@ -1,6 +1,7 @@
 package lol.up.pylon.gateway.client.service;
 
 import bot.pylon.proto.discord.v1.model.InteractionResponse;
+import bot.pylon.proto.discord.v1.model.MessageData;
 import bot.pylon.proto.discord.v1.model.SnowflakeListValue;
 import bot.pylon.proto.discord.v1.rest.*;
 import bot.pylon.proto.gateway.v1.service.GatewayRestGrpc;
@@ -497,7 +498,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> createGuildBan(final long botId, final long guildId,
-     final CreateGuildBanRequest request)
+                                               final CreateGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -518,7 +519,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> removeGuildBan(final long botId, final long guildId,
-     final RemoveGuildBanRequest request)
+                                               final RemoveGuildBanRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -545,7 +546,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Role> createGuildRole(final long botId, final long guildId,
-     final CreateGuildRoleRequest request)
+                                                final CreateGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -645,7 +646,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> deleteGuildRole(final long botId, final long guildId,
-    final DeleteGuildRoleRequest request)
+                                                final DeleteGuildRoleRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -711,7 +712,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> beginGuildPrune(final long botId, final long guildId,
-    final BeginGuildPruneRequest request)
+                                                final BeginGuildPruneRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -795,7 +796,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Channel> modifyChannel(final long botId, final long guildId,
-    final ModifyChannelRequest request)
+                                                 final ModifyChannelRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -980,7 +981,7 @@ public class RestService {
     @CheckReturnValue
     public GrpcApiRequest<Message> getMessage(final long botId, final long guildId, final long channelId,
                                               final long messageId) throws GrpcRequestException,
-                                              GrpcGatewayApiException {
+            GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
             final CompletableFutureStreamObserver<GetChannelMessageResponse> asyncResponse =
@@ -1012,7 +1013,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Message> createMessage(final long botId, final long guildId,
-     final CreateMessageRequest request)
+                                                 final CreateMessageRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1089,7 +1090,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> createReaction(final long botId, final long guildId,
-    final CreateReactionRequest request)
+                                               final CreateReactionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1340,14 +1341,14 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> bulkDeleteMessages(final long guildId, final long channelId,
-     final List<Long> messageIds)
+                                                   final List<Long> messageIds)
             throws GrpcRequestException, GrpcGatewayApiException {
         return bulkDeleteMessages(guildId, channelId, messageIds, null);
     }
 
     @CheckReturnValue
     public GrpcApiRequest<Void> bulkDeleteMessages(final long guildId, final long channelId,
- final List<Long> messageIds,
+                                                   final List<Long> messageIds,
                                                    @Nullable final String reason)
             throws GrpcRequestException, GrpcGatewayApiException {
         return bulkDeleteMessages(getBotId(), guildId, channelId, messageIds, reason);
@@ -1420,7 +1421,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<List<GuildInvite>> getChannelInvites(final long botId, final long guildId,
-     final long channelId)
+                                                               final long channelId)
             throws GrpcRequestException, GrpcGatewayApiException {
         final GrpcException source = new GrpcException("Call trace");
         try {
@@ -1472,7 +1473,7 @@ public class RestService {
 
     @CheckReturnValue
     public GrpcApiRequest<Void> deleteChannelPermission(final long guildId,
-     final DeleteChannelPermissionRequest request)
+                                                        final DeleteChannelPermissionRequest request)
             throws GrpcRequestException, GrpcGatewayApiException {
         return deleteChannelPermission(getBotId(), guildId, request);
     }
@@ -2019,4 +2020,115 @@ public class RestService {
         }
     }
 
+    @CheckReturnValue
+    public GrpcApiRequest<Message> createInteractionFollowupMessage(final long botId,
+                                                                    final long applicationId,
+                                                                    final String token,
+                                                                    final MessageData messageData) {
+        final GrpcException source = new GrpcException("Call trace");
+        try {
+            final CompletableFutureStreamObserver<InteractionFollowupMessageCreateResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
+                if (response.hasError()) {
+                    throw createApiException(response.getError(), source);
+                }
+                return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.createInteractionFollowupMessage(InteractionFollowupMessageCreateRequest.newBuilder()
+                            .setApplicationId(applicationId)
+                            .setToken(token)
+                            .setMessage(messageData)
+                            .build(), asyncResponse)));
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> editInteractionFollowupMessageOriginal(final long botId,
+                                                                  final long applicationId,
+                                                                  final String token,
+                                                                  final MessageData messageData) {
+        return editInteractionFollowupMessage(botId, applicationId, token, "@original", messageData);
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> editInteractionFollowupMessage(final long botId,
+                                                                  final long applicationId,
+                                                                  final String token,
+                                                                  final long messageId,
+                                                                  final MessageData messageData) {
+        return editInteractionFollowupMessage(botId, applicationId, token, String.valueOf(messageId), messageData);
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> editInteractionFollowupMessage(final long botId,
+                                                                  final long applicationId,
+                                                                  final String token,
+                                                                  final String messageId,
+                                                                  final MessageData messageData) {
+        final GrpcException source = new GrpcException("Call trace");
+        try {
+            final CompletableFutureStreamObserver<InteractionFollowupMessageEditResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
+                if (response.hasError()) {
+                    throw createApiException(response.getError(), source);
+                }
+                return new Message(gatewayGrpcClient, botId, response.getData().getMessage());
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.editInteractionFollowupMessage(InteractionFollowupMessageEditRequest.newBuilder()
+                            .setApplicationId(applicationId)
+                            .setToken(token)
+                            .setMessageId(messageId)
+                            .setMessage(messageData)
+                            .build(), asyncResponse)));
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Void> deleteInteractionFollowupMessageOriginal(final long botId,
+                                                                         final long applicationId,
+                                                                         final String token) {
+        return deleteInteractionFollowupMessage(botId, applicationId, token, "@original");
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Void> deleteInteractionFollowupMessage(final long botId,
+                                                                 final long applicationId,
+                                                                 final String token,
+                                                                 final long messageId) {
+        return deleteInteractionFollowupMessage(botId, applicationId, token, String.valueOf(messageId));
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Void> deleteInteractionFollowupMessage(final long botId,
+                                                                 final long applicationId,
+                                                                 final String token,
+                                                                 final String messageId) {
+        final GrpcException source = new GrpcException("Call trace");
+        try {
+            final CompletableFutureStreamObserver<InteractionFollowupMessageDeleteResponse> asyncResponse =
+                    new CompletableFutureStreamObserver<>();
+
+            return new GrpcApiRequestImpl<>(executorService, null, asyncResponse, response -> {
+                if (response.hasError()) {
+                    throw createApiException(response.getError(), source);
+                }
+                return null;
+            }, () -> Context.current().withValues(Constants.CTX_BOT_ID, botId, Constants.CTX_GUILD_ID, 0L)
+                    .run(() -> client.deleteInteractionFollowupMessage(InteractionFollowupMessageDeleteRequest.newBuilder()
+                            .setApplicationId(applicationId)
+                            .setToken(token)
+                            .setMessageId(messageId)
+                            .build(), asyncResponse)));
+        } catch (final Throwable throwable) {
+            throw ExceptionUtil.asGrpcException(throwable);
+        }
+    }
 }
