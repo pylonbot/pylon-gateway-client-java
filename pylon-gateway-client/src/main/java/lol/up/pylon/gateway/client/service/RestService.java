@@ -11,6 +11,7 @@ import io.grpc.Context;
 import io.grpc.Metadata;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.*;
+import lol.up.pylon.gateway.client.entity.event.InteractionCreateEvent;
 import lol.up.pylon.gateway.client.event.EventContext;
 import lol.up.pylon.gateway.client.event.ScheduledEventExecutorService;
 import lol.up.pylon.gateway.client.exception.*;
@@ -1995,6 +1996,13 @@ public class RestService {
     }
 
     @CheckReturnValue
+    public GrpcApiRequest<Void> createInteractionResponse(final InteractionCreateEvent event,
+                                                          final InteractionResponse interactionResponse) {
+        return createInteractionResponse(event.getBotId(), event.getInteractionId(), event.getToken(),
+                interactionResponse);
+    }
+
+    @CheckReturnValue
     public GrpcApiRequest<Void> createInteractionResponse(final long botId,
                                                           final long interactionId,
                                                           final String token,
@@ -2018,6 +2026,13 @@ public class RestService {
         } catch (final Throwable throwable) {
             throw ExceptionUtil.asGrpcException(throwable);
         }
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> createInteractionFollowupMessage(final InteractionCreateEvent event,
+                                                                    final MessageData messageData) {
+        return createInteractionFollowupMessage(event.getBotId(), event.getApplicationId(), event.getToken(),
+         messageData);
     }
 
     @CheckReturnValue
@@ -2047,10 +2062,25 @@ public class RestService {
     }
 
     @CheckReturnValue
+    public GrpcApiRequest<Message> editInteractionFollowupMessageOriginal(final InteractionCreateEvent event,
+                                                                          final MessageData messageData) {
+        return editInteractionFollowupMessage(event.getBotId(), event.getApplicationId(), event.getToken(),
+                "@original", messageData);
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Message> editInteractionFollowupMessageOriginal(final InteractionCreateEvent event,
+                                                                          final long messageId,
+                                                                          final MessageData messageData) {
+        return editInteractionFollowupMessage(event.getBotId(), event.getApplicationId(), event.getToken(),
+                String.valueOf(messageId), messageData);
+    }
+
+    @CheckReturnValue
     public GrpcApiRequest<Message> editInteractionFollowupMessageOriginal(final long botId,
-                                                                  final long applicationId,
-                                                                  final String token,
-                                                                  final MessageData messageData) {
+                                                                          final long applicationId,
+                                                                          final String token,
+                                                                          final MessageData messageData) {
         return editInteractionFollowupMessage(botId, applicationId, token, "@original", messageData);
     }
 
@@ -2090,6 +2120,20 @@ public class RestService {
             throw ExceptionUtil.asGrpcException(throwable);
         }
     }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Void> deleteInteractionFollowupMessageOriginal(final InteractionCreateEvent event) {
+        return deleteInteractionFollowupMessage(event.getBotId(), event.getApplicationId(), event.getToken(),
+                "@original");
+    }
+
+    @CheckReturnValue
+    public GrpcApiRequest<Void> deleteInteractionFollowupMessage(final InteractionCreateEvent event,
+                                                                 final long messageId) {
+        return deleteInteractionFollowupMessage(event.getBotId(), event.getApplicationId(), event.getToken(),
+                String.valueOf(messageId));
+    }
+
 
     @CheckReturnValue
     public GrpcApiRequest<Void> deleteInteractionFollowupMessageOriginal(final long botId,

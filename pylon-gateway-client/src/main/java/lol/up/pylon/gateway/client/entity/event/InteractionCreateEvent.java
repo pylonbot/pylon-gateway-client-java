@@ -1,5 +1,7 @@
 package lol.up.pylon.gateway.client.entity.event;
 
+import bot.pylon.proto.discord.v1.model.InteractionDataApplicationCommand;
+import bot.pylon.proto.discord.v1.model.InteractionDataMessageComponent;
 import bot.pylon.proto.discord.v1.model.MessageData;
 import lol.up.pylon.gateway.client.GatewayGrpcClient;
 import lol.up.pylon.gateway.client.entity.Member;
@@ -146,6 +148,10 @@ public interface InteractionCreateEvent extends Event<InteractionCreateEvent> {
         protected bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase() {
             return applicationCommandEvent.getBase();
         }
+
+        public InteractionDataApplicationCommand getData() {
+            return applicationCommandEvent.getData();
+        }
     }
 
     class MessageComponentEvent extends InteractionCreateBase {
@@ -161,6 +167,10 @@ public interface InteractionCreateEvent extends Event<InteractionCreateEvent> {
         @Override
         protected bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase() {
             return componentEvent.getBase();
+        }
+
+        public InteractionDataMessageComponent getData() {
+            return componentEvent.getData();
         }
     }
 }
