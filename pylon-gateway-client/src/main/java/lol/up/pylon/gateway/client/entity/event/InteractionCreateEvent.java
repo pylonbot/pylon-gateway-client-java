@@ -49,6 +49,36 @@ public interface InteractionCreateEvent extends Event<InteractionCreateEvent> {
         return new MessageComponentEvent(getBotId(), event.getComponent());
     }
 
+    default InteractionCreateBase getBaseEvent() {
+        if (!(this instanceof bot.pylon.proto.discord.v1.event.InteractionCreateEvent)) {
+            throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
+                    "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
+        }
+        final bot.pylon.proto.discord.v1.event.InteractionCreateEvent event =
+                (bot.pylon.proto.discord.v1.event.InteractionCreateEvent) this;
+        switch (getType()) {
+            case PING:
+                return getPingEvent();
+            case APPLICATION_COMMAND:
+                return getApplicationCommandEvent();
+            case MESSAGE_COMPONENT:
+                return getComponentEvent();
+        }
+        throw new IllegalStateException("Received unknown event type");
+    }
+
+    default String getToken() {
+        return getBaseEvent().getBase().getToken();
+    }
+
+    default long getApplicationId() {
+        return getBaseEvent().getBase().getApplicationId();
+    }
+
+    default long getInteractionId() {
+        return getBaseEvent().getBase().getId();
+    }
+
     abstract class InteractionCreateBase {
 
         protected final long botId;
