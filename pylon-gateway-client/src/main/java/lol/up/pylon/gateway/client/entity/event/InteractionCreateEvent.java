@@ -1,6 +1,11 @@
 package lol.up.pylon.gateway.client.entity.event;
 
 import bot.pylon.proto.discord.v1.model.MessageData;
+import lol.up.pylon.gateway.client.GatewayGrpcClient;
+import lol.up.pylon.gateway.client.entity.Member;
+import lol.up.pylon.gateway.client.entity.User;
+
+import java.util.Optional;
 
 public interface InteractionCreateEvent extends Event<InteractionCreateEvent> {
 
@@ -14,33 +19,118 @@ public interface InteractionCreateEvent extends Event<InteractionCreateEvent> {
         return event.getType();
     }
 
-    default bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreatePingEvent getPingEvent() {
+    default PingEvent getPingEvent() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.InteractionCreateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
         final bot.pylon.proto.discord.v1.event.InteractionCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.InteractionCreateEvent) this;
-        return event.getPing();
+        return new PingEvent(getBotId(), event.getPing());
     }
 
-    default bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateApplicationCommandEvent getApplicationCommandEvent() {
+    default ApplicationCommandEvent getApplicationCommandEvent() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.InteractionCreateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
         final bot.pylon.proto.discord.v1.event.InteractionCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.InteractionCreateEvent) this;
-        return event.getCommand();
+        return new ApplicationCommandEvent(getBotId(), event.getCommand());
     }
 
-    default bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateMessageComponentEvent getComponentEvent() {
+    default MessageComponentEvent getComponentEvent() {
         if (!(this instanceof bot.pylon.proto.discord.v1.event.InteractionCreateEvent)) {
             throw new IllegalStateException(getClass().getSimpleName() + " interface might only be implemented by " +
                     "bot.pylon.proto.discord.v1.event." + getClass().getSimpleName());
         }
         final bot.pylon.proto.discord.v1.event.InteractionCreateEvent event =
                 (bot.pylon.proto.discord.v1.event.InteractionCreateEvent) this;
-        return event.getComponent();
+        return new MessageComponentEvent(getBotId(), event.getComponent());
+    }
+
+    abstract class InteractionCreateBase {
+
+        protected final long botId;
+
+        protected InteractionCreateBase(final long botId) {
+            this.botId = botId;
+        }
+
+        protected abstract bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase();
+
+        public boolean isFromGuild() {
+            return getBase().getSourceType() == bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayloadType.GUILD;
+        }
+
+        public User getUser() {
+            if (isFromGuild()) {
+                return new User(GatewayGrpcClient.getSingleton(), botId,
+                        getBase().getSourceGuild().getMember().getUser());
+            }
+            return new User(GatewayGrpcClient.getSingleton(), botId, getBase().getSourceDm().getUser());
+        }
+
+        public Member getMember() {
+            if (!isFromGuild()) {
+                throw new IllegalArgumentException("Can't access member in a dm interaction");
+            }
+            return new Member(GatewayGrpcClient.getSingleton(), botId, getBase().getSourceGuild().getMember());
+        }
+
+        public Optional<Long> getGuildId() {
+            if (isFromGuild()) {
+                return Optional.of(getBase().getSourceGuild().getGuildId());
+            }
+            return Optional.empty();
+        }
+    }
+
+    class PingEvent extends InteractionCreateBase {
+
+        private final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreatePingEvent pingEvent;
+
+        PingEvent(final long botId,
+                  final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreatePingEvent pingEvent) {
+            super(botId);
+            this.pingEvent = pingEvent;
+        }
+
+        @Override
+        protected bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase() {
+            return pingEvent.getBase();
+        }
+    }
+
+    class ApplicationCommandEvent extends InteractionCreateBase {
+
+        private final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateApplicationCommandEvent applicationCommandEvent;
+
+        ApplicationCommandEvent(final long botId,
+                                final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateApplicationCommandEvent applicationCommandEvent) {
+            super(botId);
+            this.applicationCommandEvent = applicationCommandEvent;
+        }
+
+        @Override
+        protected bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase() {
+            return applicationCommandEvent.getBase();
+        }
+    }
+
+    class MessageComponentEvent extends InteractionCreateBase {
+
+        private final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateMessageComponentEvent componentEvent;
+
+        MessageComponentEvent(final long botId,
+                              final bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateMessageComponentEvent componentEvent) {
+            super(botId);
+            this.componentEvent = componentEvent;
+        }
+
+        @Override
+        protected bot.pylon.proto.discord.v1.event.InteractionCreateEvent.InteractionCreateBasePayload getBase() {
+            return componentEvent.getBase();
+        }
     }
 }
