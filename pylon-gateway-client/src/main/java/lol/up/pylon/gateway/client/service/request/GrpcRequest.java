@@ -22,6 +22,7 @@ public interface GrpcRequest<T> {
 
         static Consumer<Object> DEFAULT_SUCCESS_HANDLER = SUCCESS;
         static Consumer<Throwable> DEFAULT_ERROR_HANDLER = ERROR;
+        static long DEFAULT_TIMEOUT_MILLIS = 1000;
 
         public static void setDefaultSuccessHandler(final Consumer<Object> success) {
             if (success == null) {
@@ -37,6 +38,10 @@ public interface GrpcRequest<T> {
             } else {
                 DEFAULT_ERROR_HANDLER = error;
             }
+        }
+
+        public static void setDefaultTimeoutMillis(final long millis) {
+            DEFAULT_TIMEOUT_MILLIS = millis;
         }
     }
 
@@ -60,6 +65,9 @@ public interface GrpcRequest<T> {
     }
 
     void queue(final Consumer<? super T> success, final Consumer<? super Throwable> error);
+
+    @CheckReturnValue
+    CompletableFuture<T> submit();
 
     T complete();
 
